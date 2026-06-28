@@ -4,6 +4,7 @@
 
 export const ROUTES = {
   DASHBOARD: '/',
+  LOGIN: '/login',
   LIVE_ATTENDANCE: '/live-attendance',
   EMPLOYEES: '/employees',
   ATTENDANCE_RECORDS: '/attendance-records',

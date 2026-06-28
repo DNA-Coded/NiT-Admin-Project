@@ -1,9 +1,17 @@
 import { useState } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
-import { NAVIGATION_ITEMS } from '@/constants';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { NAVIGATION_ITEMS, ROUTES } from '@/constants';
+import { useAuth } from '@/hooks/useAuth';
 
 export function AdminLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate(ROUTES.LOGIN, { replace: true });
+  };
 
   return (
     <div className="text-on-background font-body-md antialiased overflow-x-hidden min-h-screen bg-background">
@@ -114,9 +122,12 @@ export function AdminLayout() {
             <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all">
               <span className="material-symbols-outlined">schedule</span>
             </button>
-            <div className="w-10 h-10 rounded bg-primary-fixed-dim overflow-hidden border border-outline-variant ml-2 flex items-center justify-center bg-primary text-white">
-              <span className="material-symbols-outlined">person</span>
-            </div>
+            <button
+              className="p-2 bg-primary text-white hover:scale-[1.02] rounded-lg transition-all"
+              onClick={handleLogout}
+            >
+              Log Out
+            </button>
           </div>
         </header>
 

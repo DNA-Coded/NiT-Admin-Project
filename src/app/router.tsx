@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { AdminLayout } from '../layouts/AdminLayout';
 import ErrorPage from '../pages/ErrorPage';
 import { ROUTES } from '@/constants';
+import AuthGuard from '@/components/AuthGuard';
 
 // Lazy-loaded page components for code-splitting
 const Dashboard = lazy(() => import('../pages/Dashboard'));
@@ -14,6 +15,7 @@ const Devices = lazy(() => import('../pages/Devices'));
 const Payroll = lazy(() => import('../pages/Payroll'));
 const Settings = lazy(() => import('../pages/Settings'));
 const Departments = lazy(() => import('../pages/Departments'));
+const Login = lazy(() => import('../pages/Login'));
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -47,8 +49,12 @@ function SuspenseWrapper({ children }: { children: React.ReactNode }) {
 
 export const router = createBrowserRouter([
   {
+    path: ROUTES.LOGIN,
+    element: <SuspenseWrapper><Login /></SuspenseWrapper>,
+  },
+  {
     path: ROUTES.DASHBOARD,
-    element: <AdminLayout />,
+    element: <AuthGuard><AdminLayout /></AuthGuard>,
     errorElement: <ErrorPage />,
     children: [
       {
