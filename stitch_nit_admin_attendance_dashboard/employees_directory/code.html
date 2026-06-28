@@ -1,0 +1,464 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>NiT Admin - Employee Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-highest": "#d8e3fb",
+                      "tertiary": "#393f45",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed": "#0b1c30",
+                      "surface-container": "#e7eeff",
+                      "primary": "#263b74",
+                      "surface-container-high": "#dee8ff",
+                      "tertiary-fixed": "#dde3eb",
+                      "error": "#ba1a1a",
+                      "background": "#f9f9ff",
+                      "primary-fixed": "#dbe1ff",
+                      "on-surface": "#111c2d",
+                      "outline-variant": "#c5c6d1",
+                      "on-secondary": "#ffffff",
+                      "outline": "#757681",
+                      "on-primary": "#ffffff",
+                      "surface-container-low": "#f0f3ff",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "on-surface-variant": "#444650",
+                      "on-background": "#111c2d",
+                      "surface-bright": "#f9f9ff",
+                      "on-tertiary": "#ffffff",
+                      "secondary": "#505f76",
+                      "tertiary-container": "#50565d",
+                      "primary-container": "#3f538d",
+                      "error-container": "#ffdad6",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "tertiary-fixed-dim": "#c1c7cf",
+                      "inverse-surface": "#263143",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#41474e",
+                      "on-secondary-container": "#54647a",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-variant": "#d8e3fb",
+                      "on-tertiary-fixed": "#161c22",
+                      "surface-tint": "#485c97",
+                      "inverse-primary": "#b4c5ff",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "secondary-fixed": "#d3e4fe",
+                      "on-primary-container": "#bac9ff",
+                      "on-primary-fixed": "#00174b",
+                      "on-primary-fixed-variant": "#30447d",
+                      "surface-dim": "#cfdaf2",
+                      "inverse-on-surface": "#ecf1ff",
+                      "secondary-container": "#d0e1fb",
+                      "on-tertiary-container": "#c5cbd3",
+                      "surface": "#f9f9ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "sidebar-width": "280px",
+                      "margin-mobile": "16px",
+                      "gutter": "24px",
+                      "margin-desktop": "40px",
+                      "unit": "8px",
+                      "container-max-width": "1440px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg": [
+                              "36px",
+                              {
+                                      "lineHeight": "44px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="bg-primary text-on-primary docked fixed h-full w-[sidebar-width] left-0 top-0 border-r border-outline-variant flat no shadows flex flex-col py-6 z-50">
+<div class="px-6 mb-8">
+<h1 class="text-headline-lg font-headline-lg font-bold text-white">NiT Admin</h1>
+<p class="font-body-sm text-body-sm text-primary-fixed-dim mt-1">Academic Administration</p>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-primary-container text-white py-2 px-4 rounded-lg font-label-md text-label-md hover:bg-surface-tint transition-colors duration-200 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-body-lg">add</span>
+                Quick Actions
+            </button>
+</div>
+<ul class="flex-1 flex flex-col space-y-1">
+<!-- Inactive -->
+<li><a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 font-label-md text-label-md transition-colors duration-200" href="#"><span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 font-label-md text-label-md transition-colors duration-200" href="#"><span class="material-symbols-outlined" data-icon="live_tv">live_tv</span> Live Attendance Monitor</a></li>
+<!-- Active -->
+<li><a class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white border-l-4 border-white font-label-md text-label-md opacity-100 transition-all duration-150" href="#"><span class="material-symbols-outlined" data-icon="badge" style="font-variation-settings: 'FILL' 1;">badge</span> Employees</a></li>
+<!-- Inactive -->
+<li><a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 font-label-md text-label-md transition-colors duration-200" href="#"><span class="material-symbols-outlined" data-icon="history">history</span> Attendance Records</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 font-label-md text-label-md transition-colors duration-200" href="#"><span class="material-symbols-outlined" data-icon="domain">domain</span> Departments</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 font-label-md text-label-md transition-colors duration-200" href="#"><span class="material-symbols-outlined" data-icon="analytics">analytics</span> Reports &amp; Analytics</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 font-label-md text-label-md transition-colors duration-200" href="#"><span class="material-symbols-outlined" data-icon="payments">payments</span> Payroll Summary</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 font-label-md text-label-md transition-colors duration-200" href="#"><span class="material-symbols-outlined" data-icon="router">router</span> Devices</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 font-label-md text-label-md transition-colors duration-200" href="#"><span class="material-symbols-outlined" data-icon="settings">settings</span> Settings</a></li>
+</ul>
+<div class="px-6 mt-auto pt-6 border-t border-outline-variant/30 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/50">
+<img alt="NiT Admin Logo" class="w-full h-full object-cover" data-alt="A professional headshot of a mature male academic administrator wearing a smart-casual navy blazer and light blue shirt. The lighting is soft and natural, suggesting a bright office environment. The background is a blurred, neutral light gray, emphasizing trust, authority, and modern enterprise professionalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTryuKzS_PRNehVI1BNURDP-p3Di9PjOjYmyLiqC4JMAb4HS5iFX1MIoJ-L2aaOB93RghnXAIjoChQhd6f50nhXM1aI7cERtdYuLUb9CfNTzEr5BEPd3GLezbN0ewpUC86vXovjxWcPPe2bdqTpipku4bhaSKrwPSi832PzU_4PLk9kEsE9pb0-4vf2y6sKci7-yMmsDFWILnSaNEsubTTOgEnNCsVLtOzi7gP23hshbA9mbhIEds5-FuGDQySavG6s3AN6Poju-Z1">
+</div>
+<div>
+<p class="font-label-md text-label-md text-white">Admin User</p>
+<p class="font-label-sm text-label-sm text-white/70">admin@nit.edu</p>
+</div>
+</div>
+</nav>
+<!-- Main Wrapper -->
+<div class="flex-1 ml-[280px] flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest text-primary docked sticky top-0 w-full z-40 border-b border-outline-variant flat no shadows flex items-center justify-between px-margin-desktop py-4 h-[72px]">
+<div class="flex-1 flex items-center">
+<!-- Search on left as per JSON -->
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant transition-all outline-none" placeholder="Search across NiT Admin..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<button class="bg-primary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+                    Quick Actions
+                    <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 p-margin-desktop bg-background overflow-y-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Employee Directory</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage, filter, and view all registered academic and administrative staff.</p>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2.5 rounded-lg flex items-center gap-2 hover:bg-primary-container transition-colors shadow-sm self-start md:self-auto">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                    Add Employee
+                </button>
+</div>
+<!-- Advanced Filters -->
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant mb-6 shadow-sm flex flex-wrap gap-4 items-end">
+<div class="flex-1 min-w-[200px]">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1.5">Search Employees</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full pl-9 pr-3 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all" placeholder="Name, ID, or Email" type="text">
+</div>
+</div>
+<div class="w-full md:w-auto min-w-[160px]">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1.5">Department</label>
+<div class="relative">
+<select class="w-full appearance-none pl-3 pr-8 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all cursor-pointer">
+<option value="">All Departments</option>
+<option value="cs">Computer Science</option>
+<option value="math">Mathematics</option>
+<option value="admin">Administration</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">arrow_drop_down</span>
+</div>
+</div>
+<div class="w-full md:w-auto min-w-[160px]">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1.5">Designation</label>
+<div class="relative">
+<select class="w-full appearance-none pl-3 pr-8 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all cursor-pointer">
+<option value="">All Designations</option>
+<option value="prof">Professor</option>
+<option value="asst_prof">Asst. Professor</option>
+<option value="staff">Support Staff</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">arrow_drop_down</span>
+</div>
+</div>
+<div class="w-full md:w-auto min-w-[140px]">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1.5">Status</label>
+<div class="relative">
+<select class="w-full appearance-none pl-3 pr-8 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all cursor-pointer">
+<option value="">All Statuses</option>
+<option value="active">Active</option>
+<option value="leave">On Leave</option>
+<option value="inactive">Inactive</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">arrow_drop_down</span>
+</div>
+</div>
+<button class="bg-white text-secondary font-label-md text-label-md px-4 py-2 rounded-lg border border-outline-variant hover:bg-surface-container-lowest transition-colors h-[38px] flex items-center justify-center">
+                    Reset
+                </button>
+</div>
+<!-- Data Table -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant whitespace-nowrap">Employee Name</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant whitespace-nowrap">Employee ID</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant whitespace-nowrap">Department</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant whitespace-nowrap">Designation</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant whitespace-nowrap">Status</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant text-right whitespace-nowrap">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest/50 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-label-md font-bold text-sm">
+                                            DR
+                                        </div>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Dr. Richard Roe</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">richard.roe@nit.edu</p>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">NIT-EMP-1042</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">Computer Science</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">Head of Department</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed">
+                                        Active
+                                    </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest/50 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-label-md font-bold text-sm">
+                                            AS
+                                        </div>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Alice Smith</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">alice.smith@nit.edu</p>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">NIT-EMP-1088</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">Administration</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">Senior Registrar</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed">
+                                        Active
+                                    </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 (On Leave) -->
+<tr class="hover:bg-surface-container-lowest/50 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-label-md font-bold text-sm">
+                                            MJ
+                                        </div>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Michael Johnson</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">m.johnson@nit.edu</p>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">NIT-EMP-1105</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">Mathematics</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">Assistant Professor</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-secondary-fixed text-on-secondary-fixed">
+                                        On Leave
+                                    </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-lowest/50 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-label-md font-bold text-sm">
+                                            EW
+                                        </div>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Emma Williams</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">e.williams@nit.edu</p>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">NIT-EMP-1150</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">Computer Science</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface">Lecturer</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed">
+                                        Active
+                                    </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 (Inactive) -->
+<tr class="hover:bg-surface-container-lowest/50 transition-colors group bg-surface-container-lowest/30">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3 opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center font-label-md font-bold text-sm">
+                                            DT
+                                        </div>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">David Taylor</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">d.taylor@nit.edu</p>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface opacity-60">NIT-EMP-0922</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface opacity-60">Facilities</td>
+<td class="py-3 px-4 font-body-sm text-body-sm text-on-surface opacity-60">Maintenance Staff</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-error-container text-on-error-container">
+                                        Inactive
+                                    </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-4 py-3 border-t border-outline-variant bg-white flex items-center justify-between">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Showing 1 to 5 of 124 entries</p>
+<div class="flex items-center gap-1">
+<button class="p-1 text-on-surface-variant hover:bg-surface-container rounded disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded flex items-center justify-center font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed">1</button>
+<button class="w-8 h-8 rounded flex items-center justify-center font-label-sm text-label-sm text-on-surface hover:bg-surface-container">2</button>
+<button class="w-8 h-8 rounded flex items-center justify-center font-label-sm text-label-sm text-on-surface hover:bg-surface-container">3</button>
+<span class="px-1 text-on-surface-variant">...</span>
+<button class="p-1 text-on-surface-variant hover:bg-surface-container rounded">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

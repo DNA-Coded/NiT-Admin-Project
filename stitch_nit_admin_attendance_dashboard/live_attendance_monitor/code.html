@@ -1,0 +1,424 @@
+<!DOCTYPE html><html class="h-full" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>NiT Admin - Live Attendance Monitor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#d8e3fb",
+                        "tertiary": "#393f45",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container": "#e7eeff",
+                        "primary": "#263b74",
+                        "surface-container-high": "#dee8ff",
+                        "tertiary-fixed": "#dde3eb",
+                        "error": "#ba1a1a",
+                        "background": "#f9f9ff",
+                        "primary-fixed": "#dbe1ff",
+                        "on-surface": "#111c2d",
+                        "outline-variant": "#c5c6d1",
+                        "on-secondary": "#ffffff",
+                        "outline": "#757681",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f0f3ff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-surface-variant": "#444650",
+                        "on-background": "#111c2d",
+                        "surface-bright": "#f9f9ff",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#505f76",
+                        "tertiary-container": "#50565d",
+                        "primary-container": "#3f538d",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "inverse-surface": "#263143",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-secondary-container": "#54647a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#d8e3fb",
+                        "on-tertiary-fixed": "#161c22",
+                        "surface-tint": "#485c97",
+                        "inverse-primary": "#b4c5ff",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-primary-container": "#bac9ff",
+                        "on-primary-fixed": "#00174b",
+                        "on-primary-fixed-variant": "#30447d",
+                        "surface-dim": "#cfdaf2",
+                        "inverse-on-surface": "#ecf1ff",
+                        "secondary-container": "#d0e1fb",
+                        "on-tertiary-container": "#c5cbd3",
+                        "surface": "#f9f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "280px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "unit": "8px",
+                        "container-max-width": "1440px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .status-pulse { animation: pulse-ring 2s infinite; }
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+        }
+    </style>
+<style>
+            @keyframes flash {
+                0% { background-color: #d8e3fb; }
+                100% { background-color: transparent; }
+            }
+        </style><style>
+            @keyframes flash {
+                0% { background-color: #d8e3fb; }
+                100% { background-color: transparent; }
+            }
+        </style></head>
+<body class="bg-surface h-full font-body-md text-on-surface antialiased overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="docked fixed h-full w-[sidebar-width] left-0 top-0 bg-primary border-r border-outline-variant flex flex-col py-6 z-50">
+<div class="px-6 mb-8 flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-white flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary font-bold">school</span>
+</div>
+<div>
+<h1 class="text-headline-lg font-headline-lg font-bold text-white leading-tight">NiT Admin</h1>
+<p class="font-label-md text-label-md text-primary-fixed-dim">Academic Administration</p>
+</div>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-surface text-primary font-label-md text-label-md py-3 rounded flex items-center justify-center gap-2 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                Quick Actions
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 hover:bg-primary-fixed-dim/20 transition-colors duration-200 rounded" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white border-l-4 border-white opacity-100 transition-all duration-150 rounded-r" href="#">
+<span class="material-symbols-outlined">live_tv</span>
+<span class="font-label-md text-label-md">Live Attendance Monitor</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 hover:bg-primary-fixed-dim/20 transition-colors duration-200 rounded" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md text-label-md">Employees</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 hover:bg-primary-fixed-dim/20 transition-colors duration-200 rounded" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Attendance Records</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 hover:bg-primary-fixed-dim/20 transition-colors duration-200 rounded" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-label-md text-label-md">Departments</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 hover:bg-primary-fixed-dim/20 transition-colors duration-200 rounded" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Reports &amp; Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 hover:bg-primary-fixed-dim/20 transition-colors duration-200 rounded" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Payroll Summary</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 hover:bg-primary-fixed-dim/20 transition-colors duration-200 rounded" href="#">
+<span class="material-symbols-outlined">router</span>
+<span class="font-label-md text-label-md">Devices</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 hover:bg-primary-fixed-dim/20 transition-colors duration-200 rounded" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-[sidebar-width] flex flex-col h-full bg-surface grid-bg relative">
+<!-- TopNavBar -->
+<header class="docked sticky top-0 w-full z-40 bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-margin-desktop py-4">
+<div class="flex items-center gap-4">
+<h2 class="font-headline-md text-headline-md font-bold text-primary">Live Attendance Monitor</h2>
+<div class="flex items-center gap-2 bg-[#ecfdf5] text-[#065f46] px-3 py-1 rounded-full border border-[#a7f3d0]">
+<div class="w-2 h-2 rounded-full bg-green-500 status-pulse"></div>
+<span class="font-label-sm text-label-sm">SYSTEM LIVE</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-64 pl-10 pr-4 py-2 bg-surface border border-outline-variant rounded focus:border-primary focus:ring-2 focus:ring-primary/20 font-body-md text-body-md text-on-surface transition-all outline-none" placeholder="Search employee..." type="text">
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all">
+<span class="material-symbols-outlined">schedule</span>
+</button>
+</div>
+<div class="w-px h-8 bg-outline-variant"></div>
+<button class="flex items-center gap-3 hover:bg-surface-container-highest p-1 rounded transition-colors pr-3">
+<img alt="Administrator Profile" class="w-8 h-8 rounded bg-surface-container-high object-cover" data-alt="A professional headshot of a female academic administrator with a warm smile, wearing a dark blazer over a light blouse, against a clean studio background. The lighting is bright and even, fitting for a corporate directory profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn6Gfia2hM0C4a6SlE4xltszFbgo9YjJSaKL1uB_lTeCTZmjXrm1_zEpE9ZRwbEbBKEDZgkpMir7Kza0_A7ctMiVe7CEnTqDjF4RW1gh9eqRoTXeIFKolN5oZFtCKGj4EwiJKxDyYXNpDD_nVVR4fk8we4oQL81-fSb_PimkIRhQXCUSZL9Ph9LLslpk5y_VQVQikcDaCzNcZqdKRMB-aGOqMOnMEQh2Ax4zRXhxwTbGNLRTW_PxrlJ5bWrUtbnJ0AykkHCtw95wy2">
+<div class="text-left hidden lg:block">
+<p class="font-label-sm text-label-sm text-on-surface font-bold leading-tight">S. Miller</p>
+<p class="text-[10px] text-on-surface-variant">Admin</p>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 overflow-y-auto p-gutter flex gap-gutter">
+<!-- Left Column: Stream & Stats -->
+<div class="flex-1 flex flex-col gap-gutter h-full">
+<!-- Macro Stats Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-6 flex items-center justify-between shadow-sm relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-surface-container-high rounded-full opacity-50"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Total Staff on Campus</p>
+<h3 class="font-display-lg text-display-lg text-primary">1,098</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-green-600">trending_up</span>
+<span class="text-green-600 font-medium">+42</span> since 08:00 AM
+                        </p>
+</div>
+<div class="flex gap-4">
+<div class="text-center px-4 border-r border-outline-variant">
+<p class="font-headline-md text-headline-md text-on-surface">94%</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Attendance Rate</p>
+</div>
+<div class="text-center px-4 border-r border-outline-variant">
+<p class="font-headline-md text-headline-md text-amber-600">12</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Late Arrivals</p>
+</div>
+<div class="text-center px-4">
+<p class="font-headline-md text-headline-md text-error">3</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Unaccounted</p>
+</div>
+</div>
+</div>
+<!-- Event Stream -->
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded flex flex-col overflow-hidden shadow-sm">
+<div class="p-4 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+<h3 class="font-headline-md text-headline-md text-on-surface">Live Event Stream</h3>
+<div class="flex items-center gap-3">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Auto-refreshing</span>
+<div class="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-0">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-highest/30 sticky top-0 z-10 backdrop-blur-sm">
+<tr>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Time</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Employee</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Department</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Action</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Location</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-sm text-body-sm text-on-surface" id="event-stream">
+<!-- Stream items generated by JS -->
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: Device Health -->
+<div class="w-80 flex flex-col h-full bg-surface-container-lowest border border-outline-variant rounded shadow-sm overflow-hidden">
+<div class="p-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Device Health</h3>
+<span class="bg-surface text-primary border border-primary/20 px-2 py-0.5 rounded font-label-sm text-label-sm">12 Online</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-3">
+<!-- Device Items -->
+<div class="p-3 border border-outline-variant rounded bg-surface hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">fingerprint</span>
+<span class="font-label-md text-label-md text-on-surface">Main Gate Alpha</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-green-500 mt-1"></div>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-sm text-[12px]">IP: 192.168.1.101</span>
+<span class="font-body-sm text-[12px]">Sync: Just now</span>
+</div>
+</div>
+<div class="p-3 border border-outline-variant rounded bg-surface hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">fingerprint</span>
+<span class="font-label-md text-label-md text-on-surface">Main Gate Beta</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-green-500 mt-1"></div>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-sm text-[12px]">IP: 192.168.1.102</span>
+<span class="font-body-sm text-[12px]">Sync: Just now</span>
+</div>
+</div>
+<div class="p-3 border border-outline-variant rounded bg-surface hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">sensor_window</span>
+<span class="font-label-md text-label-md text-on-surface">Science Block East</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-green-500 mt-1"></div>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-sm text-[12px]">IP: 192.168.1.105</span>
+<span class="font-body-sm text-[12px]">Sync: 2s ago</span>
+</div>
+</div>
+<div class="p-3 border border-outline-variant rounded bg-surface hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">sensor_window</span>
+<span class="font-label-md text-label-md text-on-surface">Arts Faculty West</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-green-500 mt-1"></div>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-sm text-[12px]">IP: 192.168.1.108</span>
+<span class="font-body-sm text-[12px]">Sync: 5s ago</span>
+</div>
+</div>
+<div class="p-3 border border-outline-variant rounded bg-surface hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">meeting_room</span>
+<span class="font-label-md text-label-md text-on-surface">Admin Block F1</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-green-500 mt-1"></div>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-sm text-[12px]">IP: 192.168.1.110</span>
+<span class="font-body-sm text-[12px]">Sync: 1s ago</span>
+</div>
+</div>
+<div class="p-3 border border-outline-variant rounded bg-surface hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">meeting_room</span>
+<span class="font-label-md text-label-md text-on-surface">Library Entrance</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-green-500 mt-1"></div>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-sm text-[12px]">IP: 192.168.1.115</span>
+<span class="font-body-sm text-[12px]">Sync: 8s ago</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+        // Fake event stream generator
+        const names = ["John Doe", "Jane Smith", "Robert Johnson", "Emily Davis", "Michael Wilson", "Sarah Brown", "David Miller", "Lisa Taylor"];
+        const depts = ["Computer Science", "Mathematics", "Physics", "Administration", "Literature", "Chemistry"];
+        const actions = [
+            { type: "Check In", class: "bg-[#ecfdf5] text-[#065f46] border-[#a7f3d0]" },
+            { type: "Check Out", class: "bg-surface-container text-primary border-primary-fixed-dim" }
+        ];
+        const locations = ["Main Gate Alpha", "Science Block East", "Admin Block F1", "Library Entrance", "Main Gate Beta"];
+
+        const streamBody = document.getElementById('event-stream');
+
+        function generateEvent() {
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+            const name = names[Math.floor(Math.random() * names.length)];
+            const dept = depts[Math.floor(Math.random() * depts.length)];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const loc = locations[Math.floor(Math.random() * locations.length)];
+            
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-surface-container-highest/20 transition-colors bg-white';
+            // Simple flash effect
+            tr.style.animation = "flash 1s ease-out";
+            
+            tr.innerHTML = `
+                <td class="py-3 px-4 border-b border-outline-variant font-mono text-[13px] text-on-surface-variant">${time}</td>
+                <td class="py-3 px-4 border-b border-outline-variant font-medium">${name}</td>
+                <td class="py-3 px-4 border-b border-outline-variant text-on-surface-variant">${dept}</td>
+                <td class="py-3 px-4 border-b border-outline-variant">
+                    <span class="px-2 py-1 rounded text-[12px] font-medium border ${action.class}">${action.type}</span>
+                </td>
+                <td class="py-3 px-4 border-b border-outline-variant text-on-surface-variant">${loc}</td>
+            `;
+
+            streamBody.insertBefore(tr, streamBody.firstChild);
+
+            // Keep list manageable
+            if (streamBody.children.length > 20) {
+                streamBody.removeChild(streamBody.lastChild);
+            }
+        }
+
+        // Initial load
+        for(let i=0; i<8; i++) {
+            generateEvent();
+        }
+
+        // Simulate stream
+        setInterval(generateEvent, 2500);
+
+        // Add flash animation to head
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes flash {
+                0% { background-color: #d8e3fb; }
+                100% { background-color: transparent; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body></html>

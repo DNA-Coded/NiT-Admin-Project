@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Payroll Summary | NiT Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#ecf1ff",
+                    "surface-tint": "#485c97",
+                    "on-primary-fixed": "#00174b",
+                    "primary-fixed": "#dbe1ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f0f3ff",
+                    "secondary": "#505f76",
+                    "tertiary-container": "#50565d",
+                    "on-tertiary-fixed-variant": "#41474e",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#f9f9ff",
+                    "tertiary": "#393f45",
+                    "on-primary-fixed-variant": "#30447d",
+                    "primary": "#263b74",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#d8e3fb",
+                    "on-tertiary-fixed": "#161c22",
+                    "on-surface": "#111c2d",
+                    "secondary-fixed": "#d3e4fe",
+                    "on-surface-variant": "#444650",
+                    "inverse-primary": "#b4c5ff",
+                    "on-tertiary-container": "#c5cbd3",
+                    "on-secondary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "surface-container": "#e7eeff",
+                    "outline-variant": "#c5c6d1",
+                    "tertiary-fixed-dim": "#c1c7cf",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "outline": "#757681",
+                    "on-background": "#111c2d",
+                    "surface-variant": "#d8e3fb",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "secondary-container": "#d0e1fb",
+                    "surface-container-high": "#dee8ff",
+                    "surface": "#f9f9ff",
+                    "tertiary-fixed": "#dde3eb",
+                    "background": "#f9f9ff",
+                    "on-primary-container": "#bac9ff",
+                    "inverse-surface": "#263143",
+                    "surface-dim": "#cfdaf2",
+                    "on-secondary-container": "#54647a",
+                    "primary-container": "#3f538d",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "on-secondary-fixed": "#0b1c30"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sidebar-width": "280px",
+                    "gutter": "24px",
+                    "unit": "8px",
+                    "margin-desktop": "40px",
+                    "margin-mobile": "16px",
+                    "container-max-width": "1440px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #f9f9ff; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-item-active { border-left: 4px solid white; background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-body-md text-on-background min-h-screen">
+<!-- SideNavBar -->
+<aside class="docked fixed h-full w-[sidebar-width] left-0 top-0 bg-primary dark:bg-primary-container border-r border-outline-variant dark:border-outline z-50 flex flex-col h-full py-6">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-primary font-bold text-xl">N</div>
+<div>
+<h1 class="text-headline-lg font-headline-lg font-bold text-white leading-tight">NiT Admin</h1>
+<p class="text-label-sm font-label-sm text-white/60">Academic Administration</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto scrollbar-hide">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="live_tv">live_tv</span>
+<span class="font-label-md text-label-md">Live Attendance Monitor</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span class="font-label-md text-label-md">Employees</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-md text-label-md">Attendance Records</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span class="font-label-md text-label-md">Departments</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Reports &amp; Analytics</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 bg-white/10 text-white border-l-4 border-white opacity-100 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-md text-label-md">Payroll Summary</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="router">router</span>
+<span class="font-label-md text-label-md">Devices</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="mt-auto px-6 pt-6 border-t border-white/10">
+<button class="w-full bg-white/10 hover:bg-white/20 text-white font-label-md text-label-md py-3 rounded transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                Quick Actions
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[sidebar-width] min-h-screen">
+<!-- TopNavBar -->
+<header class="docked sticky top-0 w-full z-40 bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-margin-desktop py-4">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Search staff or records..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-high rounded-lg transition-all text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded-lg transition-all text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right">
+<p class="text-label-md font-bold text-primary leading-none">Admin User</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Super Administrator</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary/20 group-hover:border-primary transition-all object-cover" data-alt="Close-up portrait of a professional academic administrator in a clean office setting, featuring high-end soft studio lighting and a focused, reliable expression. The background is a minimalist blurred bookshelf, reinforcing a modern institutional aesthetic with a cool blue and crisp white color palette. Sharp focus on professional attire and friendly, authoritative demeanor." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1rBwoJPCBuykM_dUspOVUXs84GpQGgxaOZI4NnWMQS2pTY0Ukm7K_wisYMf1CBHlNh_LY6Qim5wVYkljOX67y0pZMDy1MHAiRJhv9MCJ2Di6lTK5TfVA7rT6deI5MMNLq4iVW48YZDn5z6NtmYfY5oETIMfoc2njgQQaPo_1NhYzmY4oqlnKWLLRxIhtoHG1vALuBNBm2QeYPAKsd1NQC8phUFPOqjktSr9TSXYf-K40JnIlSUK3foDzXdDxHTrkQiomLrN4WALVl"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-margin-desktop space-y-gutter">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-1">Payroll Summary</h2>
+<p class="text-on-surface-variant font-body-md">Consolidated attendance data for payroll calculation.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<select class="appearance-none bg-white border border-outline-variant px-4 py-2.5 pr-10 rounded-lg text-label-md text-on-surface-variant focus:border-primary focus:ring-0 cursor-pointer">
+<option>October 2023</option>
+<option selected="">November 2023</option>
+<option>December 2023</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" data-icon="calendar_month">calendar_month</span>
+</div>
+<button class="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="data_exploration">data_exploration</span>
+                        Generate Payroll Data
+                    </button>
+</div>
+</div>
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="bg-white border border-outline-variant p-6 rounded-xl flex flex-col gap-2">
+<span class="text-label-sm uppercase tracking-widest text-on-surface-variant">Total Staff</span>
+<div class="flex items-end gap-2">
+<span class="text-display-lg font-display-lg text-primary">124</span>
+<span class="text-label-md text-primary/60 mb-2">active</span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-green-600 text-label-sm">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+                        +2 since last month
+                    </div>
+</div>
+<div class="bg-white border border-outline-variant p-6 rounded-xl flex flex-col gap-2">
+<span class="text-label-sm uppercase tracking-widest text-on-surface-variant">Avg. Hours/Staff</span>
+<div class="flex items-end gap-2">
+<span class="text-display-lg font-display-lg text-primary">168.5</span>
+<span class="text-label-md text-primary/60 mb-2">hrs</span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-on-surface-variant text-label-sm">
+<span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+                        Standard: 160 hrs
+                    </div>
+</div>
+<div class="bg-white border border-outline-variant p-6 rounded-xl flex flex-col gap-2">
+<span class="text-label-sm uppercase tracking-widest text-on-surface-variant">Total Overtime</span>
+<div class="flex items-end gap-2">
+<span class="text-display-lg font-display-lg text-primary">842</span>
+<span class="text-label-md text-primary/60 mb-2">hrs</span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-amber-600 text-label-sm">
+<span class="material-symbols-outlined text-sm" data-icon="warning">warning</span>
+                        12% increase vs Oct
+                    </div>
+</div>
+<div class="bg-white border border-outline-variant p-6 rounded-xl flex flex-col gap-2">
+<span class="text-label-sm uppercase tracking-widest text-on-surface-variant">Absenteeism Rate</span>
+<div class="flex items-end gap-2">
+<span class="text-display-lg font-display-lg text-primary">1.8%</span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-green-600 text-label-sm">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+                        Below target (3.0%)
+                    </div>
+</div>
+</div>
+<!-- Main Data Table -->
+<div class="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="px-6 py-4 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+<h3 class="font-headline-md text-headline-md text-primary">Attendance Matrix - November</h3>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="filter_list">filter_list</span>
+</button>
+<button class="p-2 hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="download">download</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Employee Name</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Department</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center">Total Hours</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center">Overtime</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center">Absent</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center">Half Days</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-bold text-xs">AA</div>
+<div>
+<p class="font-bold text-primary">Aisha Ahmed</p>
+<p class="text-xs text-on-surface-variant">ID: NIT-00452</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface">Computer Science</td>
+<td class="px-6 py-4 text-center font-semibold text-primary">176.0</td>
+<td class="px-6 py-4 text-center">
+<span class="text-amber-700 font-medium">16.0 hrs</span>
+</td>
+<td class="px-6 py-4 text-center">0</td>
+<td class="px-6 py-4 text-center">0</td>
+<td class="px-6 py-4 text-right">
+<span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-[11px] font-bold uppercase tracking-wider">Verified</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-xs">JD</div>
+<div>
+<p class="font-bold text-primary">John Doe</p>
+<p class="text-xs text-on-surface-variant">ID: NIT-00321</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface">Administration</td>
+<td class="px-6 py-4 text-center font-semibold text-primary">152.5</td>
+<td class="px-6 py-4 text-center">
+<span class="text-on-surface-variant">0.0 hrs</span>
+</td>
+<td class="px-6 py-4 text-center text-error font-bold">1</td>
+<td class="px-6 py-4 text-center text-amber-600 font-bold">1</td>
+<td class="px-6 py-4 text-right">
+<span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold uppercase tracking-wider">Pending</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold text-xs">SK</div>
+<div>
+<p class="font-bold text-primary">Sarah Khan</p>
+<p class="text-xs text-on-surface-variant">ID: NIT-00219</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface">Economics</td>
+<td class="px-6 py-4 text-center font-semibold text-primary">164.0</td>
+<td class="px-6 py-4 text-center">
+<span class="text-amber-700 font-medium">4.0 hrs</span>
+</td>
+<td class="px-6 py-4 text-center">0</td>
+<td class="px-6 py-4 text-center">0</td>
+<td class="px-6 py-4 text-right">
+<span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-[11px] font-bold uppercase tracking-wider">Verified</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-xs">RM</div>
+<div>
+<p class="font-bold text-primary">Robert Miller</p>
+<p class="text-xs text-on-surface-variant">ID: NIT-00566</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface">Humanities</td>
+<td class="px-6 py-4 text-center font-semibold text-primary">140.0</td>
+<td class="px-6 py-4 text-center">
+<span class="text-on-surface-variant">0.0 hrs</span>
+</td>
+<td class="px-6 py-4 text-center text-error font-bold">2</td>
+<td class="px-6 py-4 text-center">1</td>
+<td class="px-6 py-4 text-right">
+<span class="px-3 py-1 rounded-full bg-red-100 text-red-800 text-[11px] font-bold uppercase tracking-wider">Flagged</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-xs">LC</div>
+<div>
+<p class="font-bold text-primary">Linda Chen</p>
+<p class="text-xs text-on-surface-variant">ID: NIT-00128</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface">Science</td>
+<td class="px-6 py-4 text-center font-semibold text-primary">160.0</td>
+<td class="px-6 py-4 text-center">
+<span class="text-on-surface-variant">0.0 hrs</span>
+</td>
+<td class="px-6 py-4 text-center">0</td>
+<td class="px-6 py-4 text-center">0</td>
+<td class="px-6 py-4 text-right">
+<span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-[11px] font-bold uppercase tracking-wider">Verified</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-outline-variant flex items-center justify-between">
+<p class="text-label-sm text-on-surface-variant font-medium">Showing 5 of 124 employees</p>
+<div class="flex items-center gap-1">
+<button class="p-2 border border-outline-variant rounded hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="px-3 py-1 bg-primary text-white rounded text-label-sm">1</button>
+<button class="px-3 py-1 border border-outline-variant rounded hover:bg-surface-container-low text-label-sm transition-all">2</button>
+<button class="px-3 py-1 border border-outline-variant rounded hover:bg-surface-container-low text-label-sm transition-all">3</button>
+<span class="px-2 text-on-surface-variant">...</span>
+<button class="px-3 py-1 border border-outline-variant rounded hover:bg-surface-container-low text-label-sm transition-all">25</button>
+<button class="p-2 border border-outline-variant rounded hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Contextual Information Cards -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-margin-desktop">
+<div class="bg-white border border-outline-variant rounded-xl p-6 flex gap-6 items-start">
+<div class="p-4 bg-primary/5 rounded-full">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="info_i">info</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-primary mb-2">Payroll Calculation Rule</h4>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">
+                            Standard working hours are set at 160 hours/month. Overtime is calculated at 1.5x for weekdays and 2.0x for weekends and public holidays. Absent days without leave approval will result in automated payroll deductions.
+                        </p>
+<button class="mt-4 text-primary font-label-md text-label-md flex items-center gap-1 hover:underline">
+                            View detailed policy
+                            <span class="material-symbols-outlined text-sm" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+</div>
+<div class="bg-primary text-white rounded-xl p-6 relative overflow-hidden group">
+<div class="relative z-10 h-full flex flex-col justify-between">
+<div>
+<h4 class="font-headline-md text-headline-md mb-2">Ready to sync?</h4>
+<p class="text-white/80 text-body-sm max-w-sm">
+                                Finalize all attendance records before syncing with the central ERP. Once generated, the payroll data will be locked for the current period.
+                            </p>
+</div>
+<div class="mt-8">
+<button class="bg-white text-primary px-6 py-2.5 rounded-lg font-bold text-label-md hover:bg-white/90 transition-all active:scale-95">
+                                Finalize &amp; Sync to ERP
+                            </button>
+</div>
+</div>
+<!-- Decorative background element -->
+<div class="absolute -right-10 -bottom-10 opacity-10 transform rotate-12 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-[200px]" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple micro-interaction for table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', () => {
+                // Future implementation: Open employee detail modal
+                console.log('Employee row clicked');
+            });
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+            searchInput.parentElement.classList.add('transition-transform');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+    </script>
+</body></html>

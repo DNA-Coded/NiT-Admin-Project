@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Department Management | NiT Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-indicator {
+            box-shadow: inset 4px 0 0 0 white;
+        }
+        /* Custom scrollbar for data-heavy areas */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .bento-card {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bento-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-on-surface": "#ecf1ff",
+                      "surface-tint": "#485c97",
+                      "on-primary-fixed": "#00174b",
+                      "primary-fixed": "#dbe1ff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-low": "#f0f3ff",
+                      "secondary": "#505f76",
+                      "tertiary-container": "#50565d",
+                      "on-tertiary-fixed-variant": "#41474e",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "surface-bright": "#f9f9ff",
+                      "tertiary": "#393f45",
+                      "on-primary-fixed-variant": "#30447d",
+                      "primary": "#263b74",
+                      "on-error-container": "#93000a",
+                      "surface-container-highest": "#d8e3fb",
+                      "on-tertiary-fixed": "#161c22",
+                      "on-surface": "#111c2d",
+                      "secondary-fixed": "#d3e4fe",
+                      "on-surface-variant": "#444650",
+                      "inverse-primary": "#b4c5ff",
+                      "on-tertiary-container": "#c5cbd3",
+                      "on-secondary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "surface-container": "#e7eeff",
+                      "outline-variant": "#c5c6d1",
+                      "tertiary-fixed-dim": "#c1c7cf",
+                      "on-tertiary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "outline": "#757681",
+                      "on-background": "#111c2d",
+                      "surface-variant": "#d8e3fb",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "secondary-container": "#d0e1fb",
+                      "surface-container-high": "#dee8ff",
+                      "surface": "#f9f9ff",
+                      "tertiary-fixed": "#dde3eb",
+                      "background": "#f9f9ff",
+                      "on-primary-container": "#bac9ff",
+                      "inverse-surface": "#263143",
+                      "surface-dim": "#cfdaf2",
+                      "on-secondary-container": "#54647a",
+                      "primary-container": "#3f538d",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "on-secondary-fixed": "#0b1c30"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "sidebar-width": "280px",
+                      "gutter": "24px",
+                      "unit": "8px",
+                      "margin-desktop": "40px",
+                      "margin-mobile": "16px",
+                      "container-max-width": "1440px"
+              },
+              "fontFamily": {
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "display-lg": ["Plus Jakarta Sans"],
+                      "body-sm": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                      "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
+<!-- Side Navigation Shell -->
+<aside class="docked fixed h-full w-[sidebar-width] left-0 top-0 bg-primary dark:bg-primary-container flex flex-col h-full py-6 border-r border-outline-variant dark:border-outline z-50">
+<div class="px-6 mb-10">
+<h1 class="text-headline-lg font-headline-lg font-bold text-white">NiT Admin</h1>
+<p class="font-label-sm text-label-sm text-white/60 tracking-wider uppercase mt-1">Academic Administration</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<!-- Live Monitor -->
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">live_tv</span>
+<span class="font-label-md text-label-md">Live Attendance Monitor</span>
+</a>
+<!-- Employees -->
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md text-label-md">Employees</span>
+</a>
+<!-- Records -->
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Attendance Records</span>
+</a>
+<!-- Departments (ACTIVE) -->
+<a class="flex items-center gap-3 px-6 py-3 bg-white/10 text-white border-l-4 border-white opacity-100 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-label-md text-label-md">Departments</span>
+</a>
+<!-- Reports -->
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Reports &amp; Analytics</span>
+</a>
+<!-- Payroll -->
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Payroll Summary</span>
+</a>
+<!-- Devices -->
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">router</span>
+<span class="font-label-md text-label-md">Devices</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center gap-3 px-6 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-label-md text-label-md rounded transition-colors duration-200 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                Quick Actions
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[sidebar-width] min-h-screen flex flex-col">
+<!-- Top Navbar -->
+<header class="sticky top-0 w-full z-40 bg-surface-container-lowest dark:bg-surface-container-low border-b border-outline-variant dark:border-outline flex items-center justify-between px-margin-desktop py-4">
+<div class="flex items-center gap-8">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary/20 w-80 text-body-sm" placeholder="Search departments..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined text-primary">schedule</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="font-label-md text-label-md text-primary font-bold">Admin User</p>
+<p class="text-[10px] uppercase tracking-tighter text-outline">Super Administrator</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary-fixed shadow-sm" data-alt="A professional studio portrait of a senior academic administrator in a modern office environment. The person is smiling warmly, wearing a crisp navy suit. The background is a soft-focus office with bookshelves and a large window providing bright, natural light in a light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYDx6XGcGF3js58OCTz8Cx3oTlu5tOckAJ_nrPnAVzIEGv6R5nGFCAOtFJyaq59Uqxxp8VhOU9hgOrTvCyp-5A4KwkZeT1E7bp4_5W2B-oO9nC_7LUfKEXeoZeBWISFm33N4IrjxgYk-GupWs5haqg4AOZm7iCDGrZ9E-maLbzfkfhv_iDdYuBFrT6Zh6BtJxsiCsPaPo99u6IJA7axb8xo7ZI1Y28RUhMYxPFWOqUSWD2Gn0fepX0SG8k0tfjKzJxodQZmPPgW2aW"/>
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="p-margin-desktop flex-1 overflow-y-auto">
+<!-- Header Section -->
+<div class="flex items-end justify-between mb-8">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-1">Department Management</h2>
+<p class="text-on-surface-variant font-body-md">Oversee academic staff distribution and real-time attendance across faculties.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded hover:opacity-90 transition-opacity font-label-md text-label-md shadow-sm">
+<span class="material-symbols-outlined">add_business</span>
+                    Add Department
+                </button>
+</div>
+<!-- Stats Overview Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+<div class="bg-white border border-outline-variant p-6 rounded bento-card">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<span class="text-xs font-bold text-success text-green-600 bg-green-50 px-2 py-1 rounded">+12%</span>
+</div>
+<p class="text-outline font-label-sm uppercase tracking-widest text-[10px]">Total Departments</p>
+<h3 class="text-headline-lg font-bold text-primary">24</h3>
+</div>
+<div class="bg-white border border-outline-variant p-6 rounded bento-card">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-primary">person_check</span>
+</div>
+<span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">Stable</span>
+</div>
+<p class="text-outline font-label-sm uppercase tracking-widest text-[10px]">Active Staff</p>
+<h3 class="text-headline-lg font-bold text-primary">482</h3>
+</div>
+<div class="bg-white border border-outline-variant p-6 rounded bento-card">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-primary">analytics</span>
+</div>
+<span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">-2.4%</span>
+</div>
+<p class="text-outline font-label-sm uppercase tracking-widest text-[10px]">Avg Attendance</p>
+<h3 class="text-headline-lg font-bold text-primary">94.8%</h3>
+</div>
+<div class="bg-white border border-outline-variant p-6 rounded bento-card">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-primary">warning</span>
+</div>
+<span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded">4 Alert</span>
+</div>
+<p class="text-outline font-label-sm uppercase tracking-widest text-[10px]">Critical Gaps</p>
+<h3 class="text-headline-lg font-bold text-primary">03</h3>
+</div>
+</div>
+<!-- Departments Table Section -->
+<div class="bg-white border border-outline-variant rounded shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant flex items-center justify-between bg-surface-container-lowest">
+<h3 class="font-headline-md text-headline-md text-primary">Department Directory</h3>
+<div class="flex gap-2">
+<button class="p-2 text-outline hover:bg-surface-container-low rounded border border-outline-variant">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 text-outline hover:bg-surface-container-low rounded border border-outline-variant">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low text-label-md font-label-md text-on-surface-variant">
+<tr>
+<th class="px-6 py-4 font-semibold">Department Name</th>
+<th class="px-6 py-4 font-semibold">Head of Department</th>
+<th class="px-6 py-4 font-semibold">Total Staff</th>
+<th class="px-6 py-4 font-semibold">Attendance Status</th>
+<th class="px-6 py-4 font-semibold">Last Audit</th>
+<th class="px-6 py-4 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-sm text-on-surface">
+<!-- Department Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">terminal</span>
+</div>
+<div>
+<p class="font-bold">Computer Science</p>
+<p class="text-xs text-outline">ID: CS-2024</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img class="w-8 h-8 rounded-full" data-alt="A portrait of a professor, middle-aged with glasses, intellectual appearance, professional academia style, wearing a grey turtleneck. Clean, minimalist office background, bright daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1KogcDEXwWmHPNOJjCohaZNoPOz4LDaS_dZBhzLsaiEiNIpO_YmQNcv2j8Y4YvlKfSUIggYBvZUI-iwFhAKRmsAuMopZPQmtP5-714okndotRBhW9mkPd76zXgUnR58ypJ6DjCMj_zAxXypA_QGqzHSSXBY0T5VtDeyUnsKjj4JbeaKSXcNgs1Mv__8esgszCxRbbaE0AMAF4ymQUtNhb4QAYsiPuqjXunSXqA6xkHs8vvXEMP6LQRFY9bC6UmOAo2suQd8g5kAVq"/>
+<p>Dr. Elena Rodriguez</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col gap-1">
+<span class="font-bold">42</span>
+<div class="w-24 h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    98% Present
+                                </span>
+</td>
+<td class="px-6 py-4 text-outline">Oct 12, 2023</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-primary-container p-1 rounded hover:bg-surface-container-low">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="text-outline hover:text-error p-1 rounded hover:bg-error-container/20">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Department Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">calculate</span>
+</div>
+<div>
+<p class="font-bold">Mathematics</p>
+<p class="text-xs text-outline">ID: MATH-44</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img class="w-8 h-8 rounded-full" data-alt="A portrait of a male professor in his late 50s with salt and pepper hair, friendly expression, wearing a tweed jacket. Academic setting with books, soft lighting, light mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpvEj_2CZAJCI0DOWn7km-maNvwp3KeQtFP27XI6fsLxFou0tMCYteyx9hubodr6UEIfYT6-ZoDU6iXp9gVaGHOpZh8n4bU0eOH8IUvwXEWCtIZTj9uBXkFYlqXiZBXn9nGJSPFAHkZKZ_VY0OR7E7QDV6JbKXDk5jPSFdeKm3eMI8kIRTJibwtz-qgjTQqtsv-hqxo46vmADG9WzpDqeCKigs97XkBQrp7Q_Cdp6DpzKcIdHMecFw88jM8AUBiHQKgq1rHVROKwtF"/>
+<p>Prof. James Sterling</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col gap-1">
+<span class="font-bold">31</span>
+<div class="w-24 h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[60%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                    82% Attendance
+                                </span>
+</td>
+<td class="px-6 py-4 text-outline">Oct 10, 2023</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-primary-container p-1 rounded hover:bg-surface-container-low">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="text-outline hover:text-error p-1 rounded hover:bg-error-container/20">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Department Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">business_center</span>
+</div>
+<div>
+<p class="font-bold">Administration</p>
+<p class="text-xs text-outline">ID: ADMIN-01</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img class="w-8 h-8 rounded-full" data-alt="A portrait of a female administrator in her 30s, professional and focused, wearing a beige blazer. Minimalist modern corporate office background, high-key lighting, bright colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPCXYeZUD7d1ay_P37oK6xNe6JsZli_maWf5akgvCB6C2Omjm3LK_9AEljZNvaGVixUv12YrrpJUK-Rg8At70uBKwuRTPYXCv8P_O2GurpGh4IzcbaE1NLiw4PBbXYAAm-srhgSuWAR1G7JeoxV9gkpeMo6h83qe9k4hc6GZTIYLO6x6hPbQUH7Oy_NonH5_vF1gEbWVA4dsZ-e_HbrRu-GzQafmfu7tO4bNoCQAXTw7h4azKpcXP3yGLzrRAZEq8OgRtOFf6joImH"/>
+<p>Sarah Jenkins</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col gap-1">
+<span class="font-bold">128</span>
+<div class="w-24 h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[92%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    95% Present
+                                </span>
+</td>
+<td class="px-6 py-4 text-outline">Oct 14, 2023</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-primary-container p-1 rounded hover:bg-surface-container-low">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="text-outline hover:text-error p-1 rounded hover:bg-error-container/20">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Department Row 4 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">science</span>
+</div>
+<div>
+<p class="font-bold">Biotechnology</p>
+<p class="text-xs text-outline">ID: BIO-22</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img class="w-8 h-8 rounded-full" data-alt="Portrait of a young male scientist, wearing a lab coat but in an office setting. Professional, intellectual, smiling confidently. Bright white laboratory background, modern scientific aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCy9VnNUfMnPfFrukvsE_tBPyCWZOuNmXOllcJB94whhp8BbNbdvgUSZKxfToo754UWEueseB1-WykSPrpbr7TfwZJK7hsi70p_Wc-tNZi-9dRng6xDQUZAjleuHgJTM1W2dncM2v9oqXXv7AfwwFsYd1JKDzM4oykLb7El6Km_Zs_7F57DgFvjDvYT3T5OhgkuOEFWOzsebOZnz2UEcCCORv0JqOiMvTSMLaJFxurZDCs-b46UGlaHQ71TQrVH_dcbfBzawIGnwYTk"/>
+<p>Dr. Marcus Thorne</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col gap-1">
+<span class="font-bold">56</span>
+<div class="w-24 h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[78%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    Critical Gaps
+                                </span>
+</td>
+<td class="px-6 py-4 text-outline">Oct 11, 2023</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-primary-container p-1 rounded hover:bg-surface-container-low">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="text-outline hover:text-error p-1 rounded hover:bg-error-container/20">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination -->
+<div class="px-6 py-4 flex items-center justify-between bg-surface-container-lowest border-t border-outline-variant">
+<p class="text-label-sm text-outline">Showing 1 to 10 of 24 departments</p>
+<div class="flex gap-1">
+<button class="p-2 border border-outline-variant rounded disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="px-3 py-1 bg-primary text-white rounded font-label-md text-label-md">1</button>
+<button class="px-3 py-1 hover:bg-surface-container-low rounded font-label-md text-label-md">2</button>
+<button class="px-3 py-1 hover:bg-surface-container-low rounded font-label-md text-label-md">3</button>
+<button class="p-2 border border-outline-variant rounded">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="p-margin-desktop py-6 text-outline font-label-sm flex justify-between mt-auto">
+<span>© 2024 NiT Admin • Global Attendance Policy v4.2</span>
+<div class="flex gap-4">
+<a class="hover:text-primary" href="#">System Status</a>
+<a class="hover:text-primary" href="#">Documentation</a>
+<a class="hover:text-primary" href="#">Support</a>
+</div>
+</footer>
+</main>
+<!-- Micro-interactions Script -->
+<script>
+        // Simple hover effect for bento cards
+        document.querySelectorAll('.bento-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.borderColor = 'var(--tw-color-primary)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = '#E2E8F0';
+            });
+        });
+
+        // Search Bar Focus Effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    </script>
+</body></html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Device Management | NiT Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for data-heavy sections */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#ecf1ff",
+                        "surface-tint": "#485c97",
+                        "on-primary-fixed": "#00174b",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f0f3ff",
+                        "secondary": "#505f76",
+                        "tertiary-container": "#50565d",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f9f9ff",
+                        "tertiary": "#393f45",
+                        "on-primary-fixed-variant": "#30447d",
+                        "primary": "#263b74",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#d8e3fb",
+                        "on-tertiary-fixed": "#161c22",
+                        "on-surface": "#111c2d",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-surface-variant": "#444650",
+                        "inverse-primary": "#b4c5ff",
+                        "on-tertiary-container": "#c5cbd3",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container": "#e7eeff",
+                        "outline-variant": "#c5c6d1",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "outline": "#757681",
+                        "on-background": "#111c2d",
+                        "surface-variant": "#d8e3fb",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "secondary-container": "#d0e1fb",
+                        "surface-container-high": "#dee8ff",
+                        "surface": "#f9f9ff",
+                        "tertiary-fixed": "#dde3eb",
+                        "background": "#f9f9ff",
+                        "on-primary-container": "#bac9ff",
+                        "inverse-surface": "#263143",
+                        "surface-dim": "#cfdaf2",
+                        "on-secondary-container": "#54647a",
+                        "primary-container": "#3f538d",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-secondary-fixed": "#0b1c30"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "280px",
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "container-max-width": "1440px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- Side Navigation Shell -->
+<aside class="docked fixed h-full w-[sidebar-width] left-0 top-0 bg-primary dark:bg-primary-container text-white border-r border-outline-variant dark:border-outline z-50 flex flex-col py-6">
+<div class="px-6 mb-8">
+<h1 class="text-headline-lg font-headline-lg font-bold text-white tracking-tight">NiT Admin</h1>
+<p class="font-label-sm text-white/60 uppercase tracking-widest mt-1">Academic Administration</p>
+</div>
+<nav class="flex-1 flex flex-col space-y-1">
+<!-- Navigation Items Mapping from JSON -->
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">live_tv</span>
+<span class="font-label-md">Live Attendance Monitor</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md">Employees</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md">Attendance Records</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-label-md">Departments</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md">Reports &amp; Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md">Payroll Summary</span>
+</a>
+<!-- Active State: Devices -->
+<a class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white border-l-4 border-white opacity-100 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">router</span>
+<span class="font-label-md">Devices</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md">Settings</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full py-3 bg-white/10 border border-white/20 rounded text-white font-label-md hover:bg-white/20 transition-all">
+                Quick Actions
+            </button>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="docked sticky top-0 w-full z-40 bg-surface-container-lowest dark:bg-surface-container-low border-b border-outline-variant dark:border-outline ml-[280px] w-[calc(100%-280px)]">
+<div class="flex items-center justify-between px-margin-desktop py-4">
+<div class="flex items-center gap-6 flex-1">
+<div class="relative max-w-md w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low dark:bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary/20 text-body-sm font-body-sm" placeholder="Search devices, IP or location..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all">
+<span class="material-symbols-outlined">schedule</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-label-md font-bold text-primary">NiT Admin</p>
+<p class="text-label-sm text-outline">System Lead</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a tech administrator, middle-aged male with glasses, wearing a sleek navy blue polo shirt. He has a calm, confident expression, positioned against a blurred futuristic office background with soft blue lighting. The image style is sharp, corporate, and clean-cut, emphasizing a high-trust administrative environment with modern light-mode vibes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDutKLpvYwcCXhxtab15kit4-TMqTYk-DaFe5zniYHCIbiXO0SlcNyZbJUr0sunTGpwruJ3L48QS4UFkbZgfBlXe5msMQXS79Y5Mg2qQR9-wMVbc4GREGqKgVWtvPQCCs-B6r7iwplR5SXdrs5msIvKSlGDPJx17Ji6xv02frSngqsz-giBFeXA_8O8fDQcX_f-2VKHzeh8T4JwNJ39q_THrkImx_hmlCfYuc1KSMSwg6K5fKNhrkKnJC-xlN8wuIN7Jp0BhiqvHo0n"/>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] p-margin-desktop min-h-screen">
+<!-- Page Header -->
+<div class="flex items-end justify-between mb-8">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-1">Biometric Device Network</h2>
+<p class="text-body-md text-on-surface-variant">Real-time status and health monitoring for all campus entry points.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-white border border-outline text-primary font-label-md rounded flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                    Export Log
+                </button>
+<button class="px-4 py-2 bg-primary text-white font-label-md rounded flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Register New Device
+                </button>
+</div>
+</div>
+<!-- Bento Grid Stats -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-8">
+<div class="bg-white border border-outline-variant p-6 flex flex-col justify-between">
+<div>
+<p class="text-label-sm text-outline uppercase tracking-wider mb-2">Total Devices</p>
+<h3 class="text-display-lg font-display-lg text-primary">24</h3>
+</div>
+<div class="mt-4 flex items-center gap-2 text-label-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                    Active in 8 Blocks
+                </div>
+</div>
+<div class="bg-white border border-outline-variant p-6 flex flex-col justify-between">
+<div>
+<p class="text-label-sm text-outline uppercase tracking-wider mb-2">Online Status</p>
+<h3 class="text-display-lg font-display-lg text-[#10b981]">22</h3>
+</div>
+<div class="mt-4 flex items-center gap-2 text-label-sm text-[#10b981] bg-[#10b981]/10 px-2 py-1 rounded w-fit">
+<span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
+                    91.6% Uptime
+                </div>
+</div>
+<div class="bg-white border border-outline-variant p-6 flex flex-col justify-between">
+<div>
+<p class="text-label-sm text-outline uppercase tracking-wider mb-2">Offline Alerts</p>
+<h3 class="text-display-lg font-display-lg text-error">02</h3>
+</div>
+<div class="mt-4 flex items-center gap-2 text-label-sm text-error bg-error-container px-2 py-1 rounded w-fit">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                    Action Required
+                </div>
+</div>
+<div class="bg-white border border-outline-variant p-6 flex flex-col justify-between">
+<div>
+<p class="text-label-sm text-outline uppercase tracking-wider mb-2">Sync Success</p>
+<h3 class="text-display-lg font-display-lg text-primary">99.8%</h3>
+</div>
+<div class="mt-4 text-label-sm text-outline">
+                    Last 24 hours average
+                </div>
+</div>
+</div>
+<!-- Main Device Table -->
+<div class="bg-white border border-outline-variant overflow-hidden mb-8">
+<div class="px-6 py-4 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+<h4 class="font-label-md text-primary font-bold">Active Device List</h4>
+<div class="flex gap-2">
+<select class="text-label-sm border-outline rounded bg-white py-1">
+<option>All Locations</option>
+<option>Main Gate</option>
+<option>Science Block</option>
+<option>Admin Block</option>
+</select>
+<button class="p-1 hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low text-label-md text-outline uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4 font-label-md">Device Name / ID</th>
+<th class="px-6 py-4 font-label-md">IP Address</th>
+<th class="px-6 py-4 font-label-md">Location</th>
+<th class="px-6 py-4 font-label-md">Status</th>
+<th class="px-6 py-4 font-label-md">Last Sync</th>
+<th class="px-6 py-4 font-label-md text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Device Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high rounded flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">fingerprint</span>
+</div>
+<div>
+<p class="font-label-md text-primary font-bold">ZKTeco-MG-01</p>
+<p class="text-label-sm text-outline">SN: 8823940122</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 font-body-sm text-on-surface-variant">192.168.1.104</td>
+<td class="px-6 py-4">
+<span class="bg-surface-container-high px-2 py-1 rounded text-label-sm text-on-surface-variant">Main Gate East</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 bg-[#dcfce7] text-[#166534] px-3 py-1 rounded-full text-label-sm font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-[#166534]"></span>
+                                    Online
+                                </span>
+</td>
+<td class="px-6 py-4 text-label-sm text-on-surface-variant">2 mins ago</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings_suggest</span>
+</button>
+<button class="p-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">history</span>
+</button>
+</td>
+</tr>
+<!-- Device Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high rounded flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-fill-icon">face</span>
+</div>
+<div>
+<p class="font-label-md text-primary font-bold">HIK-SB-03</p>
+<p class="text-label-sm text-outline">SN: 7712390145</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 font-body-sm text-on-surface-variant">192.168.4.22</td>
+<td class="px-6 py-4">
+<span class="bg-surface-container-high px-2 py-1 rounded text-label-sm text-on-surface-variant">Science Block A</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 bg-[#fef3c7] text-[#92400e] px-3 py-1 rounded-full text-label-sm font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-[#92400e] animate-pulse"></span>
+                                    Syncing
+                                </span>
+</td>
+<td class="px-6 py-4 text-label-sm text-on-surface-variant">14 mins ago</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings_suggest</span>
+</button>
+<button class="p-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">history</span>
+</button>
+</td>
+</tr>
+<!-- Device Row 3 (Offline) -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-error-container/20 rounded flex items-center justify-center text-error">
+<span class="material-symbols-outlined">router</span>
+</div>
+<div>
+<p class="font-label-md text-primary font-bold">ZKTeco-LB-01</p>
+<p class="text-label-sm text-outline">SN: 8823940129</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 font-body-sm text-on-surface-variant">192.168.12.5</td>
+<td class="px-6 py-4">
+<span class="bg-surface-container-high px-2 py-1 rounded text-label-sm text-on-surface-variant">Library Entrance</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 bg-error-container text-on-error-container px-3 py-1 rounded-full text-label-sm font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                    Offline
+                                </span>
+</td>
+<td class="px-6 py-4 text-label-sm text-on-surface-variant">5 hours ago</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-error hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">report</span>
+</button>
+<button class="p-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">history</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Health Logs & Alerts -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Recent Logs -->
+<div class="lg:col-span-2 bg-white border border-outline-variant">
+<div class="px-6 py-4 border-b border-outline-variant flex items-center justify-between">
+<h4 class="font-label-md text-primary font-bold">System Health Logs</h4>
+<span class="text-label-sm text-outline">Auto-refresh: 10s</span>
+</div>
+<div class="p-6">
+<div class="space-y-4">
+<div class="flex gap-4 items-start p-3 hover:bg-surface-container-lowest transition-colors border-l-4 border-primary">
+<div class="text-label-sm text-outline whitespace-nowrap pt-0.5">14:42:01</div>
+<div>
+<p class="text-label-md text-on-surface font-bold">Data Sync Success</p>
+<p class="text-body-sm text-on-surface-variant">Device <span class="font-mono text-primary">ZKTeco-MG-01</span> synchronized 142 new attendance records.</p>
+</div>
+</div>
+<div class="flex gap-4 items-start p-3 hover:bg-surface-container-lowest transition-colors border-l-4 border-error">
+<div class="text-label-sm text-outline whitespace-nowrap pt-0.5">14:38:15</div>
+<div>
+<p class="text-label-md text-error font-bold">Connection Lost</p>
+<p class="text-body-sm text-on-surface-variant">Device <span class="font-mono text-primary">ZKTeco-LB-01</span> is unreachable. Retrying connection (3/10)...</p>
+</div>
+</div>
+<div class="flex gap-4 items-start p-3 hover:bg-surface-container-lowest transition-colors border-l-4 border-amber-500">
+<div class="text-label-sm text-outline whitespace-nowrap pt-0.5">14:15:22</div>
+<div>
+<p class="text-label-md text-on-surface font-bold">Threshold Alert</p>
+<p class="text-body-sm text-on-surface-variant">Science Block A device reporting high CPU temperature (72°C). Monitoring active.</p>
+</div>
+</div>
+<div class="flex gap-4 items-start p-3 hover:bg-surface-container-lowest transition-colors border-l-4 border-primary">
+<div class="text-label-sm text-outline whitespace-nowrap pt-0.5">13:58:04</div>
+<div>
+<p class="text-label-md text-on-surface font-bold">New Device Discovered</p>
+<p class="text-body-sm text-on-surface-variant">A new biometric unit was detected at <span class="font-mono text-primary">192.168.4.55</span>. Pending authorization.</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-2 text-label-md text-primary font-bold hover:underline">View Full Log History</button>
+</div>
+</div>
+<!-- Network Topology Status -->
+<div class="bg-white border border-outline-variant flex flex-col">
+<div class="px-6 py-4 border-b border-outline-variant bg-primary-container/10">
+<h4 class="font-label-md text-primary font-bold">Infrastructure Health</h4>
+</div>
+<div class="p-6 flex-1 flex flex-col gap-6">
+<div class="space-y-3">
+<div class="flex justify-between items-center text-label-md">
+<span class="text-on-surface-variant">Network Latency</span>
+<span class="font-bold text-[#10b981]">14ms</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-[#10b981] w-[15%]"></div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-label-md">
+<span class="text-on-surface-variant">Server Load</span>
+<span class="font-bold text-primary">32%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[32%]"></div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-label-md">
+<span class="text-on-surface-variant">Database Storage</span>
+<span class="font-bold text-on-surface">64%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-on-surface-variant w-[64%]"></div>
+</div>
+</div>
+<div class="mt-auto p-4 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-primary">settings_ethernet</span>
+<p class="font-label-md text-primary font-bold">Cloud Gateway</p>
+</div>
+<div class="flex items-center justify-between text-label-sm">
+<span class="text-[#10b981] flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-[#10b981] rounded-full"></span>
+                                Secure (SSL)
+                            </span>
+<span class="text-outline">v2.4.12-rev</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Tooltip for Micro-interactions -->
+<div class="fixed hidden pointer-events-none z-[100] bg-inverse-surface text-inverse-on-surface px-3 py-2 rounded text-label-sm shadow-xl border border-white/10 transition-opacity duration-200" id="device-tooltip">
+        Device Details Quick View
+    </div>
+<script>
+        // Simple Micro-interaction for table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', (e) => {
+                const tooltip = document.getElementById('device-tooltip');
+                const deviceName = row.querySelector('.font-bold').innerText;
+                tooltip.innerText = `View live telemetry for ${deviceName}`;
+                tooltip.classList.remove('hidden');
+                tooltip.classList.add('flex');
+            });
+            row.addEventListener('mousemove', (e) => {
+                const tooltip = document.getElementById('device-tooltip');
+                tooltip.style.left = (e.clientX + 15) + 'px';
+                tooltip.style.top = (e.clientY + 15) + 'px';
+            });
+            row.addEventListener('mouseleave', () => {
+                const tooltip = document.getElementById('device-tooltip');
+                tooltip.classList.add('hidden');
+            });
+        });
+
+        // Simulating live refresh for health logs
+        const logContainer = document.querySelector('.space-y-4');
+        const originalLogs = logContainer.innerHTML;
+        
+        setInterval(() => {
+            // Visual heartbeat pulse on online devices
+            document.querySelectorAll('.animate-pulse').forEach(pulse => {
+                pulse.classList.toggle('opacity-50');
+            });
+        }, 2000);
+    </script>
+</body></html>
