@@ -6,4 +6,5 @@ export * from './reports';
 export * from './payroll';
 export * from './settings';
 export * from './liveMonitor';
+export * from './departments';
 

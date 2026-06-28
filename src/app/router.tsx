@@ -13,6 +13,7 @@ const Reports = lazy(() => import('../pages/Reports'));
 const Devices = lazy(() => import('../pages/Devices'));
 const Payroll = lazy(() => import('../pages/Payroll'));
 const Settings = lazy(() => import('../pages/Settings'));
+const Departments = lazy(() => import('../pages/Departments'));
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -77,6 +78,10 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.PAYROLL,
         element: <SuspenseWrapper><Payroll /></SuspenseWrapper>,
+      },
+      {
+        path: ROUTES.DEPARTMENTS,
+        element: <SuspenseWrapper><Departments /></SuspenseWrapper>,
       },
       {
         path: ROUTES.SETTINGS,
