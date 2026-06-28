@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { AdminLayout } from '../layouts/AdminLayout';
+import ErrorPage from '../pages/ErrorPage';
 import { ROUTES } from '@/constants';
 
 // Lazy-loaded page components for code-splitting
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
   {
     path: ROUTES.DASHBOARD,
     element: <AdminLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
