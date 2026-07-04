@@ -1,10 +1,16 @@
 import Device from './device.model.js';
+import Department from '../departments/departments.model.js';
 import { MESSAGES } from '../../constants/index.js';
 import {
   logDeviceListFetched,
   logDeviceFetched,
   logDeviceCreated,
   logDeviceUpdated,
+  logDeviceAssignmentChanged,
+  logDeviceConfigUpdated,
+  logDeviceHeartbeatUpdated,
+  logDeviceAttendanceToggled,
+  logDeviceDefaultChanged,
   logDeviceStatusChanged,
   logDeviceDeleted,
   logDeviceRestored,
@@ -16,6 +22,20 @@ const makeError = (message, status) => {
   const err = new Error(message);
   err.statusCode = status;
   return err;
+};
+
+const assertDepartmentExists = async (departmentId, requestMeta = {}) => {
+  if (!departmentId) return;
+
+  const dept = await Department.findById(departmentId).select('isActive').lean();
+
+  if (!dept) {
+    throw makeError(MESSAGES.DEPARTMENT_NOT_FOUND, 404);
+  }
+
+  if (!dept.isActive) {
+    throw makeError('The referenced department is inactive and cannot be assigned.', 422);
+  }
 };
 
 const assertNoDuplicate = async (fields, excludeId = null, requestMeta = {}) => {
@@ -52,38 +72,56 @@ const assertNoDuplicate = async (fields, excludeId = null, requestMeta = {}) => 
   }
 };
 
-const toListItem = (doc) => ({
-  id:                  doc._id,
-  deviceCode:          doc.deviceCode,
-  deviceName:          doc.deviceName,
-  deviceType:          doc.deviceType,
-  manufacturer:        doc.manufacturer,
-  model:               doc.model,
-  serialNumber:        doc.serialNumber,
-  firmwareVersion:     doc.firmwareVersion ?? null,
-  ipAddress:           doc.ipAddress,
-  macAddress:          doc.macAddress ?? null,
-  port:                doc.port,
-  building:            doc.building,
-  floor:               doc.floor,
-  room:                doc.room,
-  locationDescription: doc.locationDescription ?? null,
-  status:              doc.status,
-  lastSeen:            doc.lastSeen ?? null,
-  lastSync:            doc.lastSync ?? null,
-  isActive:            doc.isActive,
-  deletedAt:           doc.deletedAt ?? null,
-  deletedBy:           doc.deletedBy ?? null,
-  createdBy:           doc.createdBy,
-  updatedBy:           doc.updatedBy ?? null,
-  createdAt:           doc.createdAt,
-  updatedAt:           doc.updatedAt,
-});
+const toListItem = (doc) => {
+  const dept = doc.assignedDepartment;
+  const assignedDepartmentField =
+    dept && typeof dept === 'object' && dept._id
+      ? { id: dept._id, name: dept.name, code: dept.code }
+      : dept ?? null;
+
+  return {
+    id:                  doc._id,
+    deviceCode:          doc.deviceCode,
+    deviceName:          doc.deviceName,
+    deviceType:          doc.deviceType,
+    manufacturer:        doc.manufacturer,
+    model:               doc.model,
+    serialNumber:        doc.serialNumber,
+    firmwareVersion:     doc.firmwareVersion ?? null,
+    ipAddress:           doc.ipAddress,
+    macAddress:          doc.macAddress ?? null,
+    port:                doc.port,
+    campus:              doc.campus ?? null,
+    building:            doc.building,
+    floor:               doc.floor,
+    room:                doc.room,
+    locationDescription: doc.locationDescription ?? null,
+    assignedDepartment:  assignedDepartmentField,
+    connectionMode:      doc.connectionMode ?? null,
+    heartbeatInterval:   doc.heartbeatInterval ?? null,
+    isAttendanceEnabled: doc.isAttendanceEnabled,
+    isDefaultDevice:     doc.isDefaultDevice,
+    status:              doc.status,
+    lastSeen:            doc.lastSeen ?? null,
+    lastSync:            doc.lastSync ?? null,
+    lastHeartbeat:       doc.lastHeartbeat ?? null,
+    lastError:           doc.lastError ?? null,
+    isActive:            doc.isActive,
+    deletedAt:           doc.deletedAt ?? null,
+    deletedBy:           doc.deletedBy ?? null,
+    createdBy:           doc.createdBy,
+    updatedBy:           doc.updatedBy ?? null,
+    createdAt:           doc.createdAt,
+    updatedAt:           doc.updatedAt,
+  };
+};
 
 export const listDevices = async (query = {}, requestMeta = {}) => {
   const {
     page = 1, limit = 10, search = '',
     deviceType = null, status = null, building = null, floor = null,
+    assignedDepartment = null, connectionMode = null,
+    isAttendanceEnabled = 'all', isDefaultDevice = 'all',
     isActive = 'all', sortBy = 'createdAt', sortOrder = 'desc',
   } = query;
 
@@ -91,6 +129,22 @@ export const listDevices = async (query = {}, requestMeta = {}) => {
 
   if (isActive !== 'all') {
     filter.isActive = isActive === true || isActive === 'true';
+  }
+
+  if (isAttendanceEnabled !== 'all') {
+    filter.isAttendanceEnabled = isAttendanceEnabled === true || isAttendanceEnabled === 'true';
+  }
+
+  if (isDefaultDevice !== 'all') {
+    filter.isDefaultDevice = isDefaultDevice === true || isDefaultDevice === 'true';
+  }
+
+  if (assignedDepartment && mongoose.Types.ObjectId.isValid(assignedDepartment)) {
+    filter.assignedDepartment = new mongoose.Types.ObjectId(assignedDepartment);
+  }
+
+  if (connectionMode && connectionMode.trim()) {
+    filter.connectionMode = connectionMode.trim().toUpperCase();
   }
 
   if (deviceType && deviceType.trim()) {
@@ -127,7 +181,12 @@ export const listDevices = async (query = {}, requestMeta = {}) => {
 
   const [total, docs] = await Promise.all([
     Device.countDocuments(filter),
-    Device.find(filter).sort(sort).skip(skip).limit(limitNum).lean(),
+    Device.find(filter)
+      .populate('assignedDepartment', 'name code')
+      .sort(sort)
+      .skip(skip)
+      .limit(limitNum)
+      .lean(),
   ]);
 
   const totalPages = Math.ceil(total / limitNum);
@@ -148,7 +207,7 @@ export const listDevices = async (query = {}, requestMeta = {}) => {
 };
 
 export const getDeviceById = async (id, requestMeta = {}) => {
-  const device = await Device.findById(id);
+  const device = await Device.findById(id).populate('assignedDepartment', 'name code');
 
   if (!device) {
     logDeviceNotFound(id, requestMeta);
@@ -162,19 +221,27 @@ export const getDeviceById = async (id, requestMeta = {}) => {
 export const createDevice = async (data, adminEmail, requestMeta = {}) => {
   const {
     deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
-    ipAddress, macAddress = null, port, building, floor, room,
+    ipAddress, macAddress = null, port, campus = null, building, floor, room,
     locationDescription = null, firmwareVersion = null, status,
+    assignedDepartment = null, connectionMode = null, heartbeatInterval = null,
+    isAttendanceEnabled, isDefaultDevice,
   } = data;
 
+  await assertDepartmentExists(assignedDepartment, requestMeta);
   await assertNoDuplicate({ deviceCode, serialNumber }, null, requestMeta);
 
   const device = await Device.create({
     deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
-    ipAddress, macAddress, port, building, floor, room,
+    ipAddress, macAddress, port, campus, building, floor, room,
     locationDescription, firmwareVersion,
+    assignedDepartment, connectionMode, heartbeatInterval,
+    ...(isAttendanceEnabled !== undefined && { isAttendanceEnabled }),
+    ...(isDefaultDevice !== undefined && { isDefaultDevice }),
     ...(status && { status }),
     createdBy: adminEmail,
   });
+
+  await device.populate('assignedDepartment', 'name code');
 
   logDeviceCreated(
     { id: device._id, deviceCode: device.deviceCode, ipAddress: device.ipAddress },
@@ -188,8 +255,10 @@ export const createDevice = async (data, adminEmail, requestMeta = {}) => {
 export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
   const allowedFields = [
     'deviceCode', 'deviceName', 'deviceType', 'manufacturer', 'model', 'serialNumber',
-    'ipAddress', 'macAddress', 'port', 'building', 'floor', 'room',
+    'ipAddress', 'macAddress', 'port', 'campus', 'building', 'floor', 'room',
     'locationDescription', 'firmwareVersion', 'status',
+    'assignedDepartment', 'connectionMode', 'heartbeatInterval',
+    'isAttendanceEnabled', 'isDefaultDevice',
   ];
 
   const updates = {};
@@ -209,6 +278,10 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
     throw makeError(MESSAGES.DEVICE_NOT_FOUND, 404);
   }
 
+  if (updates.assignedDepartment !== undefined) {
+    await assertDepartmentExists(updates.assignedDepartment, requestMeta);
+  }
+
   await assertNoDuplicate(
     {
       deviceCode:   updates.deviceCode,
@@ -218,7 +291,26 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
     requestMeta
   );
 
-  // If status is changing, log it specifically
+  // Compare config changes for specific logs
+  const oldDept = device.assignedDepartment?.toString();
+  const newDept = updates.assignedDepartment?.toString();
+  if (newDept !== undefined && oldDept !== newDept) {
+    logDeviceAssignmentChanged({ id: device._id, deviceCode: device.deviceCode, oldDepartment: oldDept, newDepartment: newDept }, adminEmail, requestMeta);
+  }
+
+  if ((updates.connectionMode !== undefined && updates.connectionMode !== device.connectionMode) ||
+      (updates.heartbeatInterval !== undefined && updates.heartbeatInterval !== device.heartbeatInterval)) {
+    logDeviceConfigUpdated({ id: device._id, deviceCode: device.deviceCode, connectionMode: updates.connectionMode ?? device.connectionMode, heartbeatInterval: updates.heartbeatInterval ?? device.heartbeatInterval }, adminEmail, requestMeta);
+  }
+
+  if (updates.isAttendanceEnabled !== undefined && updates.isAttendanceEnabled !== device.isAttendanceEnabled) {
+    logDeviceAttendanceToggled({ id: device._id, deviceCode: device.deviceCode, isAttendanceEnabled: updates.isAttendanceEnabled }, adminEmail, requestMeta);
+  }
+
+  if (updates.isDefaultDevice !== undefined && updates.isDefaultDevice !== device.isDefaultDevice) {
+    logDeviceDefaultChanged({ id: device._id, deviceCode: device.deviceCode, isDefaultDevice: updates.isDefaultDevice }, adminEmail, requestMeta);
+  }
+
   if (updates.status && updates.status !== device.status) {
     logDeviceStatusChanged(
       { id: device._id, deviceCode: device.deviceCode, oldStatus: device.status, newStatus: updates.status },
@@ -230,6 +322,8 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
   Object.assign(device, updates);
   device.updatedBy = adminEmail;
   await device.save();
+
+  await device.populate('assignedDepartment', 'name code');
 
   logDeviceUpdated(
     { id: device._id, deviceCode: device.deviceCode, ipAddress: device.ipAddress },

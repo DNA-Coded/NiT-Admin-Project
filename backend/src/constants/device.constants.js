@@ -22,13 +22,24 @@ export const DEVICE_STATUS = Object.freeze({
 
 export const DEVICE_STATUS_VALUES = Object.freeze(Object.values(DEVICE_STATUS));
 
+export const DEVICE_CONNECTION_MODES = Object.freeze({
+  LAN:   'LAN',
+  WAN:   'WAN',
+  CLOUD: 'CLOUD',
+  USB:   'USB',
+});
+
+export const DEVICE_CONNECTION_MODES_VALUES = Object.freeze(Object.values(DEVICE_CONNECTION_MODES));
+
 export const DEVICE_SORT_FIELDS = Object.freeze([
   'deviceCode',
   'deviceName',
   'manufacturer',
   'building',
   'status',
+  'connectionMode',
   'lastSeen',
+  'lastHeartbeat',
   'createdAt',
   'updatedAt',
 ]);

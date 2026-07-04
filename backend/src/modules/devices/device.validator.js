@@ -3,6 +3,7 @@ import { handleValidationErrors } from '../../validators/index.js';
 import {
   DEVICE_TYPES_VALUES,
   DEVICE_STATUS_VALUES,
+  DEVICE_CONNECTION_MODES_VALUES,
   DEVICE_SORT_FIELDS,
   DEVICE_SORT_ORDERS,
   DEVICE_PAGINATION,
@@ -21,8 +22,10 @@ const validateCreateDeviceFields = (req, res, next) => {
   const errors = [];
   const {
     deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
-    ipAddress, macAddress, port, building, floor, room,
+    ipAddress, macAddress, port, campus, building, floor, room,
     locationDescription, firmwareVersion, status,
+    assignedDepartment, connectionMode, heartbeatInterval,
+    isAttendanceEnabled, isDefaultDevice,
   } = req.body ?? {};
 
   // Required Fields
@@ -40,6 +43,11 @@ const validateCreateDeviceFields = (req, res, next) => {
 
   const serialErr = validateStringField(serialNumber, 'Serial number', 1, 100);
   if (serialErr) errors.push({ field: 'serialNumber', message: serialErr });
+
+  if (campus !== undefined && campus !== null && campus !== '') {
+    const campusErr = validateStringField(campus, 'Campus', 1, 100);
+    if (campusErr) errors.push({ field: 'campus', message: campusErr });
+  }
 
   const bldgErr = validateStringField(building, 'Building', 1, 100);
   if (bldgErr) errors.push({ field: 'building', message: bldgErr });
@@ -90,6 +98,33 @@ const validateCreateDeviceFields = (req, res, next) => {
     }
   }
 
+  if (assignedDepartment !== undefined && assignedDepartment !== null && assignedDepartment !== '') {
+    if (!mongoose.Types.ObjectId.isValid(assignedDepartment)) {
+      errors.push({ field: 'assignedDepartment', message: 'Must be a valid department ID.' });
+    }
+  }
+
+  if (connectionMode !== undefined && connectionMode !== null) {
+    if (!DEVICE_CONNECTION_MODES_VALUES.includes(connectionMode)) {
+      errors.push({ field: 'connectionMode', message: `Invalid connection mode. Allowed values: ${DEVICE_CONNECTION_MODES_VALUES.join(', ')}.` });
+    }
+  }
+
+  if (heartbeatInterval !== undefined && heartbeatInterval !== null) {
+    const hb = parseInt(heartbeatInterval, 10);
+    if (isNaN(hb) || hb < 1 || hb > 1440) {
+      errors.push({ field: 'heartbeatInterval', message: 'Heartbeat interval must be a number between 1 and 1440 minutes.' });
+    }
+  }
+
+  if (isAttendanceEnabled !== undefined && typeof isAttendanceEnabled !== 'boolean') {
+    errors.push({ field: 'isAttendanceEnabled', message: 'Must be a boolean.' });
+  }
+
+  if (isDefaultDevice !== undefined && typeof isDefaultDevice !== 'boolean') {
+    errors.push({ field: 'isDefaultDevice', message: 'Must be a boolean.' });
+  }
+
   req.validationErrors = errors;
   next();
 };
@@ -103,14 +138,18 @@ const validateUpdateDeviceFields = (req, res, next) => {
   const errors = [];
   const {
     deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
-    ipAddress, macAddress, port, building, floor, room,
+    ipAddress, macAddress, port, campus, building, floor, room,
     locationDescription, firmwareVersion, status,
+    assignedDepartment, connectionMode, heartbeatInterval,
+    isAttendanceEnabled, isDefaultDevice,
   } = req.body ?? {};
 
   const knownFields = [
     'deviceCode', 'deviceName', 'deviceType', 'manufacturer', 'model', 'serialNumber',
-    'ipAddress', 'macAddress', 'port', 'building', 'floor', 'room',
+    'ipAddress', 'macAddress', 'port', 'campus', 'building', 'floor', 'room',
     'locationDescription', 'firmwareVersion', 'status',
+    'assignedDepartment', 'connectionMode', 'heartbeatInterval',
+    'isAttendanceEnabled', 'isDefaultDevice',
   ];
   
   const provided = knownFields.filter(
@@ -146,6 +185,11 @@ const validateUpdateDeviceFields = (req, res, next) => {
   if (serialNumber !== undefined) {
     const err = validateStringField(serialNumber, 'Serial number', 1, 100);
     if (err) errors.push({ field: 'serialNumber', message: err });
+  }
+
+  if (campus !== undefined && campus !== null && campus !== '') {
+    const err = validateStringField(campus, 'Campus', 1, 100);
+    if (err) errors.push({ field: 'campus', message: err });
   }
 
   if (building !== undefined) {
@@ -234,6 +278,7 @@ const validateListQueryFields = (req, res, next) => {
   const {
     page, limit, search,
     deviceType, status, building, floor, isActive,
+    assignedDepartment, connectionMode, isAttendanceEnabled, isDefaultDevice,
     sortBy, sortOrder,
   } = req.query ?? {};
 
@@ -274,6 +319,22 @@ const validateListQueryFields = (req, res, next) => {
 
   if (floor !== undefined && floor.trim().length > 100) {
     errors.push({ field: 'floor', message: 'floor filter cannot exceed 100 characters.' });
+  }
+
+  if (assignedDepartment !== undefined && !mongoose.Types.ObjectId.isValid(assignedDepartment)) {
+    errors.push({ field: 'assignedDepartment', message: 'Must be a valid department ID.' });
+  }
+
+  if (connectionMode !== undefined && !DEVICE_CONNECTION_MODES_VALUES.includes(connectionMode)) {
+    errors.push({ field: 'connectionMode', message: `connectionMode filter must be one of: ${DEVICE_CONNECTION_MODES_VALUES.join(', ')}.` });
+  }
+
+  if (isAttendanceEnabled !== undefined && !['true', 'false', 'all'].includes(isAttendanceEnabled)) {
+    errors.push({ field: 'isAttendanceEnabled', message: "isAttendanceEnabled must be 'true', 'false', or 'all'." });
+  }
+
+  if (isDefaultDevice !== undefined && !['true', 'false', 'all'].includes(isDefaultDevice)) {
+    errors.push({ field: 'isDefaultDevice', message: "isDefaultDevice must be 'true', 'false', or 'all'." });
   }
 
   if (isActive !== undefined && !['true', 'false', 'all'].includes(isActive)) {

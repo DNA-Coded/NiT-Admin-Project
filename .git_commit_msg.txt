@@ -1,10 +1,11 @@
-feat: implement device management module
+feat: implement device configuration and operational management
 
-- Add Device Management module
-- Implement device CRUD operations
-- Add device validation and structured logging
-- Support fingerprint, face recognition, and hybrid devices
-- Add pagination, filtering, sorting, and search
-- Implement soft delete with audit fields
-- Add device status management endpoint
-- Keep module device-agnostic and production-ready
+- Add device assignment and location management
+- Add operational configuration fields
+- Support department assignment validation
+- Add connection mode configuration
+- Add heartbeat monitoring fields
+- Add attendance enable/disable controls
+- Extend device filtering capabilities
+- Add structured operational logging
+- Keep implementation production-ready and device-agnostic

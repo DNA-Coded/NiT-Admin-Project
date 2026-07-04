@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { DEVICE_TYPES_VALUES, DEVICE_STATUS_VALUES, DEVICE_STATUS } from '../../constants/device.constants.js';
+import { DEVICE_TYPES_VALUES, DEVICE_STATUS_VALUES, DEVICE_STATUS, DEVICE_CONNECTION_MODES_VALUES } from '../../constants/device.constants.js';
 
 const { Schema } = mongoose;
 
@@ -89,6 +89,12 @@ const deviceSchema = new Schema(
     },
 
     // ── Physical Location ────────────────────────────────────────────────────
+    campus: {
+      type:    String,
+      trim:    true,
+      default: null,
+    },
+
     building: {
       type:     String,
       required: [true, 'Building is required.'],
@@ -115,6 +121,49 @@ const deviceSchema = new Schema(
     },
 
     // ── Operational & State ──────────────────────────────────────────────────
+    assignedDepartment: {
+      type:    Schema.Types.ObjectId,
+      ref:     'Department',
+      default: null,
+    },
+
+    connectionMode: {
+      type: String,
+      enum: {
+        values:  DEVICE_CONNECTION_MODES_VALUES,
+        message: 'Invalid connection mode.',
+      },
+      default: null,
+    },
+
+    heartbeatInterval: {
+      type:    Number, // in minutes
+      default: null,
+      min:     [1, 'Heartbeat interval must be at least 1 minute.'],
+      max:     [1440, 'Heartbeat interval cannot exceed 1440 minutes.'],
+    },
+
+    lastHeartbeat: {
+      type:    Date,
+      default: null,
+    },
+
+    lastError: {
+      type:    String,
+      trim:    true,
+      default: null,
+    },
+
+    isAttendanceEnabled: {
+      type:    Boolean,
+      default: true,
+    },
+
+    isDefaultDevice: {
+      type:    Boolean,
+      default: false,
+    },
+
     status: {
       type: String,
       enum: {
@@ -177,6 +226,12 @@ deviceSchema.index({ createdAt: -1 });
 
 // ─── Instance Methods ─────────────────────────────────────────────────────────
 deviceSchema.methods.toPublicJSON = function () {
+  const dept = this.assignedDepartment;
+  const assignedDepartmentField =
+    dept && typeof dept === 'object' && dept._id
+      ? { id: dept._id, name: dept.name, code: dept.code }
+      : dept ?? null;
+
   return {
     id:                  this._id,
     deviceCode:          this.deviceCode,
@@ -189,13 +244,21 @@ deviceSchema.methods.toPublicJSON = function () {
     ipAddress:           this.ipAddress,
     macAddress:          this.macAddress,
     port:                this.port,
+    campus:              this.campus,
     building:            this.building,
     floor:               this.floor,
     room:                this.room,
     locationDescription: this.locationDescription,
+    assignedDepartment:  assignedDepartmentField,
+    connectionMode:      this.connectionMode,
+    heartbeatInterval:   this.heartbeatInterval,
+    isAttendanceEnabled: this.isAttendanceEnabled,
+    isDefaultDevice:     this.isDefaultDevice,
     status:              this.status,
     lastSeen:            this.lastSeen,
     lastSync:            this.lastSync,
+    lastHeartbeat:       this.lastHeartbeat,
+    lastError:           this.lastError,
     isActive:            this.isActive,
     deletedAt:           this.deletedAt,
     deletedBy:           this.deletedBy,
