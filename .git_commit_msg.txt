@@ -1,0 +1,10 @@
+feat: add production-ready Department, Faculty, and Student modules with CRUD, validation, soft delete, audit logs, and search
+
+- Implement Department, Faculty, and Student modules
+- Add production-ready CRUD operations
+- Add centralized validation and structured logging
+- Implement soft delete with audit fields
+- Add pagination, filtering, sorting, and search
+- Add department reference validation and population
+- Keep attendance identity device-agnostic
+- Standardize architecture across

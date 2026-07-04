@@ -8,7 +8,7 @@
  */
 export const PERMISSIONS = Object.freeze({
   // Employee resource
-  EMPLOYEE_READ: 'employee:read',
+  EMPLOYEE_READ:   'employee:read',
   EMPLOYEE_CREATE: 'employee:create',
   EMPLOYEE_UPDATE: 'employee:update',
 
@@ -16,7 +16,7 @@ export const PERMISSIONS = Object.freeze({
   ATTENDANCE_READ: 'attendance:read',
 
   // Reports resource
-  REPORTS_READ: 'reports:read',
+  REPORTS_READ:     'reports:read',
   REPORTS_GENERATE: 'reports:generate',
 
   // Devices resource
@@ -24,11 +24,11 @@ export const PERMISSIONS = Object.freeze({
   DEVICES_PING: 'devices:ping',
 
   // Payroll resource
-  PAYROLL_READ: 'payroll:read',
+  PAYROLL_READ:   'payroll:read',
   PAYROLL_EXPORT: 'payroll:export',
 
   // Settings resource
-  SETTINGS_READ: 'settings:read',
+  SETTINGS_READ:   'settings:read',
   SETTINGS_UPDATE: 'settings:update',
 
   // System-level

@@ -67,7 +67,7 @@ const adminSchema = new Schema(
 );
 
 // ─── Indexes ──────────────────────────────────────────────────────────────────
-adminSchema.index({ email: 1 });
+// Note: email has unique:true on the field definition — no separate index needed.
 adminSchema.index({ role: 1 });
 
 // ─── Pre-save Hook — Password Hashing ─────────────────────────────────────────
