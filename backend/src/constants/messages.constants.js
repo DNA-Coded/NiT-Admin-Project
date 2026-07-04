@@ -83,4 +83,21 @@ export const MESSAGES = Object.freeze({
   STUDENT_NO_CHANGES:                'No fields were provided to update.',
   STUDENT_INVALID_STATUS:            'Invalid status.',
   STUDENT_INVALID_SEMESTER:          'Invalid semester.',
+
+  // ─── Device ──────────────────────────────────────────────────────────────────
+  DEVICE_FETCH_LIST:          'Devices retrieved successfully.',
+  DEVICE_FETCH_DETAIL:        'Device retrieved successfully.',
+  DEVICE_CREATED:             'Device created successfully.',
+  DEVICE_UPDATED:             'Device updated successfully.',
+  DEVICE_STATUS_UPDATED:      'Device status updated successfully.',
+  DEVICE_DELETED:             'Device deactivated successfully.',
+  DEVICE_RESTORED:            'Device restored successfully.',
+  DEVICE_NOT_FOUND:           'Device not found.',
+  DEVICE_CODE_TAKEN:          'A device with this code already exists.',
+  DEVICE_SERIAL_TAKEN:        'A device with this serial number already exists.',
+  DEVICE_ALREADY_ACTIVE:      'Device is already active.',
+  DEVICE_ALREADY_INACTIVE:    'Device is already inactive.',
+  DEVICE_NO_CHANGES:          'No fields were provided to update.',
+  DEVICE_INVALID_STATUS:      'Invalid device status. Allowed values are: ONLINE, OFFLINE, MAINTENANCE, DISCONNECTED.',
+  DEVICE_INVALID_TYPE:        'Invalid device type. Allowed values are: FINGERPRINT, FACE_RECOGNITION, HYBRID.',
 });

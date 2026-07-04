@@ -30,3 +30,12 @@ export {
   STUDENT_SORT_ORDERS,
   STUDENT_PAGINATION,
 } from './student.constants.js';
+export {
+  DEVICE_TYPES,
+  DEVICE_TYPES_VALUES,
+  DEVICE_STATUS,
+  DEVICE_STATUS_VALUES,
+  DEVICE_SORT_FIELDS,
+  DEVICE_SORT_ORDERS,
+  DEVICE_PAGINATION,
+} from './device.constants.js';

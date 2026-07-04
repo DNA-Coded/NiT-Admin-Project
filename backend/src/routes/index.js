@@ -16,6 +16,7 @@ import authRoutes       from '../modules/auth/auth.routes.js';
 import departmentRoutes from '../modules/departments/departments.routes.js';
 import facultyRoutes    from '../modules/faculty/faculty.routes.js';
 import studentRoutes    from '../modules/students/student.routes.js';
+import deviceRoutes     from '../modules/devices/device.routes.js';
 
 // Future routes — import and mount here as each module is built:
 // import attendanceRoutes from './attendance.routes.js';
@@ -31,6 +32,7 @@ router.use('/auth',        authRoutes);
 router.use('/departments', departmentRoutes);
 router.use('/faculty',     facultyRoutes);
 router.use('/students',    studentRoutes);
+router.use('/devices',     deviceRoutes);
 
 // Future mounts:
 // router.use('/attendance', attendanceRoutes);
