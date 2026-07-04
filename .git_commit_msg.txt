@@ -1,11 +1,11 @@
-feat: implement device configuration and operational management
+feat: implement attendance engine
 
-- Add device assignment and location management
-- Add operational configuration fields
-- Support department assignment validation
-- Add connection mode configuration
-- Add heartbeat monitoring fields
-- Add attendance enable/disable controls
-- Extend device filtering capabilities
-- Add structured operational logging
-- Keep implementation production-ready and device-agnostic
+- Add Attendance module
+- Implement device-agnostic attendance engine
+- Support Faculty and Student attendance
+- Add dynamic refPath relationships
+- Implement CRUD APIs
+- Add validation and structured logging
+- Add filtering, pagination, and search
+- Implement attendance audit fields
+- Keep implementation independent of device communication

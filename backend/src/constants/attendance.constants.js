@@ -1,39 +1,60 @@
 /**
  * Attendance Constants
  *
- * Defines all possible status values and punch types for the attendance system.
- * These are used across models, controllers, and services to avoid magic strings.
+ * Domain-specific constants for the Attendance Engine.
  */
 
-/**
- * Daily attendance status of an employee.
- */
-export const ATTENDANCE_STATUS = Object.freeze({
-  PRESENT: 'present',       // Arrived on time
-  ABSENT: 'absent',         // No biometric record for the day
-  LATE: 'late',             // Arrived after the configured grace period
-  HALF_DAY: 'half_day',     // Left before minimum hours threshold
-  ON_LEAVE: 'on_leave',     // Covered by an approved leave request
-  HOLIDAY: 'holiday',       // Institutional holiday — no attendance required
-  WEEKEND: 'weekend',       // Non-working day
+export const PERSON_TYPES = Object.freeze({
+  FACULTY: 'FACULTY',
+  STUDENT: 'STUDENT',
 });
 
-/**
- * Biometric punch direction recorded by the device.
- */
-export const PUNCH_TYPE = Object.freeze({
-  IN: 'in',    // Entry punch
-  OUT: 'out',  // Exit punch
+export const PERSON_TYPES_VALUES = Object.freeze(Object.values(PERSON_TYPES));
+
+export const VERIFICATION_METHODS = Object.freeze({
+  FINGERPRINT:      'FINGERPRINT',
+  FACE_RECOGNITION: 'FACE_RECOGNITION',
+  HYBRID:           'HYBRID',
+  MANUAL:           'MANUAL',
 });
 
-/**
- * Leave types that may be applied to an attendance record.
- */
-export const LEAVE_TYPE = Object.freeze({
-  CASUAL: 'casual',
-  SICK: 'sick',
-  EARNED: 'earned',
-  MATERNITY: 'maternity',
-  PATERNITY: 'paternity',
-  UNPAID: 'unpaid',
+export const VERIFICATION_METHODS_VALUES = Object.freeze(Object.values(VERIFICATION_METHODS));
+
+export const ATTENDANCE_TYPES = Object.freeze({
+  CHECK_IN:  'CHECK_IN',
+  CHECK_OUT: 'CHECK_OUT',
+});
+
+export const ATTENDANCE_TYPES_VALUES = Object.freeze(Object.values(ATTENDANCE_TYPES));
+
+export const ATTENDANCE_RECORD_STATUS = Object.freeze({
+  PRESENT:   'PRESENT',
+  LATE:      'LATE',
+  EARLY_OUT: 'EARLY_OUT',
+  ABSENT:    'ABSENT',
+  MANUAL:    'MANUAL',
+  CORRECTED: 'CORRECTED',
+});
+
+export const ATTENDANCE_RECORD_STATUS_VALUES = Object.freeze(Object.values(ATTENDANCE_RECORD_STATUS));
+
+export const ATTENDANCE_SORT_FIELDS = Object.freeze([
+  'attendanceCode',
+  'timestamp',
+  'attendanceDate',
+  'attendanceTime',
+  'status',
+  'personType',
+  'verificationMethod',
+  'attendanceType',
+  'createdAt',
+  'updatedAt',
+]);
+
+export const ATTENDANCE_SORT_ORDERS = Object.freeze(['asc', 'desc']);
+
+export const ATTENDANCE_PAGINATION = Object.freeze({
+  DEFAULT_PAGE:  1,
+  DEFAULT_LIMIT: 20,
+  MAX_LIMIT:     500, // Slightly higher limit for bulk fetching attendance tables
 });

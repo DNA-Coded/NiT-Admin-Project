@@ -100,4 +100,20 @@ export const MESSAGES = Object.freeze({
   DEVICE_NO_CHANGES:          'No fields were provided to update.',
   DEVICE_INVALID_STATUS:      'Invalid device status. Allowed values are: ONLINE, OFFLINE, MAINTENANCE, DISCONNECTED.',
   DEVICE_INVALID_TYPE:        'Invalid device type. Allowed values are: FINGERPRINT, FACE_RECOGNITION, HYBRID.',
+
+  // ─── Attendance ─────────────────────────────────────────────────────────────
+  ATTENDANCE_FETCH_LIST:          'Attendance records retrieved successfully.',
+  ATTENDANCE_FETCH_DETAIL:        'Attendance record retrieved successfully.',
+  ATTENDANCE_CREATED:             'Attendance record created successfully.',
+  ATTENDANCE_UPDATED:             'Attendance record updated successfully.',
+  ATTENDANCE_DELETED:             'Attendance record deactivated successfully.',
+  ATTENDANCE_RESTORED:            'Attendance record restored successfully.',
+  ATTENDANCE_NOT_FOUND:           'Attendance record not found.',
+  ATTENDANCE_CODE_TAKEN:          'An attendance record with this code already exists.',
+  ATTENDANCE_DUPLICATE_ENTRY:     'A duplicate attendance entry already exists for this exact time.',
+  ATTENDANCE_ALREADY_ACTIVE:      'Attendance record is already active.',
+  ATTENDANCE_ALREADY_INACTIVE:    'Attendance record is already inactive.',
+  ATTENDANCE_NO_CHANGES:          'No fields were provided to update.',
+  ATTENDANCE_PERSON_NOT_FOUND:    'The referenced person does not exist or is inactive.',
+  ATTENDANCE_IDENTITY_MISMATCH:   'The attendance identity provided does not match the referenced person.',
 });

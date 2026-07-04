@@ -7,7 +7,19 @@
  */
 export { ROLES } from './roles.constants.js';
 export { PERMISSIONS, ROLE_PERMISSIONS } from './permissions.constants.js';
-export { ATTENDANCE_STATUS, PUNCH_TYPE, LEAVE_TYPE } from './attendance.constants.js';
+export {
+  PERSON_TYPES,
+  PERSON_TYPES_VALUES,
+  VERIFICATION_METHODS,
+  VERIFICATION_METHODS_VALUES,
+  ATTENDANCE_TYPES,
+  ATTENDANCE_TYPES_VALUES,
+  ATTENDANCE_RECORD_STATUS,
+  ATTENDANCE_RECORD_STATUS_VALUES,
+  ATTENDANCE_SORT_FIELDS,
+  ATTENDANCE_SORT_ORDERS,
+  ATTENDANCE_PAGINATION,
+} from './attendance.constants.js';
 export { MESSAGES } from './messages.constants.js';
 export {
   DEPARTMENT_SORT_FIELDS,
