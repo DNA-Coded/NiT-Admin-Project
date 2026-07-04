@@ -71,3 +71,9 @@ export const logAttendanceNotFound = (attendanceId, requestMeta = {}) =>
 
 export const logAttendanceConflict = (attendanceCode, requestMeta = {}) =>
   emit('warn', 'ATTENDANCE_CONFLICT', { outcome: 'failure', reason: 'duplicate_attendance_code', attendanceCode, ...requestMeta });
+
+export const logAttendanceDuplicateRejected = (personId, attendanceType, timestamp, requestMeta = {}) =>
+  emit('warn', 'ATTENDANCE_DUPLICATE_REJECTED', { outcome: 'failure', reason: 'chronological_duplicate', personId, attendanceType, timestamp, ...requestMeta });
+
+export const logAttendanceInvalidRejected = (personId, timestamp, errorReason, requestMeta = {}) =>
+  emit('warn', 'ATTENDANCE_INVALID_REJECTED', { outcome: 'failure', reason: errorReason, personId, timestamp, ...requestMeta });

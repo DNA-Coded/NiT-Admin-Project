@@ -107,6 +107,17 @@ const attendanceSchema = new Schema(
       maxlength: [500, 'Remarks cannot exceed 500 characters.'],
     },
 
+    correctionHistory: [
+      {
+        correctionReason: { type: String, required: true, trim: true },
+        correctedAt: { type: Date, required: true },
+        correctedBy: { type: String, required: true, trim: true },
+        originalStatus: { type: String, required: true },
+        originalAttendanceType: { type: String, required: true },
+        originalRemarks: { type: String, default: null },
+      }
+    ],
+
     isActive: {
       type:    Boolean,
       default: true,
@@ -193,6 +204,7 @@ attendanceSchema.methods.toPublicJSON = function () {
     attendanceTime:     this.attendanceTime,
     status:             this.status,
     remarks:            this.remarks,
+    correctionHistory:  this.correctionHistory || [],
     isActive:           this.isActive,
     deletedAt:          this.deletedAt,
     deletedBy:          this.deletedBy,

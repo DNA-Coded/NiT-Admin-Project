@@ -4,15 +4,18 @@ import {
   validateListQuery,
   validateCreateAttendance,
   validateUpdateAttendance,
+  validateCorrectAttendance,
   validateObjectId,
 } from './attendance.validator.js';
 import {
   getAllAttendance,
   getAttendanceHandler,
+  getAttendanceHistoryHandler,
   createAttendanceHandler,
   updateAttendanceHandler,
   deleteAttendanceHandler,
   restoreAttendanceHandler,
+  correctAttendanceHandler,
 } from './attendance.controller.js';
 
 const router = Router();
@@ -38,6 +41,13 @@ router.get(
   getAttendanceHandler
 );
 
+router.get(
+  '/:id/history',
+  authenticate,
+  validateObjectId,
+  getAttendanceHistoryHandler
+);
+
 router.put(
   '/:id',
   authenticate,
@@ -58,6 +68,14 @@ router.patch(
   authenticate,
   validateObjectId,
   restoreAttendanceHandler
+);
+
+router.patch(
+  '/:id/correct',
+  authenticate,
+  validateObjectId,
+  validateCorrectAttendance,
+  correctAttendanceHandler
 );
 
 export default router;

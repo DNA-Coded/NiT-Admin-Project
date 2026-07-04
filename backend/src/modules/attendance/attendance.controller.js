@@ -9,6 +9,7 @@ import {
   updateAttendance,
   softDeleteAttendance,
   restoreAttendance,
+  correctAttendance,
 } from './attendance.service.js';
 
 export const getAllAttendance = asyncHandler(async (req, res) => {
@@ -38,6 +39,19 @@ export const getAttendanceHandler = asyncHandler(async (req, res) => {
   try {
     const record = await getAttendanceById(req.params.id, requestMeta);
     return sendSuccess(res, record, MESSAGES.ATTENDANCE_FETCH_DETAIL, 200);
+  } catch (err) {
+    if (!err.statusCode) throw err;
+    return sendError(res, err.message, err.statusCode);
+  }
+});
+
+export const getAttendanceHistoryHandler = asyncHandler(async (req, res) => {
+  const requestMeta = extractRequestMeta(req);
+
+  try {
+    const record = await getAttendanceById(req.params.id, requestMeta);
+    // The history is already embedded in the public JSON output
+    return sendSuccess(res, record, 'Attendance history retrieved successfully.', 200);
   } catch (err) {
     if (!err.statusCode) throw err;
     return sendError(res, err.message, err.statusCode);
@@ -119,6 +133,26 @@ export const restoreAttendanceHandler = asyncHandler(async (req, res) => {
   try {
     const record = await restoreAttendance(req.params.id, adminEmail, requestMeta);
     return sendSuccess(res, record, MESSAGES.ATTENDANCE_RESTORED, 200);
+  } catch (err) {
+    if (!err.statusCode) throw err;
+    return sendError(res, err.message, err.statusCode);
+  }
+});
+
+export const correctAttendanceHandler = asyncHandler(async (req, res) => {
+  const { status, attendanceType, remarks, correctionReason } = req.body;
+
+  const adminEmail  = req.admin?.email ?? 'unknown';
+  const requestMeta = extractRequestMeta(req);
+
+  try {
+    const record = await correctAttendance(
+      req.params.id,
+      { status, attendanceType, remarks, correctionReason },
+      adminEmail,
+      requestMeta
+    );
+    return sendSuccess(res, record, 'Attendance record corrected successfully.', 200);
   } catch (err) {
     if (!err.statusCode) throw err;
     return sendError(res, err.message, err.statusCode);

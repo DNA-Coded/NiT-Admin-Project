@@ -172,6 +172,45 @@ export const validateUpdateAttendance = [
   handleValidationErrors,
 ];
 
+const validateCorrectAttendanceFields = (req, res, next) => {
+  const errors = [];
+  const { status, attendanceType, remarks, correctionReason } = req.body ?? {};
+  
+  const knownFields = ['status', 'attendanceType', 'remarks', 'correctionReason'];
+  const providedKeys = Object.keys(req.body ?? {});
+  
+  const invalidFields = providedKeys.filter(f => !knownFields.includes(f));
+  if (invalidFields.length > 0) {
+    errors.push({ field: 'body', message: `Cannot modify protected fields. Only ${knownFields.join(', ')} are allowed in correction.` });
+    req.validationErrors = errors;
+    return next();
+  }
+
+  const err = validateStringField(correctionReason, 'Correction reason', 1, 500);
+  if (err) errors.push({ field: 'correctionReason', message: err });
+
+  if (status !== undefined && !ATTENDANCE_RECORD_STATUS_VALUES.includes(status)) {
+    errors.push({ field: 'status', message: `Invalid status. Allowed values: ${ATTENDANCE_RECORD_STATUS_VALUES.join(', ')}.` });
+  }
+
+  if (attendanceType !== undefined && !ATTENDANCE_TYPES_VALUES.includes(attendanceType)) {
+    errors.push({ field: 'attendanceType', message: `Invalid attendance type. Allowed values: ${ATTENDANCE_TYPES_VALUES.join(', ')}.` });
+  }
+
+  if (remarks !== undefined && remarks !== null && remarks !== '') {
+    const rErr = validateStringField(remarks, 'Remarks', 1, 500);
+    if (rErr) errors.push({ field: 'remarks', message: rErr });
+  }
+
+  req.validationErrors = errors;
+  next();
+};
+
+export const validateCorrectAttendance = [
+  validateCorrectAttendanceFields,
+  handleValidationErrors,
+];
+
 const validateListQueryFields = (req, res, next) => {
   const errors = [];
   const {

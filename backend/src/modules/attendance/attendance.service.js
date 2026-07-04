@@ -37,7 +37,7 @@ const assertPersonExistsAndMatchesIdentity = async (personId, personType, attend
   if (!personId || !personType || !attendanceIdentity) return;
 
   const Model = personType === 'FACULTY' ? Faculty : Student;
-  const person = await Model.findById(personId).select('isActive attendanceIdentity').lean();
+  const person = await Model.findById(personId).populate('department').lean();
 
   if (!person) {
     throw makeError(MESSAGES.ATTENDANCE_PERSON_NOT_FOUND, 404);
@@ -45,6 +45,10 @@ const assertPersonExistsAndMatchesIdentity = async (personId, personType, attend
 
   if (!person.isActive) {
     throw makeError(MESSAGES.ATTENDANCE_PERSON_NOT_FOUND, 422);
+  }
+
+  if (person.department && !person.department.isActive) {
+    throw makeError('The assigned department for this person is inactive.', 422);
   }
 
   if (person.attendanceIdentity !== attendanceIdentity.trim()) {
@@ -73,6 +77,33 @@ const assertNoDuplicate = async (fields, excludeId = null, requestMeta = {}) => 
     if (existing) {
       throw makeError(MESSAGES.ATTENDANCE_DUPLICATE_ENTRY, 409);
     }
+  }
+};
+
+const assertChronologicalValidity = async (person, attendanceType, timestamp, excludeId = null, requestMeta = {}) => {
+  if (!person || !attendanceType || !timestamp) return;
+
+  const punchTime = new Date(timestamp);
+  const now = new Date();
+  
+  // Future validation (allow up to 5 minutes drift)
+  if (punchTime.getTime() > now.getTime() + 5 * 60 * 1000) {
+    logAttendanceInvalidRejected(person, timestamp, 'future_timestamp', requestMeta);
+    throw makeError('Attendance timestamp cannot be in the future.', 422);
+  }
+
+  // Check last chronological record for this person to prevent consecutive punches of same type
+  const filter = { person, isActive: true, timestamp: { $lte: punchTime } };
+  if (excludeId) filter._id = { $ne: excludeId };
+
+  const lastRecord = await Attendance.findOne(filter)
+    .sort({ timestamp: -1, createdAt: -1 })
+    .select('attendanceType timestamp')
+    .lean();
+
+  if (lastRecord && lastRecord.attendanceType === attendanceType) {
+    logAttendanceDuplicateRejected(person, attendanceType, timestamp, requestMeta);
+    throw makeError(`Cannot record a ${attendanceType} immediately following another ${attendanceType} without an intervening record.`, 422);
   }
 };
 
@@ -272,6 +303,7 @@ export const createAttendance = async (data, adminEmail, requestMeta = {}) => {
   await assertDeviceExists(device);
   await assertPersonExistsAndMatchesIdentity(person, personType, attendanceIdentity);
   await assertNoDuplicate({ attendanceCode, person, attendanceType, timestamp }, null, requestMeta);
+  await assertChronologicalValidity(person, attendanceType, timestamp, null, requestMeta);
 
   const record = await Attendance.create({
     attendanceCode, personType, person, device, attendanceIdentity,
@@ -343,6 +375,12 @@ export const updateAttendance = async (id, data, adminEmail, requestMeta = {}) =
     id,
     requestMeta
   );
+
+  const newType = updates.attendanceType ?? record.attendanceType;
+  const newTimestamp = updates.timestamp ?? record.timestamp;
+  if (updates.attendanceType !== undefined || updates.timestamp !== undefined) {
+    await assertChronologicalValidity(updates.person ?? record.person, newType, newTimestamp, id, requestMeta);
+  }
 
   if (updates.status && updates.status !== record.status) {
     logAttendanceCorrected(
@@ -424,6 +462,75 @@ export const restoreAttendance = async (id, adminEmail, requestMeta = {}) => {
 
   logAttendanceRestored(
     { id: record._id, attendanceCode: record.attendanceCode },
+    adminEmail,
+    requestMeta
+  );
+
+  return record.toPublicJSON();
+};
+
+export const correctAttendance = async (id, data, adminEmail, requestMeta = {}) => {
+  const { status, attendanceType, remarks, correctionReason } = data;
+
+  const record = await Attendance.findById(id);
+  if (!record) {
+    logAttendanceNotFound(id, requestMeta);
+    throw makeError(MESSAGES.ATTENDANCE_NOT_FOUND, 404);
+  }
+
+  if (!record.isActive) {
+    throw makeError(MESSAGES.ATTENDANCE_ALREADY_INACTIVE, 400);
+  }
+
+  let isModified = false;
+  const originalStatus = record.status;
+  const originalAttendanceType = record.attendanceType;
+  const originalRemarks = record.remarks;
+
+  if (status && status !== record.status) {
+    record.status = status;
+    isModified = true;
+  }
+
+  if (attendanceType && attendanceType !== record.attendanceType) {
+    record.attendanceType = attendanceType;
+    isModified = true;
+  }
+
+  if (remarks !== undefined && remarks !== record.remarks) {
+    record.remarks = remarks;
+    isModified = true;
+  }
+
+  if (!isModified) {
+    throw makeError(MESSAGES.ATTENDANCE_NO_CHANGES, 400);
+  }
+
+  if (record.isModified('attendanceType')) {
+    await assertChronologicalValidity(record.person, record.attendanceType, record.timestamp, id, requestMeta);
+  }
+
+  record.correctionHistory.push({
+    correctionReason,
+    correctedAt: new Date(),
+    correctedBy: adminEmail,
+    originalStatus,
+    originalAttendanceType,
+    originalRemarks
+  });
+
+  record.updatedBy = adminEmail;
+  await record.save();
+
+  await record.populate({
+    path: 'person',
+    select: 'firstName lastName fullName department',
+    populate: { path: 'department', select: 'name code' }
+  });
+  await record.populate('device', 'deviceCode deviceName deviceType');
+
+  logAttendanceCorrected(
+    { id: record._id, attendanceCode: record.attendanceCode, oldStatus: originalStatus, newStatus: record.status, reason: correctionReason },
     adminEmail,
     requestMeta
   );
