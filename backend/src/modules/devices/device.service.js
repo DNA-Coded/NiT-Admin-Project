@@ -83,7 +83,8 @@ const toListItem = (doc) => {
     id:                  doc._id,
     deviceCode:          doc.deviceCode,
     deviceName:          doc.deviceName,
-    deviceType:          doc.deviceType,
+    deviceCategory:      doc.deviceCategory,
+    supportedVerificationMethods: doc.supportedVerificationMethods,
     manufacturer:        doc.manufacturer,
     model:               doc.model,
     serialNumber:        doc.serialNumber,
@@ -119,7 +120,7 @@ const toListItem = (doc) => {
 export const listDevices = async (query = {}, requestMeta = {}) => {
   const {
     page = 1, limit = 10, search = '',
-    deviceType = null, status = null, building = null, floor = null,
+    deviceCategory = null, status = null, building = null, floor = null,
     assignedDepartment = null, connectionMode = null,
     isAttendanceEnabled = 'all', isDefaultDevice = 'all',
     isActive = 'all', sortBy = 'createdAt', sortOrder = 'desc',
@@ -147,8 +148,8 @@ export const listDevices = async (query = {}, requestMeta = {}) => {
     filter.connectionMode = connectionMode.trim().toUpperCase();
   }
 
-  if (deviceType && deviceType.trim()) {
-    filter.deviceType = deviceType.trim().toUpperCase();
+  if (deviceCategory && deviceCategory.trim()) {
+    filter.deviceCategory = deviceCategory.trim().toUpperCase();
   }
 
   if (status && status.trim()) {
@@ -220,7 +221,7 @@ export const getDeviceById = async (id, requestMeta = {}) => {
 
 export const createDevice = async (data, adminEmail, requestMeta = {}) => {
   const {
-    deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
+    deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
     ipAddress, macAddress = null, port, campus = null, building, floor, room,
     locationDescription = null, firmwareVersion = null, status,
     assignedDepartment = null, connectionMode = null, heartbeatInterval = null,
@@ -231,7 +232,7 @@ export const createDevice = async (data, adminEmail, requestMeta = {}) => {
   await assertNoDuplicate({ deviceCode, serialNumber }, null, requestMeta);
 
   const device = await Device.create({
-    deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
+    deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
     ipAddress, macAddress, port, campus, building, floor, room,
     locationDescription, firmwareVersion,
     assignedDepartment, connectionMode, heartbeatInterval,
@@ -254,7 +255,7 @@ export const createDevice = async (data, adminEmail, requestMeta = {}) => {
 
 export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
   const allowedFields = [
-    'deviceCode', 'deviceName', 'deviceType', 'manufacturer', 'model', 'serialNumber',
+    'deviceCode', 'deviceName', 'deviceCategory', 'supportedVerificationMethods', 'manufacturer', 'model', 'serialNumber',
     'ipAddress', 'macAddress', 'port', 'campus', 'building', 'floor', 'room',
     'locationDescription', 'firmwareVersion', 'status',
     'assignedDepartment', 'connectionMode', 'heartbeatInterval',

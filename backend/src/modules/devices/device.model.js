@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { DEVICE_TYPES_VALUES, DEVICE_STATUS_VALUES, DEVICE_STATUS, DEVICE_CONNECTION_MODES_VALUES } from '../../constants/device.constants.js';
+import { DEVICE_CATEGORIES_VALUES, VERIFICATION_METHODS_VALUES, DEVICE_STATUS_VALUES, DEVICE_STATUS, DEVICE_CONNECTION_MODES_VALUES } from '../../constants/device.constants.js';
 
 const { Schema } = mongoose;
 
@@ -29,13 +29,25 @@ const deviceSchema = new Schema(
       maxlength: [100, 'Device name cannot exceed 100 characters.'],
     },
 
-    deviceType: {
+    deviceCategory: {
       type: String,
-      required: [true, 'Device type is required.'],
+      required: [true, 'Device category is required.'],
       enum: {
-        values:  DEVICE_TYPES_VALUES,
-        message: 'Invalid device type.',
+        values:  DEVICE_CATEGORIES_VALUES,
+        message: 'Invalid device category.',
       },
+    },
+
+    supportedVerificationMethods: {
+      type: [String],
+      required: [true, 'At least one supported verification method is required.'],
+      validate: {
+        validator: function (methods) {
+          return methods && methods.length > 0 && methods.every(method => VERIFICATION_METHODS_VALUES.includes(method));
+        },
+        message: 'Invalid supported verification methods.',
+      },
+      default: [],
     },
 
     // ── Hardware Specs ───────────────────────────────────────────────────────
@@ -219,7 +231,7 @@ const deviceSchema = new Schema(
 
 // ─── Indexes ──────────────────────────────────────────────────────────────────
 // Unique indexes are already enforced on deviceCode and serialNumber.
-deviceSchema.index({ deviceType: 1, isActive: 1 });
+deviceSchema.index({ deviceCategory: 1, isActive: 1 });
 deviceSchema.index({ status: 1, isActive: 1 });
 deviceSchema.index({ building: 1, floor: 1, isActive: 1 });
 deviceSchema.index({ createdAt: -1 });
@@ -236,7 +248,8 @@ deviceSchema.methods.toPublicJSON = function () {
     id:                  this._id,
     deviceCode:          this.deviceCode,
     deviceName:          this.deviceName,
-    deviceType:          this.deviceType,
+    deviceCategory:      this.deviceCategory,
+    supportedVerificationMethods: this.supportedVerificationMethods,
     manufacturer:        this.manufacturer,
     model:               this.model,
     serialNumber:        this.serialNumber,

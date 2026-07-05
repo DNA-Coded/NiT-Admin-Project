@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 import { handleValidationErrors } from '../../validators/index.js';
 import {
-  DEVICE_TYPES_VALUES,
+  DEVICE_CATEGORIES_VALUES,
+  VERIFICATION_METHODS_VALUES,
   DEVICE_STATUS_VALUES,
   DEVICE_CONNECTION_MODES_VALUES,
   DEVICE_SORT_FIELDS,
@@ -21,7 +22,7 @@ const validateStringField = (value, fieldName, min, max) => {
 const validateCreateDeviceFields = (req, res, next) => {
   const errors = [];
   const {
-    deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
+    deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
     ipAddress, macAddress, port, campus, building, floor, room,
     locationDescription, firmwareVersion, status,
     assignedDepartment, connectionMode, heartbeatInterval,
@@ -58,10 +59,21 @@ const validateCreateDeviceFields = (req, res, next) => {
   const roomErr = validateStringField(room, 'Room', 1, 100);
   if (roomErr) errors.push({ field: 'room', message: roomErr });
 
-  if (deviceType === undefined || deviceType === null) {
-    errors.push({ field: 'deviceType', message: 'Device type is required.' });
-  } else if (!DEVICE_TYPES_VALUES.includes(deviceType)) {
-    errors.push({ field: 'deviceType', message: `Invalid device type. Allowed values: ${DEVICE_TYPES_VALUES.join(', ')}.` });
+  if (deviceCategory === undefined || deviceCategory === null) {
+    errors.push({ field: 'deviceCategory', message: 'Device category is required.' });
+  } else if (!DEVICE_CATEGORIES_VALUES.includes(deviceCategory)) {
+    errors.push({ field: 'deviceCategory', message: `Invalid device category. Allowed values: ${DEVICE_CATEGORIES_VALUES.join(', ')}.` });
+  }
+
+  if (supportedVerificationMethods === undefined || supportedVerificationMethods === null) {
+    errors.push({ field: 'supportedVerificationMethods', message: 'At least one supported verification method is required.' });
+  } else if (!Array.isArray(supportedVerificationMethods) || supportedVerificationMethods.length === 0) {
+    errors.push({ field: 'supportedVerificationMethods', message: 'Supported verification methods must be a non-empty array.' });
+  } else {
+    const invalidMethods = supportedVerificationMethods.filter(m => !VERIFICATION_METHODS_VALUES.includes(m));
+    if (invalidMethods.length > 0) {
+      errors.push({ field: 'supportedVerificationMethods', message: `Invalid verification methods. Allowed values: ${VERIFICATION_METHODS_VALUES.join(', ')}.` });
+    }
   }
 
   // Network Config Validators
@@ -137,7 +149,7 @@ export const validateCreateDevice = [
 const validateUpdateDeviceFields = (req, res, next) => {
   const errors = [];
   const {
-    deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
+    deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
     ipAddress, macAddress, port, campus, building, floor, room,
     locationDescription, firmwareVersion, status,
     assignedDepartment, connectionMode, heartbeatInterval,
@@ -145,7 +157,7 @@ const validateUpdateDeviceFields = (req, res, next) => {
   } = req.body ?? {};
 
   const knownFields = [
-    'deviceCode', 'deviceName', 'deviceType', 'manufacturer', 'model', 'serialNumber',
+    'deviceCode', 'deviceName', 'deviceCategory', 'supportedVerificationMethods', 'manufacturer', 'model', 'serialNumber',
     'ipAddress', 'macAddress', 'port', 'campus', 'building', 'floor', 'room',
     'locationDescription', 'firmwareVersion', 'status',
     'assignedDepartment', 'connectionMode', 'heartbeatInterval',
@@ -207,9 +219,20 @@ const validateUpdateDeviceFields = (req, res, next) => {
     if (err) errors.push({ field: 'room', message: err });
   }
 
-  if (deviceType !== undefined) {
-    if (!DEVICE_TYPES_VALUES.includes(deviceType)) {
-      errors.push({ field: 'deviceType', message: `Invalid device type. Allowed values: ${DEVICE_TYPES_VALUES.join(', ')}.` });
+  if (deviceCategory !== undefined) {
+    if (!DEVICE_CATEGORIES_VALUES.includes(deviceCategory)) {
+      errors.push({ field: 'deviceCategory', message: `Invalid device category. Allowed values: ${DEVICE_CATEGORIES_VALUES.join(', ')}.` });
+    }
+  }
+
+  if (supportedVerificationMethods !== undefined) {
+    if (!Array.isArray(supportedVerificationMethods) || supportedVerificationMethods.length === 0) {
+      errors.push({ field: 'supportedVerificationMethods', message: 'Supported verification methods must be a non-empty array.' });
+    } else {
+      const invalidMethods = supportedVerificationMethods.filter(m => !VERIFICATION_METHODS_VALUES.includes(m));
+      if (invalidMethods.length > 0) {
+        errors.push({ field: 'supportedVerificationMethods', message: `Invalid verification methods. Allowed values: ${VERIFICATION_METHODS_VALUES.join(', ')}.` });
+      }
     }
   }
 
@@ -277,7 +300,7 @@ const validateListQueryFields = (req, res, next) => {
   const errors = [];
   const {
     page, limit, search,
-    deviceType, status, building, floor, isActive,
+    deviceCategory, status, building, floor, isActive,
     assignedDepartment, connectionMode, isAttendanceEnabled, isDefaultDevice,
     sortBy, sortOrder,
   } = req.query ?? {};
@@ -305,8 +328,8 @@ const validateListQueryFields = (req, res, next) => {
     errors.push({ field: 'search', message: 'search term cannot exceed 100 characters.' });
   }
 
-  if (deviceType !== undefined && !DEVICE_TYPES_VALUES.includes(deviceType)) {
-    errors.push({ field: 'deviceType', message: `deviceType filter must be one of: ${DEVICE_TYPES_VALUES.join(', ')}.` });
+  if (deviceCategory !== undefined && !DEVICE_CATEGORIES_VALUES.includes(deviceCategory)) {
+    errors.push({ field: 'deviceCategory', message: `deviceCategory filter must be one of: ${DEVICE_CATEGORIES_VALUES.join(', ')}.` });
   }
 
   if (status !== undefined && !DEVICE_STATUS_VALUES.includes(status)) {

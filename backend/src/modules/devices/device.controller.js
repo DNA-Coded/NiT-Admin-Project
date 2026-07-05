@@ -14,7 +14,7 @@ import {
 
 export const getAllDevices = asyncHandler(async (req, res) => {
   const {
-    page, limit, search, deviceType, status, building, floor,
+    page, limit, search, deviceCategory, status, building, floor,
     assignedDepartment, connectionMode, isAttendanceEnabled, isDefaultDevice,
     isActive, sortBy, sortOrder,
   } = req.query;
@@ -23,7 +23,7 @@ export const getAllDevices = asyncHandler(async (req, res) => {
 
   try {
     const result = await listDevices(
-      { page, limit, search, deviceType, status, building, floor, assignedDepartment, connectionMode, isAttendanceEnabled, isDefaultDevice, isActive, sortBy, sortOrder },
+      { page, limit, search, deviceCategory, status, building, floor, assignedDepartment, connectionMode, isAttendanceEnabled, isDefaultDevice, isActive, sortBy, sortOrder },
       requestMeta
     );
     return sendSuccess(res, result, MESSAGES.DEVICE_FETCH_LIST, 200);
@@ -47,7 +47,7 @@ export const getDeviceHandler = asyncHandler(async (req, res) => {
 
 export const createDeviceHandler = asyncHandler(async (req, res) => {
   const {
-    deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
+    deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
     ipAddress, macAddress, port, campus, building, floor, room,
     locationDescription, firmwareVersion, status,
     assignedDepartment, connectionMode, heartbeatInterval,
@@ -60,7 +60,7 @@ export const createDeviceHandler = asyncHandler(async (req, res) => {
   try {
     const device = await createDevice(
       {
-        deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
+        deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
         ipAddress, macAddress, port, campus, building, floor, room,
         locationDescription, firmwareVersion, status,
         assignedDepartment, connectionMode, heartbeatInterval,
@@ -78,7 +78,7 @@ export const createDeviceHandler = asyncHandler(async (req, res) => {
 
 export const updateDeviceHandler = asyncHandler(async (req, res) => {
   const {
-    deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
+    deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
     ipAddress, macAddress, port, campus, building, floor, room,
     locationDescription, firmwareVersion, status,
     assignedDepartment, connectionMode, heartbeatInterval,
@@ -92,7 +92,7 @@ export const updateDeviceHandler = asyncHandler(async (req, res) => {
     const device = await updateDevice(
       req.params.id,
       {
-        deviceCode, deviceName, deviceType, manufacturer, model, serialNumber,
+        deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
         ipAddress, macAddress, port, campus, building, floor, room,
         locationDescription, firmwareVersion, status,
         assignedDepartment, connectionMode, heartbeatInterval,

@@ -188,7 +188,7 @@ attendanceSchema.methods.toPublicJSON = function () {
   const d = this.device;
   const deviceField =
     d && typeof d === 'object' && d._id
-      ? { id: d._id, deviceCode: d.deviceCode, deviceName: d.deviceName, deviceType: d.deviceType }
+      ? { id: d._id, deviceCode: d.deviceCode, deviceName: d.deviceName, deviceCategory: d.deviceCategory }
       : d ?? null;
 
   return {

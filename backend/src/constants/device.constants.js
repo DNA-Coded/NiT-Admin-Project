@@ -5,13 +5,26 @@
  * Used for validation and database enums to ensure device-agnostic compatibility.
  */
 
-export const DEVICE_TYPES = Object.freeze({
-  FINGERPRINT:      'FINGERPRINT',
-  FACE_RECOGNITION: 'FACE_RECOGNITION',
-  HYBRID:           'HYBRID',
+export const DEVICE_CATEGORIES = Object.freeze({
+  BIOMETRIC_TERMINAL: 'BIOMETRIC_TERMINAL',
+  RFID_READER:        'RFID_READER',
+  QR_SCANNER:         'QR_SCANNER',
+  MOBILE_DEVICE:      'MOBILE_DEVICE',
+  OTHER:              'OTHER',
 });
 
-export const DEVICE_TYPES_VALUES = Object.freeze(Object.values(DEVICE_TYPES));
+export const DEVICE_CATEGORIES_VALUES = Object.freeze(Object.values(DEVICE_CATEGORIES));
+
+export const VERIFICATION_METHODS = Object.freeze({
+  FACE_RECOGNITION: 'FACE_RECOGNITION',
+  FINGERPRINT:      'FINGERPRINT',
+  RFID:             'RFID',
+  PIN:              'PIN',
+  QR_CODE:          'QR_CODE',
+  MANUAL:           'MANUAL',
+});
+
+export const VERIFICATION_METHODS_VALUES = Object.freeze(Object.values(VERIFICATION_METHODS));
 
 export const DEVICE_STATUS = Object.freeze({
   ONLINE:       'ONLINE',

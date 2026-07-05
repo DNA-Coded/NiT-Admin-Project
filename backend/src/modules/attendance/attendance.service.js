@@ -203,7 +203,7 @@ export const listAttendance = async (query = {}, requestMeta = {}) => {
         select: 'firstName lastName fullName department',
         populate: { path: 'department', select: 'name code' }
       })
-      .populate('device', 'deviceCode deviceName deviceType')
+      .populate('device', 'deviceCode deviceName deviceCategory')
       .sort(sort)
       .skip(skip)
       .limit(limitNum)
@@ -236,7 +236,7 @@ export const listAttendance = async (query = {}, requestMeta = {}) => {
     const d = doc.device;
     const deviceField =
       d && typeof d === 'object' && d._id
-        ? { id: d._id, deviceCode: d.deviceCode, deviceName: d.deviceName, deviceType: d.deviceType }
+        ? { id: d._id, deviceCode: d.deviceCode, deviceName: d.deviceName, deviceCategory: d.deviceCategory }
         : d ?? null;
 
     return {
@@ -282,7 +282,7 @@ export const getAttendanceById = async (id, requestMeta = {}) => {
       select: 'firstName lastName fullName department',
       populate: { path: 'department', select: 'name code' }
     })
-    .populate('device', 'deviceCode deviceName deviceType');
+    .populate('device', 'deviceCode deviceName deviceCategory');
 
   if (!record) {
     logAttendanceNotFound(id, requestMeta);
@@ -317,7 +317,7 @@ export const createAttendance = async (data, adminEmail, requestMeta = {}) => {
     select: 'firstName lastName fullName department',
     populate: { path: 'department', select: 'name code' }
   });
-  await record.populate('device', 'deviceCode deviceName deviceType');
+  await record.populate('device', 'deviceCode deviceName deviceCategory');
 
   logAttendanceCreated(
     { id: record._id, attendanceCode: record.attendanceCode, personId: record.person._id, deviceId: record.device._id },
@@ -399,7 +399,7 @@ export const updateAttendance = async (id, data, adminEmail, requestMeta = {}) =
     select: 'firstName lastName fullName department',
     populate: { path: 'department', select: 'name code' }
   });
-  await record.populate('device', 'deviceCode deviceName deviceType');
+  await record.populate('device', 'deviceCode deviceName deviceCategory');
 
   logAttendanceUpdated(
     { id: record._id, attendanceCode: record.attendanceCode },
@@ -458,7 +458,7 @@ export const restoreAttendance = async (id, adminEmail, requestMeta = {}) => {
     select: 'firstName lastName fullName department',
     populate: { path: 'department', select: 'name code' }
   });
-  await record.populate('device', 'deviceCode deviceName deviceType');
+  await record.populate('device', 'deviceCode deviceName deviceCategory');
 
   logAttendanceRestored(
     { id: record._id, attendanceCode: record.attendanceCode },
@@ -527,7 +527,7 @@ export const correctAttendance = async (id, data, adminEmail, requestMeta = {}) 
     select: 'firstName lastName fullName department',
     populate: { path: 'department', select: 'name code' }
   });
-  await record.populate('device', 'deviceCode deviceName deviceType');
+  await record.populate('device', 'deviceCode deviceName deviceCategory');
 
   logAttendanceCorrected(
     { id: record._id, attendanceCode: record.attendanceCode, oldStatus: originalStatus, newStatus: record.status, reason: correctionReason },
