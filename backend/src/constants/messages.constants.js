@@ -125,4 +125,11 @@ export const MESSAGES = Object.freeze({
   SYNC_NOT_FOUND:           'Sync job not found.',
   SYNC_ALREADY_RUNNING:     'A sync job is already running for this device.',
   SYNC_INVALID_STATUS:      'Invalid sync status transition.',
+
+  // ─── Events (Integration Pipeline) ──────────────────────────────────────────
+  EVENT_FETCH_LIST:         'Events retrieved successfully.',
+  EVENT_FETCH_DETAIL:       'Event details retrieved successfully.',
+  EVENT_PROCESSED:          'Event processed successfully.',
+  EVENT_NOT_FOUND:          'Event not found.',
+  EVENT_ALREADY_PROCESSED:  'Event is already processed or failed.',
 });

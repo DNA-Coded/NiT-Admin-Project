@@ -53,3 +53,10 @@ export {
   DEVICE_SORT_ORDERS,
   DEVICE_PAGINATION,
 } from './device.constants.js';
+export {
+  PROCESSING_STATUS,
+  PROCESSING_STATUS_VALUES,
+  RAW_EVENT_SORT_FIELDS,
+  RAW_EVENT_SORT_ORDERS,
+  RAW_EVENT_PAGINATION,
+} from '../modules/rawEvents/rawAttendanceEvent.constants.js';
