@@ -116,4 +116,13 @@ export const MESSAGES = Object.freeze({
   ATTENDANCE_NO_CHANGES:          'No fields were provided to update.',
   ATTENDANCE_PERSON_NOT_FOUND:    'The referenced person does not exist or is inactive.',
   ATTENDANCE_IDENTITY_MISMATCH:   'The attendance identity provided does not match the referenced person.',
+
+  // ─── Sync ───────────────────────────────────────────────────────────────────
+  SYNC_FETCH_LIST:          'Sync history retrieved successfully.',
+  SYNC_FETCH_DETAIL:        'Sync details retrieved successfully.',
+  SYNC_STARTED:             'Sync job started successfully.',
+  SYNC_RETRY_STARTED:       'Sync job retry started successfully.',
+  SYNC_NOT_FOUND:           'Sync job not found.',
+  SYNC_ALREADY_RUNNING:     'A sync job is already running for this device.',
+  SYNC_INVALID_STATUS:      'Invalid sync status transition.',
 });
