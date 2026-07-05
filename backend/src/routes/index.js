@@ -11,7 +11,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 import { Router } from 'express';
-import healthRoutes     from '../modules/health/health.routes.js';
+import systemHealthRoutes from '../modules/health/health.routes.js';
 import authRoutes       from '../modules/auth/auth.routes.js';
 import departmentRoutes from '../modules/departments/departments.routes.js';
 import facultyRoutes    from '../modules/faculty/faculty.routes.js';
@@ -20,6 +20,7 @@ import deviceRoutes     from '../modules/devices/device.routes.js';
 import attendanceRoutes from '../modules/attendance/attendance.routes.js';
 import syncRoutes       from '../integrations/sync/sync.routes.js';
 import rawEventRoutes   from '../modules/rawEvents/rawAttendanceEvent.routes.js';
+import deviceHealthRoutes from '../integrations/health/health.routes.js';
 
 // Future routes — import and mount here as each module is built:
 // import attendanceRoutes from './attendance.routes.js';
@@ -30,7 +31,7 @@ import rawEventRoutes   from '../modules/rawEvents/rawAttendanceEvent.routes.js'
 
 const router = Router();
 
-router.use('/health',      healthRoutes);
+router.use('/system-health', systemHealthRoutes);
 router.use('/auth',        authRoutes);
 router.use('/departments', departmentRoutes);
 router.use('/faculty',     facultyRoutes);
@@ -39,6 +40,7 @@ router.use('/devices',     deviceRoutes);
 router.use('/attendance',  attendanceRoutes);
 router.use('/sync',        syncRoutes);
 router.use('/events',      rawEventRoutes);
+router.use('/health',      deviceHealthRoutes);
 
 // Future mounts:
 // router.use('/attendance', attendanceRoutes);

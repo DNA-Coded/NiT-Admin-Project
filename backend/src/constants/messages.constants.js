@@ -132,4 +132,12 @@ export const MESSAGES = Object.freeze({
   EVENT_PROCESSED:          'Event processed successfully.',
   EVENT_NOT_FOUND:          'Event not found.',
   EVENT_ALREADY_PROCESSED:  'Event is already processed or failed.',
+
+  // ─── Health (Device Health Monitoring) ──────────────────────────────────────
+  HEALTH_FETCH_LIST:          'Device health list retrieved successfully.',
+  HEALTH_FETCH_DETAIL:        'Device health details retrieved successfully.',
+  HEALTH_HEARTBEAT_RECORDED:  'Device heartbeat recorded successfully.',
+  HEALTH_STATUS_UPDATED:      'Device health status updated successfully.',
+  HEALTH_ERROR_RECORDED:      'Device error recorded successfully.',
+  HEALTH_RESET:               'Device health metrics reset successfully.',
 });

@@ -60,3 +60,7 @@ export {
   RAW_EVENT_SORT_ORDERS,
   RAW_EVENT_PAGINATION,
 } from '../modules/rawEvents/rawAttendanceEvent.constants.js';
+export {
+  DEVICE_HEALTH_STATUS,
+  DEVICE_HEALTH_STATUS_VALUES,
+} from '../integrations/health/health.constants.js';

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { DEVICE_CATEGORIES_VALUES, VERIFICATION_METHODS_VALUES, DEVICE_STATUS_VALUES, DEVICE_STATUS, DEVICE_CONNECTION_MODES_VALUES } from '../../constants/device.constants.js';
+import { DEVICE_HEALTH_STATUS_VALUES, DEVICE_HEALTH_STATUS } from '../../integrations/health/health.constants.js';
 
 const { Schema } = mongoose;
 
@@ -166,6 +167,39 @@ const deviceSchema = new Schema(
       default: null,
     },
 
+    // ── Health Monitoring ────────────────────────────────────────────────────
+    healthStatus: {
+      type: String,
+      enum: {
+        values:  DEVICE_HEALTH_STATUS_VALUES,
+        message: 'Invalid device health status.',
+      },
+      default: DEVICE_HEALTH_STATUS.OFFLINE,
+    },
+
+    failureCount: {
+      type:    Number,
+      default: 0,
+      min:     0,
+    },
+
+    uptime: {
+      type:    Number, // in seconds
+      default: 0,
+      min:     0,
+    },
+
+    downtime: {
+      type:    Number, // in seconds
+      default: 0,
+      min:     0,
+    },
+
+    lastHealthCheck: {
+      type:    Date,
+      default: null,
+    },
+
     isAttendanceEnabled: {
       type:    Boolean,
       default: true,
@@ -268,6 +302,11 @@ deviceSchema.methods.toPublicJSON = function () {
     isAttendanceEnabled: this.isAttendanceEnabled,
     isDefaultDevice:     this.isDefaultDevice,
     status:              this.status,
+    healthStatus:        this.healthStatus,
+    failureCount:        this.failureCount,
+    uptime:              this.uptime,
+    downtime:            this.downtime,
+    lastHealthCheck:     this.lastHealthCheck,
     lastSeen:            this.lastSeen,
     lastSync:            this.lastSync,
     lastHeartbeat:       this.lastHeartbeat,
