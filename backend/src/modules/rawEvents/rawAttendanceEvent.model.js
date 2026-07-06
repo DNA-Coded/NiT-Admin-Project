@@ -80,7 +80,6 @@ const rawAttendanceEventSchema = new Schema(
 );
 
 // ─── Indexes ──────────────────────────────────────────────────────────────────
-rawAttendanceEventSchema.index({ eventId: 1 });
 rawAttendanceEventSchema.index({ device: 1, processingStatus: 1 });
 rawAttendanceEventSchema.index({ processingStatus: 1 });
 rawAttendanceEventSchema.index({ receivedAt: -1 });

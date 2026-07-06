@@ -5,12 +5,14 @@ import { DepartmentSummaryCards } from '@/features/departments/components/Depart
 import { DepartmentTable } from '@/features/departments/components/DepartmentTable';
 import { DepartmentDrawer } from '@/features/departments/components/DepartmentDrawer';
 import { AddDepartmentDialog } from '@/features/departments/components/AddDepartmentDialog';
+import { EditDepartmentDialog } from '@/features/departments/components/EditDepartmentDialog';
 import { StatePlaceholder } from '@/components/shared/StatePlaceholder';
 
 export default function Departments() {
   const [departments, setDepartments] = useState<Department[]>(mockDepartments);
   const [selectedDept, setSelectedDept] = useState<Department | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
   // States to satisfy mandatory UI requirements
@@ -35,6 +37,16 @@ export default function Departments() {
     setDepartments((prev) => [created, ...prev]);
   };
 
+  const handleEditDepartment = (id: string, updatedDept: Partial<Department>) => {
+    setDepartments((prev) => 
+      prev.map(dept => dept.id === id ? { ...dept, ...updatedDept } : dept)
+    );
+    // Also update selectedDept if it's currently selected
+    if (selectedDept?.id === id) {
+      setSelectedDept((prev) => prev ? { ...prev, ...updatedDept } : null);
+    }
+  };
+
   const triggerError = () => {
     setError('Failed to fetch departments. Please try again.');
   };
@@ -44,30 +56,7 @@ export default function Departments() {
     setTimeout(() => setLoading(false), 1200);
   };
 
-  if (loading) {
-    return (
-      <div className="py-20 flex justify-center items-center">
-        <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm">
-        <StatePlaceholder
-          state="error"
-          errorMessage={error}
-        />
-        <button
-          onClick={() => setError(null)}
-          className="mt-2 px-4 py-2 bg-primary text-on-primary rounded hover:bg-primary-container transition-colors font-label-md text-label-md shadow-sm"
-        >
-          Retry Connection
-        </button>
-      </div>
-    );
-  }
+  // No early return for loading and error, we handle them inline below
 
   return (
     <div className="space-y-6">
@@ -123,7 +112,19 @@ export default function Departments() {
       </div>
 
       {/* Main Table view */}
-      {filteredDepartments.length === 0 ? (
+      {loading ? (
+        <div className="py-20 flex justify-center items-center bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm">
+          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm">
+          <StatePlaceholder
+            state="error"
+            errorMessage={error}
+            onRetry={() => setError(null)}
+          />
+        </div>
+      ) : filteredDepartments.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm">
           <StatePlaceholder 
             state="empty"
@@ -147,6 +148,7 @@ export default function Departments() {
       <DepartmentDrawer 
         department={selectedDept}
         onClose={() => setSelectedDept(null)}
+        onEditClick={() => { setIsEditOpen(true); }}
       />
 
       {/* Add Dialog Modal */}
@@ -154,6 +156,14 @@ export default function Departments() {
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
         onAdd={handleAddDepartment}
+      />
+
+      {/* Edit Dialog Modal */}
+      <EditDepartmentDialog 
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        department={selectedDept}
+        onEdit={handleEditDepartment}
       />
     </div>
   );

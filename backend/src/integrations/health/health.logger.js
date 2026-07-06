@@ -1,5 +1,5 @@
 import { createLogger, format, transports } from 'winston';
-import config from '../../config/index.js';
+import serverConfig from '../../config/server.config.js';
 
 const { combine, timestamp, printf, errors } = format;
 
@@ -25,7 +25,7 @@ const healthFormat = printf(({ level, message, timestamp, stack, ...meta }) => {
 });
 
 const healthLogger = createLogger({
-  level: config.isDevelopment ? 'debug' : 'info',
+  level: serverConfig.isDevelopment ? 'debug' : 'info',
   format: combine(
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     errors({ stack: true }),

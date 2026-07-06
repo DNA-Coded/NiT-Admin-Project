@@ -7,6 +7,7 @@ interface StatePlaceholderProps {
   state: ViewState;
   emptyMessage?: string;
   errorMessage?: string;
+  onRetry?: () => void;
   className?: string;
   children?: React.ReactNode;
 }
@@ -15,6 +16,7 @@ export const StatePlaceholder: React.FC<StatePlaceholderProps> = ({
   state,
   emptyMessage = 'No data available.',
   errorMessage = 'Something went wrong.',
+  onRetry,
   className,
   children,
 }) => {
@@ -47,9 +49,14 @@ export const StatePlaceholder: React.FC<StatePlaceholderProps> = ({
         <div className="flex flex-col items-center gap-3 text-error">
           <span className="material-symbols-outlined text-4xl">error</span>
           <p className="font-body-sm text-body-sm">{errorMessage}</p>
-          <button className="mt-2 px-4 py-2 border border-error rounded hover:bg-error-container transition-colors font-label-md text-label-md">
-            Retry
-          </button>
+          {onRetry && (
+            <button 
+              onClick={onRetry}
+              className="mt-2 px-4 py-2 border border-error rounded hover:bg-error-container transition-colors font-label-md text-label-md"
+            >
+              Retry
+            </button>
+          )}
         </div>
       )}
     </div>

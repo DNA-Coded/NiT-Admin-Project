@@ -3,9 +3,10 @@ import type { Department } from '@/types/departments';
 interface DepartmentDrawerProps {
   department: Department | null;
   onClose: () => void;
+  onEditClick: () => void;
 }
 
-export function DepartmentDrawer({ department, onClose }: DepartmentDrawerProps) {
+export function DepartmentDrawer({ department, onClose, onEditClick }: DepartmentDrawerProps) {
   if (!department) return null;
 
   return (
@@ -123,7 +124,10 @@ export function DepartmentDrawer({ department, onClose }: DepartmentDrawerProps)
           >
             Cancel
           </button>
-          <button className="bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-2 px-4 rounded transition-colors shadow-sm">
+          <button 
+            className="bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-2 px-4 rounded transition-colors shadow-sm"
+            onClick={onEditClick}
+          >
             Edit Department
           </button>
         </div>
