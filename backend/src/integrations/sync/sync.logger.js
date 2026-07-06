@@ -32,6 +32,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export const logProviderInitialized = (meta) => syncLogger.info('Provider initialized', { ...meta });
+export const logProviderLoaded = (meta) => syncLogger.info('Provider loaded', { ...meta });
 export const logDeviceConnected = (meta) => syncLogger.info('Device connected', { ...meta });
 export const logDeviceDisconnected = (meta) => syncLogger.info('Device disconnected', { ...meta });
 export const logPingSuccessful = (meta) => syncLogger.info('Ping successful', { ...meta });
@@ -39,5 +40,8 @@ export const logSyncStarted = (meta) => syncLogger.info('Sync started', { ...met
 export const logSyncCompleted = (meta) => syncLogger.info('Sync completed', { ...meta });
 export const logSyncFailed = (meta) => syncLogger.error('Sync failed', { ...meta });
 export const logProviderError = (meta) => syncLogger.error('Provider error', { ...meta });
+export const logPlaceholderInvoked = (meta) => syncLogger.info('Placeholder invoked', { ...meta });
+export const logUnsupportedOperation = (meta) => syncLogger.warn('Unsupported operation', { ...meta });
+export const logValidationFailed = (meta) => syncLogger.warn('Provider validation failed', { ...meta });
 
 export default syncLogger;

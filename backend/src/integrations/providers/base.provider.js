@@ -14,6 +14,15 @@ class BaseProvider {
   }
 
   /**
+   * Initialize provider configuration (e.g. credentials, connection settings)
+   * @param {Object} config Optional configuration parameters
+   * @returns {Promise<boolean>}
+   */
+  async initialize(config = {}) {
+    throw new Error('Method initialize() must be implemented');
+  }
+
+  /**
    * Initialize connection with the device
    * @returns {Promise<boolean>}
    */
@@ -81,8 +90,25 @@ class BaseProvider {
   }
 
   /**
+   * Normalize successful responses into a standard format
+   * @param {string} operation The name of the operation
+   * @param {any} data The resulting data
+   * @param {Object} metadata Any additional metadata
+   * @returns {Object} Standardized success response
+   */
+  standardizeResponse(operation, data = null, metadata = {}) {
+    return {
+      success: true,
+      provider: this.constructor.name,
+      operation,
+      data,
+      metadata
+    };
+  }
+
+  /**
    * Normalize errors into a standard format
-   * @param {Error} error 
+   * @param {Error|Object} error 
    * @param {boolean} retryable 
    * @returns {Object} Standardized error object
    */
