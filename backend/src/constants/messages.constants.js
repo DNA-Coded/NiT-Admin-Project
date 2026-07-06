@@ -147,4 +147,7 @@ export const MESSAGES = Object.freeze({
   DASHBOARD_ANALYTICS_FETCHED: 'Dashboard analytics retrieved successfully.',
   DASHBOARD_LIVE_FETCHED:     'Dashboard live monitoring retrieved successfully.',
   DASHBOARD_FILTER_FETCHED:   'Dashboard filtered data retrieved successfully.',
+  
+  // ─── Reports ────────────────────────────────────────────────────────────────
+  REPORT_GENERATED:           'Report generated successfully.',
 });

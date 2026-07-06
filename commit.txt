@@ -1,8 +1,8 @@
-feat: add dashboard filtering and search APIs
+feat: add reporting APIs
 
-- Add unified dashboard filtering endpoint
-- Support dynamic attendance, device and synchronization filters
-- Add date range, department and academic filters
-- Add pagination and sorting
-- Optimize filtering queries using dynamic query builders
-- Prepare backend for advanced dashboard interactions
+- Add Reports module
+- Implement attendance, faculty, student, device and synchronization reports
+- Add filtering, pagination and sorting
+- Add report summaries
+- Optimize report queries using dynamic query builders
+- Prepare backend for report exports

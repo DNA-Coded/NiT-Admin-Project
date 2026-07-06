@@ -19,9 +19,10 @@ import studentRoutes    from '../modules/students/student.routes.js';
 import deviceRoutes     from '../modules/devices/device.routes.js';
 import attendanceRoutes from '../modules/attendance/attendance.routes.js';
 import syncRoutes       from '../integrations/sync/sync.routes.js';
-import rawEventRoutes   from '../modules/rawEvents/rawAttendanceEvent.routes.js';
-import deviceHealthRoutes from '../integrations/health/health.routes.js';
+import rawAttendanceEventRoutes from '../modules/rawEvents/rawAttendanceEvent.routes.js';
+import healthRoutes from '../integrations/health/health.routes.js';
 import dashboardRoutes    from '../modules/dashboard/dashboard.routes.js';
+import reportsRoutes from '../modules/reports/reports.routes.js';
 
 // Future routes — import and mount here as each module is built:
 // import attendanceRoutes from './attendance.routes.js';
@@ -40,9 +41,10 @@ router.use('/students',    studentRoutes);
 router.use('/devices',     deviceRoutes);
 router.use('/attendance',  attendanceRoutes);
 router.use('/sync',        syncRoutes);
-router.use('/events',      rawEventRoutes);
-router.use('/health',      deviceHealthRoutes);
+router.use('/events',      rawAttendanceEventRoutes);
+router.use('/health',      healthRoutes);
 router.use('/dashboard',   dashboardRoutes);
+router.use('/reports',     reportsRoutes);
 
 // Future mounts:
 // router.use('/attendance', attendanceRoutes);
