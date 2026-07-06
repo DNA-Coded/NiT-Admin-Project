@@ -48,3 +48,18 @@ export const getDeviceStatus = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAnalytics = async (req, res, next) => {
+  try {
+    const adminEmail = req.admin?.email;
+    const requestMeta = { ip: req.ip, userAgent: req.get('user-agent'), method: req.method, path: req.originalUrl };
+    
+    const analytics = await dashboardService.getDashboardAnalytics();
+    
+    dashboardLogger.logDashboardAnalyticsRequested(adminEmail, requestMeta);
+    
+    return res.status(200).json(formatSuccessResponse(MESSAGES.DASHBOARD_ANALYTICS_FETCHED, analytics));
+  } catch (error) {
+    next(error);
+  }
+};

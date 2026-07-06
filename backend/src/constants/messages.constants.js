@@ -144,4 +144,5 @@ export const MESSAGES = Object.freeze({
   DASHBOARD_OVERVIEW_FETCHED: 'Dashboard overview metrics retrieved successfully.',
   LIVE_ATTENDANCE_FETCHED:    'Live attendance retrieved successfully.',
   DEVICE_STATUS_FETCHED:      'Device status retrieved successfully.',
+  DASHBOARD_ANALYTICS_FETCHED: 'Dashboard analytics retrieved successfully.',
 });

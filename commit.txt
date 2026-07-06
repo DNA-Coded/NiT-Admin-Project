@@ -1,9 +1,7 @@
-feat: implement dashboard overview APIs
+feat: add dashboard analytics APIs
 
-- Add Dashboard module
-- Implement overview aggregation APIs
-- Add live attendance endpoint
-- Add device status endpoint
-- Reuse existing services for dashboard metrics
-- Optimize dashboard queries with parallel aggregation
-- Prepare backend for admin dashboard frontend
+- Add consolidated dashboard analytics endpoint
+- Aggregate attendance, department, faculty, student and device metrics
+- Add synchronization analytics
+- Optimize dashboard queries using Promise.all and MongoDB aggregations
+- Prepare backend for analytics widgets and charts
