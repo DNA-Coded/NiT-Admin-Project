@@ -140,4 +140,8 @@ export const MESSAGES = Object.freeze({
   HEALTH_STATUS_UPDATED:      'Device health status updated successfully.',
   HEALTH_ERROR_RECORDED:      'Device error recorded successfully.',
   HEALTH_RESET:               'Device health metrics reset successfully.',
+  // ─── Dashboard ──────────────────────────────────────────────────────────────
+  DASHBOARD_OVERVIEW_FETCHED: 'Dashboard overview metrics retrieved successfully.',
+  LIVE_ATTENDANCE_FETCHED:    'Live attendance retrieved successfully.',
+  DEVICE_STATUS_FETCHED:      'Device status retrieved successfully.',
 });

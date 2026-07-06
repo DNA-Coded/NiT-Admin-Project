@@ -1,0 +1,9 @@
+feat: implement dashboard overview APIs
+
+- Add Dashboard module
+- Implement overview aggregation APIs
+- Add live attendance endpoint
+- Add device status endpoint
+- Reuse existing services for dashboard metrics
+- Optimize dashboard queries with parallel aggregation
+- Prepare backend for admin dashboard frontend
