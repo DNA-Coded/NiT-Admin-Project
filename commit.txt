@@ -1,8 +1,9 @@
-feat: add reporting APIs
+feat: add export engine
 
-- Add Reports module
-- Implement attendance, faculty, student, device and synchronization reports
-- Add filtering, pagination and sorting
-- Add report summaries
-- Optimize report queries using dynamic query builders
-- Prepare backend for report exports
+- Add Export module
+- Implement unified export endpoint
+- Support CSV, Excel and PDF exports
+- Reuse Reports module for export generation
+- Add formatter layer for export formats
+- Add export history tracking
+- Optimize export workflow for large datasets
