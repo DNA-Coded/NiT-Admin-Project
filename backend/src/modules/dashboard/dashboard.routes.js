@@ -5,6 +5,7 @@ import {
   getLiveAttendance,
   getDeviceStatus,
   getAnalytics,
+  getLiveMonitoring,
 } from './dashboard.controller.js';
 
 const router = Router();
@@ -20,5 +21,6 @@ router.get('/overview', authenticate, getOverview);
 router.get('/live-attendance', authenticate, getLiveAttendance);
 router.get('/device-status', authenticate, getDeviceStatus);
 router.get('/analytics', authenticate, getAnalytics);
+router.get('/live', authenticate, getLiveMonitoring);
 
 export default router;

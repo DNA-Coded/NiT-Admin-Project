@@ -319,3 +319,170 @@ export const getDashboardAnalytics = async () => {
     }
   };
 };
+
+/**
+ * Get Dashboard Live Monitoring
+ * Provides real-time operational data for the dashboard.
+ */
+export const getDashboardLiveMonitoring = async () => {
+  const [
+    latestAttendanceDocs,
+    activeDevicesDocs,
+    failedDevicesDocs,
+    recentCorrectionsDocs,
+    activeSyncJobsDocs,
+    recentSyncJobsDocs,
+    recentDeviceDocs
+  ] = await Promise.all([
+    // latestAttendance
+    Attendance.find({ isActive: true })
+      .sort({ timestamp: -1 })
+      .limit(20)
+      .populate('person', 'fullName')
+      .populate('device', 'deviceName')
+      .select('timestamp verificationMethod attendanceType personType person device')
+      .lean(),
+    
+    // activeDevices
+    Device.find({ isActive: true, healthStatus: DEVICE_HEALTH_STATUS.HEALTHY })
+      .select('deviceName healthStatus status lastHeartbeat')
+      .lean(),
+      
+    // failedDevices
+    Device.find({ 
+      isActive: true, 
+      $or: [
+        { status: DEVICE_STATUS.OFFLINE }, 
+        { healthStatus: { $in: [DEVICE_HEALTH_STATUS.ERROR, DEVICE_HEALTH_STATUS.WARNING] } }
+      ] 
+    })
+      .select('deviceName healthStatus lastError failureCount lastSeen')
+      .lean(),
+      
+    // recentCorrections
+    Attendance.find({ isActive: true, status: ATTENDANCE_RECORD_STATUS.CORRECTED, 'correctionHistory.0': { $exists: true } })
+      .sort({ 'correctionHistory.correctedAt': -1 })
+      .limit(10)
+      .populate('person', 'fullName')
+      .select('person correctionHistory')
+      .lean(),
+      
+    // activeSyncJobs
+    SyncJob.find({ isActive: true, status: { $in: ['PENDING', 'RUNNING'] } })
+      .select('syncId provider status startedAt')
+      .lean(),
+
+    // Extra queries for recentSystemEvents
+    SyncJob.find({ isActive: true })
+      .sort({ updatedAt: -1 })
+      .limit(10)
+      .select('provider status updatedAt')
+      .lean(),
+      
+    Device.find({ isActive: true })
+      .sort({ updatedAt: -1 })
+      .limit(10)
+      .select('deviceName status updatedAt')
+      .lean()
+  ]);
+
+  // Format latestAttendance
+  const latestAttendance = latestAttendanceDocs.map(doc => ({
+    personName: doc.person?.fullName || 'Unknown',
+    personType: doc.personType || 'Unknown',
+    attendanceType: doc.attendanceType,
+    verificationMethod: doc.verificationMethod,
+    timestamp: doc.timestamp,
+    deviceName: doc.device?.deviceName || 'Unknown'
+  }));
+
+  // Format activeDevices
+  const activeDevices = activeDevicesDocs.map(doc => ({
+    deviceName: doc.deviceName,
+    healthStatus: doc.healthStatus,
+    connectionStatus: doc.status,
+    lastHeartbeat: doc.lastHeartbeat
+  }));
+
+  // Format failedDevices
+  const failedDevices = failedDevicesDocs.map(doc => ({
+    deviceName: doc.deviceName,
+    healthStatus: doc.healthStatus,
+    lastError: doc.lastError,
+    failureCount: doc.failureCount,
+    lastSeen: doc.lastSeen
+  }));
+
+  // Format recentCorrections
+  const recentCorrections = recentCorrectionsDocs.map(doc => {
+    // Get the latest correction
+    const lastCorrection = doc.correctionHistory[doc.correctionHistory.length - 1];
+    return {
+      personName: doc.person?.fullName || 'Unknown',
+      correctionReason: lastCorrection?.correctionReason || 'Unknown',
+      correctedBy: lastCorrection?.correctedBy || 'Unknown',
+      correctedAt: lastCorrection?.correctedAt || null
+    };
+  });
+
+  // Format activeSyncJobs
+  const activeSyncJobs = activeSyncJobsDocs.map(doc => ({
+    syncId: doc.syncId,
+    provider: doc.provider,
+    status: doc.status,
+    startedAt: doc.startedAt
+  }));
+
+  // Compile recentSystemEvents
+  const systemEvents = [];
+  
+  recentSyncJobsDocs.forEach(job => {
+    let eventName = '';
+    if (job.status === 'FAILED') eventName = 'Sync Failed';
+    else if (job.status === 'SUCCESS') eventName = 'Sync Completed';
+    else if (job.status === 'RUNNING') eventName = 'Sync Started';
+    else return;
+    
+    systemEvents.push({
+      event: eventName,
+      module: 'Synchronization',
+      timestamp: job.updatedAt
+    });
+  });
+
+  recentDeviceDocs.forEach(dev => {
+    let eventName = '';
+    if (dev.status === DEVICE_STATUS.OFFLINE) eventName = 'Device Offline';
+    else if (dev.status === DEVICE_STATUS.ONLINE) eventName = 'Device Connected';
+    else return;
+    
+    systemEvents.push({
+      event: eventName,
+      module: 'Devices',
+      timestamp: dev.updatedAt
+    });
+  });
+
+  recentCorrectionsDocs.forEach(corr => {
+    const lastCorrection = corr.correctionHistory[corr.correctionHistory.length - 1];
+    if (!lastCorrection) return;
+    systemEvents.push({
+      event: 'Attendance Corrected',
+      module: 'Attendance',
+      timestamp: lastCorrection.correctedAt
+    });
+  });
+
+  // Sort by timestamp desc and take top 20
+  systemEvents.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const recentSystemEvents = systemEvents.slice(0, 20);
+
+  return {
+    latestAttendance,
+    activeDevices,
+    failedDevices,
+    recentCorrections,
+    activeSyncJobs,
+    recentSystemEvents
+  };
+};

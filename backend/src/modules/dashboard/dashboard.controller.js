@@ -63,3 +63,18 @@ export const getAnalytics = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getLiveMonitoring = async (req, res, next) => {
+  try {
+    const adminEmail = req.admin?.email;
+    const requestMeta = { ip: req.ip, userAgent: req.get('user-agent'), method: req.method, path: req.originalUrl };
+    
+    const liveData = await dashboardService.getDashboardLiveMonitoring();
+    
+    dashboardLogger.logDashboardLiveRequested(adminEmail, requestMeta);
+    
+    return res.status(200).json(formatSuccessResponse(MESSAGES.DASHBOARD_LIVE_FETCHED, liveData));
+  } catch (error) {
+    next(error);
+  }
+};

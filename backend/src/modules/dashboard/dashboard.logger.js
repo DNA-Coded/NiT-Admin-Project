@@ -18,3 +18,6 @@ export const logDeviceStatusRequested = (adminEmail, requestMeta = {}) =>
 
 export const logDashboardAnalyticsRequested = (adminEmail, requestMeta = {}) =>
   emit('info', 'DASHBOARD_ANALYTICS_REQUESTED', { adminEmail, ...requestMeta });
+
+export const logDashboardLiveRequested = (adminEmail, requestMeta = {}) =>
+  emit('info', 'DASHBOARD_LIVE_REQUESTED', { adminEmail, ...requestMeta });
