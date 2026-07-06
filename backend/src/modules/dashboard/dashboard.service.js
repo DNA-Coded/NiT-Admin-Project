@@ -486,3 +486,183 @@ export const getDashboardLiveMonitoring = async () => {
     recentSystemEvents
   };
 };
+
+/**
+ * Get Filtered Dashboard Data
+ * Applies dynamic filters cleanly to Attendance, Devices, and Synchronization.
+ */
+export const getFilteredDashboardData = async (filters, { page, limit }) => {
+  const skip = (page - 1) * limit;
+
+  // ─── 1. Pre-resolve Person Filters (if any) ──────────────────────────────
+  const {
+    from, to,
+    department, faculty, designation, facultyStatus,
+    semester, section, batch, academicSession, studentStatus,
+    attendanceType, verificationMethod, correctionStatus,
+    device, deviceCategory, healthStatus, connectionStatus,
+    syncStatus, provider
+  } = filters;
+
+  let matchedPersonIds = null;
+  const personFiltersPresent = department || faculty || designation || facultyStatus ||
+                               semester || section || batch || academicSession || studentStatus;
+
+  if (personFiltersPresent) {
+    const facultyQuery = { isActive: true };
+    const studentQuery = { isActive: true };
+    let checkFaculty = false;
+    let checkStudent = false;
+
+    // Faculty-specific filters
+    if (faculty || designation || facultyStatus) {
+      if (faculty) facultyQuery._id = faculty;
+      if (designation) facultyQuery.designation = designation;
+      if (facultyStatus) facultyQuery.status = facultyStatus;
+      checkFaculty = true;
+    }
+
+    // Student-specific filters
+    if (semester || section || batch || academicSession || studentStatus) {
+      if (semester) studentQuery.semester = semester;
+      if (section) studentQuery.section = section;
+      if (batch) studentQuery.batch = batch;
+      if (academicSession) studentQuery.academicSession = academicSession;
+      if (studentStatus) studentQuery.status = studentStatus;
+      checkStudent = true;
+    }
+
+    // Shared filters (department)
+    if (department) {
+      facultyQuery.department = department;
+      studentQuery.department = department;
+      // If neither specific was requested, check both (they both have departments)
+      if (!checkFaculty && !checkStudent) {
+        checkFaculty = true;
+        checkStudent = true;
+      }
+    }
+
+    const ids = [];
+    if (checkFaculty) {
+      const facs = await Faculty.find(facultyQuery).select('_id').lean();
+      ids.push(...facs.map(f => f._id));
+    }
+    if (checkStudent) {
+      const stds = await Student.find(studentQuery).select('_id').lean();
+      ids.push(...stds.map(s => s._id));
+    }
+    
+    matchedPersonIds = ids;
+  }
+
+  // ─── 2. Build Module Queries ──────────────────────────────────────────────
+  
+  // Attendance Query Builder
+  const attendanceQuery = { isActive: true };
+  if (from || to) {
+    attendanceQuery.timestamp = {};
+    if (from) attendanceQuery.timestamp.$gte = new Date(from);
+    if (to) attendanceQuery.timestamp.$lte = new Date(to);
+  }
+  if (attendanceType) attendanceQuery.attendanceType = attendanceType;
+  if (verificationMethod) attendanceQuery.verificationMethod = verificationMethod;
+  if (correctionStatus === 'CORRECTED') {
+    attendanceQuery.status = ATTENDANCE_RECORD_STATUS.CORRECTED;
+  } else if (correctionStatus === 'UNCORRECTED') {
+    attendanceQuery.status = { $ne: ATTENDANCE_RECORD_STATUS.CORRECTED };
+  }
+  if (device) attendanceQuery.device = device;
+  if (matchedPersonIds !== null) {
+    attendanceQuery.person = { $in: matchedPersonIds };
+  }
+
+  // Device Query Builder
+  const deviceQuery = { isActive: true };
+  if (device) deviceQuery._id = device;
+  if (deviceCategory) deviceQuery.type = deviceCategory; // Using type for category
+  if (healthStatus) deviceQuery.healthStatus = healthStatus;
+  if (connectionStatus) deviceQuery.status = connectionStatus;
+
+  // Synchronization Query Builder
+  const syncQuery = { isActive: true };
+  if (syncStatus) syncQuery.status = syncStatus;
+  if (provider) syncQuery.provider = provider;
+  if (from || to) {
+    syncQuery.startedAt = {};
+    if (from) syncQuery.startedAt.$gte = new Date(from);
+    if (to) syncQuery.startedAt.$lte = new Date(to);
+  }
+
+  // ─── 3. Execute Queries & Counts Concurrently ─────────────────────────────
+  const [
+    totalAttendance,
+    attendanceList,
+    totalDevices,
+    devicesList,
+    totalSyncJobs,
+    syncList
+  ] = await Promise.all([
+    Attendance.countDocuments(attendanceQuery),
+    Attendance.find(attendanceQuery)
+      .sort({ timestamp: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('person', 'fullName')
+      .populate('device', 'deviceName')
+      .lean(),
+
+    Device.countDocuments(deviceQuery),
+    Device.find(deviceQuery)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+
+    SyncJob.countDocuments(syncQuery),
+    SyncJob.find(syncQuery)
+      .sort({ startedAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+  ]);
+
+  // ─── 4. Map & Return Results ──────────────────────────────────────────────
+  return {
+    filters,
+    summary: {
+      totalAttendance,
+      totalDevices,
+      totalSyncJobs
+    },
+    attendance: attendanceList.map(doc => ({
+      id: doc._id,
+      personName: doc.person?.fullName || 'Unknown',
+      attendanceType: doc.attendanceType,
+      verificationMethod: doc.verificationMethod,
+      status: doc.status,
+      timestamp: doc.timestamp,
+      deviceName: doc.device?.deviceName || 'Unknown'
+    })),
+    devices: devicesList.map(doc => ({
+      id: doc._id,
+      deviceName: doc.deviceName,
+      type: doc.type,
+      healthStatus: doc.healthStatus,
+      status: doc.status,
+      lastHeartbeat: doc.lastHeartbeat
+    })),
+    synchronization: syncList.map(doc => ({
+      id: doc._id,
+      syncId: doc.syncId,
+      provider: doc.provider,
+      status: doc.status,
+      startedAt: doc.startedAt,
+      completedAt: doc.completedAt
+    })),
+    pagination: {
+      page,
+      limit
+    }
+  };
+};

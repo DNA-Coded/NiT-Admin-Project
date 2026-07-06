@@ -21,3 +21,6 @@ export const logDashboardAnalyticsRequested = (adminEmail, requestMeta = {}) =>
 
 export const logDashboardLiveRequested = (adminEmail, requestMeta = {}) =>
   emit('info', 'DASHBOARD_LIVE_REQUESTED', { adminEmail, ...requestMeta });
+
+export const logDashboardFilteredRequested = (adminEmail, filters = {}, requestMeta = {}) =>
+  emit('info', 'DASHBOARD_FILTERED_REQUESTED', { adminEmail, filters, ...requestMeta });

@@ -78,3 +78,32 @@ export const getLiveMonitoring = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getFilteredSearch = async (req, res, next) => {
+  try {
+    const adminEmail = req.admin?.email;
+    const requestMeta = { ip: req.ip, userAgent: req.get('user-agent'), method: req.method, path: req.originalUrl };
+    
+    // Extract filters and pagination from query
+    const filters = { ...req.query };
+    
+    // Extract pagination Options
+    const page = parseInt(filters.page, 10) || 1;
+    const limit = parseInt(filters.limit, 10) || 10;
+    const paginationOptions = { page, limit };
+    
+    // Clean up generic query params from filters object
+    delete filters.page;
+    delete filters.limit;
+    delete filters.sortBy;
+    delete filters.sortOrder;
+    
+    const searchResult = await dashboardService.getFilteredDashboardData(filters, paginationOptions);
+    
+    dashboardLogger.logDashboardFilteredRequested(adminEmail, filters, requestMeta);
+    
+    return res.status(200).json(formatSuccessResponse(MESSAGES.DASHBOARD_FILTER_FETCHED, searchResult));
+  } catch (error) {
+    next(error);
+  }
+};

@@ -1,9 +1,8 @@
-feat: add live dashboard monitoring APIs
+feat: add dashboard filtering and search APIs
 
-- Add live dashboard endpoint
-- Expose latest attendance activity
-- Add active and failed device monitoring
-- Add active synchronization job tracking
-- Add recent attendance corrections
-- Add recent system event aggregation
-- Optimize live dashboard queries
+- Add unified dashboard filtering endpoint
+- Support dynamic attendance, device and synchronization filters
+- Add date range, department and academic filters
+- Add pagination and sorting
+- Optimize filtering queries using dynamic query builders
+- Prepare backend for advanced dashboard interactions
