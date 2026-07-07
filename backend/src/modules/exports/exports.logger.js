@@ -1,4 +1,8 @@
-import { emit } from '../../../utils/eventBus.js';
+import logger from '../../config/logger.config.js';
+
+const emit = (level, event, meta = {}) => {
+  logger[level](event, { exportEvent: true, ...meta });
+};
 
 export const logExportRequested = (adminEmail, reportType, format, requestMeta = {}) =>
   emit('info', 'EXPORT_REQUESTED', { adminEmail, reportType, format, ...requestMeta });

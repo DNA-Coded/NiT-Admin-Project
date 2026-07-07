@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.middleware.js';
+import { authenticate } from '../auth/auth.middleware.js';
 import { validateReportFilters } from './reports.validator.js';
 import {
   getAttendanceReport,
@@ -11,10 +11,70 @@ import {
 
 const router = Router();
 
+/**
+ * @swagger
+ * /reports/attendance:
+ *   get:
+ *     summary: Generate attendance report
+ *     tags: [Reports]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Attendance report generated successfully
+ */
 router.get('/attendance', authenticate, validateReportFilters, getAttendanceReport);
+/**
+ * @swagger
+ * /reports/faculty:
+ *   get:
+ *     summary: Generate faculty report
+ *     tags: [Reports]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Faculty report generated successfully
+ */
 router.get('/faculty', authenticate, validateReportFilters, getFacultyReport);
+/**
+ * @swagger
+ * /reports/students:
+ *   get:
+ *     summary: Generate student report
+ *     tags: [Reports]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Student report generated successfully
+ */
 router.get('/students', authenticate, validateReportFilters, getStudentReport);
+/**
+ * @swagger
+ * /reports/devices:
+ *   get:
+ *     summary: Generate device report
+ *     tags: [Reports]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Device report generated successfully
+ */
 router.get('/devices', authenticate, validateReportFilters, getDeviceReport);
+/**
+ * @swagger
+ * /reports/synchronization:
+ *   get:
+ *     summary: Generate sync report
+ *     tags: [Reports]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Sync report generated successfully
+ */
 router.get('/synchronization', authenticate, validateReportFilters, getSynchronizationReport);
 
 export default router;

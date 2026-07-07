@@ -1,6 +1,5 @@
 import { Activity } from './activity.model.js';
 import { activityLogger } from './activity.logger.js';
-import { generateId } from '../../utils/generateId.js'; // Assuming a utility to generate IDs exists. We'll use crypto if not available.
 import crypto from 'crypto';
 
 /**

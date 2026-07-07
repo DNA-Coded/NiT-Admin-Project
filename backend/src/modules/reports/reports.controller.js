@@ -1,6 +1,6 @@
 import * as reportsService from './reports.service.js';
 import * as reportsLogger from './reports.logger.js';
-import { formatSuccessResponse } from '../../utils/responseFormatter.js';
+import { sendSuccess } from '../../helpers/response.helper.js';
 import { MESSAGES } from '../../constants/index.js';
 import { activityService } from '../activity/activity.service.js';
 import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
@@ -31,7 +31,7 @@ export const getAttendanceReport = async (req, res, next) => {
       severity: ACTIVITY_SEVERITY.LOW
     }).catch(() => {});
 
-    return res.status(200).json(formatSuccessResponse(MESSAGES.REPORT_GENERATED, report));
+    return sendSuccess(res, report, MESSAGES.REPORT_GENERATED);
   } catch (error) {
     next(error);
   }
@@ -56,7 +56,7 @@ export const getFacultyReport = async (req, res, next) => {
       severity: ACTIVITY_SEVERITY.LOW
     }).catch(() => {});
 
-    return res.status(200).json(formatSuccessResponse(MESSAGES.REPORT_GENERATED, report));
+    return sendSuccess(res, report, MESSAGES.REPORT_GENERATED);
   } catch (error) {
     next(error);
   }
@@ -81,7 +81,7 @@ export const getStudentReport = async (req, res, next) => {
       severity: ACTIVITY_SEVERITY.LOW
     }).catch(() => {});
 
-    return res.status(200).json(formatSuccessResponse(MESSAGES.REPORT_GENERATED, report));
+    return sendSuccess(res, report, MESSAGES.REPORT_GENERATED);
   } catch (error) {
     next(error);
   }
@@ -106,7 +106,7 @@ export const getDeviceReport = async (req, res, next) => {
       severity: ACTIVITY_SEVERITY.LOW
     }).catch(() => {});
 
-    return res.status(200).json(formatSuccessResponse(MESSAGES.REPORT_GENERATED, report));
+    return sendSuccess(res, report, MESSAGES.REPORT_GENERATED);
   } catch (error) {
     next(error);
   }
@@ -131,7 +131,7 @@ export const getSynchronizationReport = async (req, res, next) => {
       severity: ACTIVITY_SEVERITY.LOW
     }).catch(() => {});
 
-    return res.status(200).json(formatSuccessResponse(MESSAGES.REPORT_GENERATED, report));
+    return sendSuccess(res, report, MESSAGES.REPORT_GENERATED);
   } catch (error) {
     next(error);
   }

@@ -1,8 +1,7 @@
 import * as dashboardService from './dashboard.service.js';
 import * as dashboardLogger from './dashboard.logger.js';
 import { MESSAGES } from '../../constants/index.js';
-import { formatSuccessResponse } from '../../utils/response.formatter.js';
-import { makeError } from '../../utils/error.utils.js';
+import { sendSuccess, sendError } from '../../helpers/response.helper.js';
 
 export const getOverview = async (req, res, next) => {
   try {
@@ -13,7 +12,7 @@ export const getOverview = async (req, res, next) => {
     
     dashboardLogger.logDashboardViewed(adminEmail, requestMeta);
     
-    return res.status(200).json(formatSuccessResponse(MESSAGES.DASHBOARD_OVERVIEW_FETCHED, overview));
+    return sendSuccess(res, overview, MESSAGES.DASHBOARD_OVERVIEW_FETCHED);
   } catch (error) {
     next(error);
   }
@@ -28,7 +27,7 @@ export const getLiveAttendance = async (req, res, next) => {
     
     dashboardLogger.logLiveAttendanceRequested(adminEmail, requestMeta);
     
-    return res.status(200).json(formatSuccessResponse(MESSAGES.LIVE_ATTENDANCE_FETCHED, liveAttendance));
+    return sendSuccess(res, liveAttendance, MESSAGES.LIVE_ATTENDANCE_FETCHED);
   } catch (error) {
     next(error);
   }
@@ -43,7 +42,7 @@ export const getDeviceStatus = async (req, res, next) => {
     
     dashboardLogger.logDeviceStatusRequested(adminEmail, requestMeta);
     
-    return res.status(200).json(formatSuccessResponse(MESSAGES.DEVICE_STATUS_FETCHED, deviceStatus));
+    return sendSuccess(res, deviceStatus, MESSAGES.DEVICE_STATUS_FETCHED);
   } catch (error) {
     next(error);
   }
@@ -58,7 +57,7 @@ export const getAnalytics = async (req, res, next) => {
     
     dashboardLogger.logDashboardAnalyticsRequested(adminEmail, requestMeta);
     
-    return res.status(200).json(formatSuccessResponse(MESSAGES.DASHBOARD_ANALYTICS_FETCHED, analytics));
+    return sendSuccess(res, analytics, MESSAGES.DASHBOARD_ANALYTICS_FETCHED);
   } catch (error) {
     next(error);
   }
@@ -73,7 +72,7 @@ export const getLiveMonitoring = async (req, res, next) => {
     
     dashboardLogger.logDashboardLiveRequested(adminEmail, requestMeta);
     
-    return res.status(200).json(formatSuccessResponse(MESSAGES.DASHBOARD_LIVE_FETCHED, liveData));
+    return sendSuccess(res, liveData, MESSAGES.DASHBOARD_LIVE_FETCHED);
   } catch (error) {
     next(error);
   }
@@ -102,7 +101,7 @@ export const getFilteredSearch = async (req, res, next) => {
     
     dashboardLogger.logDashboardFilteredRequested(adminEmail, filters, requestMeta);
     
-    return res.status(200).json(formatSuccessResponse(MESSAGES.DASHBOARD_FILTER_FETCHED, searchResult));
+    return sendSuccess(res, searchResult, MESSAGES.DASHBOARD_FILTER_FETCHED);
   } catch (error) {
     next(error);
   }

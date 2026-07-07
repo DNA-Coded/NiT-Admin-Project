@@ -28,10 +28,27 @@ const router = Router();
 // ─── Collection routes ────────────────────────────────────────────────────────
 
 /**
- * @route   GET /api/v1/faculty
- * @desc    List faculty — supports pagination, search, filtering, sorting
- * @access  Protected
- * @query   page, limit, search, department, designation, isActive, sortBy, sortOrder
+ * @swagger
+ * /faculty:
+ *   get:
+ *     summary: List faculty
+ *     description: Retrieve a paginated list of faculty members.
+ *     tags: [Faculty]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 10 }
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: A paginated list of faculty
  */
 router.get(
   '/',
@@ -41,10 +58,22 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/faculty
- * @desc    Create a new faculty record
- * @access  Protected
- * @body    { employeeId, firstName, lastName, designation, department, attendanceIdentity, email?, phone? }
+ * @swagger
+ * /faculty:
+ *   post:
+ *     summary: Create a new faculty record
+ *     tags: [Faculty]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Faculty'
+ *     responses:
+ *       201:
+ *         description: Faculty created successfully
  */
 router.post(
   '/',
@@ -56,9 +85,21 @@ router.post(
 // ─── Document routes ──────────────────────────────────────────────────────────
 
 /**
- * @route   GET /api/v1/faculty/:id
- * @desc    Get a single faculty record by ID
- * @access  Protected
+ * @swagger
+ * /faculty/{id}:
+ *   get:
+ *     summary: Get a faculty record by ID
+ *     tags: [Faculty]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Faculty retrieved successfully
  */
 router.get(
   '/:id',
@@ -68,11 +109,27 @@ router.get(
 );
 
 /**
- * @route   PUT /api/v1/faculty/:id
- * @desc    Update a faculty record (partial update supported)
- * @access  Protected
- * @body    Any subset of { employeeId, firstName, lastName, designation, department,
- *          attendanceIdentity, email, phone } — at least one field required
+ * @swagger
+ * /faculty/{id}:
+ *   put:
+ *     summary: Update a faculty record
+ *     tags: [Faculty]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Faculty'
+ *     responses:
+ *       200:
+ *         description: Faculty updated successfully
  */
 router.put(
   '/:id',
@@ -83,9 +140,21 @@ router.put(
 );
 
 /**
- * @route   DELETE /api/v1/faculty/:id
- * @desc    Soft-delete a faculty record (sets isActive: false, stamps deletedAt/deletedBy)
- * @access  Protected
+ * @swagger
+ * /faculty/{id}:
+ *   delete:
+ *     summary: Soft-delete a faculty record
+ *     tags: [Faculty]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Faculty deactivated successfully
  */
 router.delete(
   '/:id',
@@ -95,11 +164,21 @@ router.delete(
 );
 
 /**
- * @route   PATCH /api/v1/faculty/:id/restore
- * @desc    Restore a soft-deleted faculty record (clears deletedAt/deletedBy)
- * @access  Protected
- *
- * Note: registered before /:id to prevent 'restore' being parsed as a document ID.
+ * @swagger
+ * /faculty/{id}/restore:
+ *   patch:
+ *     summary: Restore a soft-deleted faculty record
+ *     tags: [Faculty]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Faculty restored successfully
  */
 router.patch(
   '/:id/restore',

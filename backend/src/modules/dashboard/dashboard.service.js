@@ -1,4 +1,4 @@
-import Department from '../departments/department.model.js';
+import Department from '../departments/departments.model.js';
 import Faculty from '../faculty/faculty.model.js';
 import Student from '../students/student.model.js';
 import Device from '../devices/device.model.js';

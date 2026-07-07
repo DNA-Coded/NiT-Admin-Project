@@ -8,6 +8,9 @@ import serverConfig from './config/server.config.js';
 import apiRoutes from './routes/index.js';
 import { notFound, errorHandler } from './middleware/error.middleware.js';
 
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './docs/swagger/swagger.config.js';
+
 const app = express();
 
 // ─── Core Middleware ──────────────────────────────────────────────────────────
@@ -30,6 +33,11 @@ if (!serverConfig.isTest) {
 
 // All versioned REST API routes mounted under /api/v1
 app.use(`/api/${serverConfig.apiVersion}`, apiRoutes);
+
+// Swagger Documentation Route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customSiteTitle: 'NiT Admin API Docs',
+}));
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 

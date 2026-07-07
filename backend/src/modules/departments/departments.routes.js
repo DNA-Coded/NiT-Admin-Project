@@ -29,10 +29,47 @@ const router = Router();
 // ─── Collection routes ────────────────────────────────────────────────────────
 
 /**
- * @route   GET /api/v1/departments
- * @desc    List departments — supports pagination, search, filtering, sorting
- * @access  Protected
- * @query   page, limit, search, isActive, sortBy, sortOrder
+ * @swagger
+ * /departments:
+ *   get:
+ *     summary: List departments
+ *     description: Retrieve a paginated list of departments. Supports search, filtering, and sorting.
+ *     tags: [Departments]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 10 }
+ *         description: Items per page
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *         description: Search by name or code
+ *       - in: query
+ *         name: isActive
+ *         schema: { type: boolean }
+ *         description: Filter by active status
+ *     responses:
+ *       200:
+ *         description: A paginated list of departments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/StandardSuccess'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Department'
+ *                     meta:
+ *                       $ref: '#/components/schemas/Pagination'
  */
 router.get(
   '/',
@@ -42,10 +79,43 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/departments
- * @desc    Create a new department
- * @access  Protected
- * @body    { name, code, description? }
+ * @swagger
+ * /departments:
+ *   post:
+ *     summary: Create a new department
+ *     description: Creates a new active department.
+ *     tags: [Departments]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, code]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Information Technology
+ *               code:
+ *                 type: string
+ *                 example: IT
+ *               description:
+ *                 type: string
+ *                 example: IT Dept
+ *     responses:
+ *       201:
+ *         description: Department created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/StandardSuccess'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/Department'
  */
 router.post(
   '/',
@@ -57,9 +127,33 @@ router.post(
 // ─── Document routes ──────────────────────────────────────────────────────────
 
 /**
- * @route   GET /api/v1/departments/:id
- * @desc    Get a single department by ID
- * @access  Protected
+ * @swagger
+ * /departments/{id}:
+ *   get:
+ *     summary: Get a department by ID
+ *     tags: [Departments]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *         description: Department ID
+ *     responses:
+ *       200:
+ *         description: Department retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/StandardSuccess'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/Department'
+ *       404:
+ *         description: Department not found
  */
 router.get(
   '/:id',
@@ -69,10 +163,34 @@ router.get(
 );
 
 /**
- * @route   PUT /api/v1/departments/:id
- * @desc    Update a department (partial update supported)
- * @access  Protected
- * @body    { name?, code?, description? } — at least one required
+ * @swagger
+ * /departments/{id}:
+ *   put:
+ *     summary: Update a department
+ *     description: Perform a partial update of a department.
+ *     tags: [Departments]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name: { type: string }
+ *               code: { type: string }
+ *               description: { type: string }
+ *     responses:
+ *       200:
+ *         description: Department updated successfully
+ *       404:
+ *         description: Department not found
  */
 router.put(
   '/:id',
@@ -83,9 +201,24 @@ router.put(
 );
 
 /**
- * @route   DELETE /api/v1/departments/:id
- * @desc    Soft-delete a department (sets isActive: false, stamps deletedAt/deletedBy)
- * @access  Protected
+ * @swagger
+ * /departments/{id}:
+ *   delete:
+ *     summary: Soft-delete a department
+ *     description: Deactivates a department.
+ *     tags: [Departments]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Department deactivated successfully
+ *       404:
+ *         description: Department not found
  */
 router.delete(
   '/:id',
@@ -95,9 +228,23 @@ router.delete(
 );
 
 /**
- * @route   PATCH /api/v1/departments/:id/restore
- * @desc    Restore a soft-deleted department (clears isActive, deletedAt, deletedBy)
- * @access  Protected
+ * @swagger
+ * /departments/{id}/restore:
+ *   patch:
+ *     summary: Restore a soft-deleted department
+ *     tags: [Departments]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Department restored successfully
+ *       404:
+ *         description: Department not found
  */
 router.patch(
   '/:id/restore',

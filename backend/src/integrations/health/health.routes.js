@@ -24,23 +24,130 @@ router.use(authorize(
   [PERMISSIONS.DEVICES_MANAGE]
 ));
 
-// Get overall health summary of all devices
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: List device health statuses
+ *     tags: [Health]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of device health statuses
+ */
 router.get('/', getAllDevicesHealth);
 
-// Get health specific to one device
+/**
+ * @swagger
+ * /health/{deviceId}:
+ *   get:
+ *     summary: Get health details for a specific device
+ *     tags: [Health]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: deviceId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Device health details retrieved successfully
+ */
 router.get('/:deviceId', validateDeviceId, getDeviceHealth);
 
-// Record a heartbeat (could be called internally or via a webhook without full auth in a real device scenario)
-// Here, we maintain auth since it's a managed platform.
+/**
+ * @swagger
+ * /health/{deviceId}/heartbeat:
+ *   patch:
+ *     summary: Record a device heartbeat
+ *     tags: [Health]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: deviceId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Heartbeat recorded successfully
+ */
 router.patch('/:deviceId/heartbeat', validateDeviceId, updateHeartbeat);
 
-// Update status manually
+/**
+ * @swagger
+ * /health/{deviceId}/status:
+ *   patch:
+ *     summary: Update device status
+ *     tags: [Health]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: deviceId
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status: { type: string }
+ *     responses:
+ *       200:
+ *         description: Status updated successfully
+ */
 router.patch('/:deviceId/status', validateDeviceId, validateStatusUpdate, updateStatus);
 
-// Record an error
+/**
+ * @swagger
+ * /health/{deviceId}/error:
+ *   patch:
+ *     summary: Record a device error
+ *     tags: [Health]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: deviceId
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               errorType: { type: string }
+ *               errorMessage: { type: string }
+ *     responses:
+ *       200:
+ *         description: Error recorded successfully
+ */
 router.patch('/:deviceId/error', validateDeviceId, validateErrorRecord, recordError);
 
-// Reset health metrics
+/**
+ * @swagger
+ * /health/{deviceId}/reset:
+ *   patch:
+ *     summary: Reset health metrics for a device
+ *     tags: [Health]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: deviceId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Health metrics reset successfully
+ */
 router.patch('/:deviceId/reset', validateDeviceId, resetHealthMetrics);
 
 export default router;
