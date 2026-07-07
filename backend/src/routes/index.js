@@ -24,6 +24,7 @@ import healthRoutes from '../integrations/health/health.routes.js';
 import dashboardRoutes    from '../modules/dashboard/dashboard.routes.js';
 import reportsRoutes from '../modules/reports/reports.routes.js';
 import exportsRoutes from '../modules/exports/exports.routes.js';
+import activityRoutes from '../modules/activity/activity.routes.js';
 
 // Future routes — import and mount here as each module is built:
 // import attendanceRoutes from './attendance.routes.js';
@@ -47,6 +48,7 @@ router.use('/health',      healthRoutes);
 router.use('/dashboard',   dashboardRoutes);
 router.use('/reports',     reportsRoutes);
 router.use('/exports',     exportsRoutes);
+router.use('/activity',    activityRoutes);
 
 // Future mounts:
 // router.use('/attendance', attendanceRoutes);

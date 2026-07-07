@@ -1,0 +1,61 @@
+/**
+ * Activity Module Constants
+ */
+
+export const ACTIVITY_MODULES = {
+  AUTH: 'AUTH',
+  DEPARTMENT: 'DEPARTMENT',
+  FACULTY: 'FACULTY',
+  STUDENT: 'STUDENT',
+  DEVICE: 'DEVICE',
+  ATTENDANCE: 'ATTENDANCE',
+  SYNCHRONIZATION: 'SYNCHRONIZATION',
+  REPORT: 'REPORT',
+  EXPORT: 'EXPORT',
+  SETTINGS: 'SETTINGS',
+  SYSTEM: 'SYSTEM',
+};
+
+export const ACTIVITY_MODULES_VALUES = Object.values(ACTIVITY_MODULES);
+
+export const ACTIVITY_ACTIONS = {
+  CREATE: 'CREATE',
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE',
+  RESTORE: 'RESTORE',
+  LOGIN: 'LOGIN',
+  LOGOUT: 'LOGOUT',
+  EXPORT: 'EXPORT',
+  SYNC: 'SYNC',
+  HEALTH: 'HEALTH',
+  CORRECTION: 'CORRECTION',
+  CONFIGURATION: 'CONFIGURATION',
+};
+
+export const ACTIVITY_ACTIONS_VALUES = Object.values(ACTIVITY_ACTIONS);
+
+export const ACTIVITY_STATUS = {
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED',
+  WARNING: 'WARNING',
+};
+
+export const ACTIVITY_STATUS_VALUES = Object.values(ACTIVITY_STATUS);
+
+export const ACTIVITY_SEVERITY = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL',
+};
+
+export const ACTIVITY_SEVERITY_VALUES = Object.values(ACTIVITY_SEVERITY);
+
+export const ACTIVITY_SORT_FIELDS = ['createdAt', 'module', 'action', 'severity'];
+export const ACTIVITY_SORT_ORDERS = ['asc', 'desc'];
+
+export const ACTIVITY_PAGINATION = {
+  DEFAULT_PAGE: 1,
+  DEFAULT_LIMIT: 20,
+  MAX_LIMIT: 100,
+};

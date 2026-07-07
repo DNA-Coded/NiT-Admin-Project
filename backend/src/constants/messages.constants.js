@@ -150,4 +150,9 @@ export const MESSAGES = Object.freeze({
   
   // ─── Reports ────────────────────────────────────────────────────────────────
   REPORT_GENERATED:           'Report generated successfully.',
+
+  // ─── Activity & Audit Center ────────────────────────────────────────────────
+  ACTIVITY_FETCH_LIST:        'Activities retrieved successfully.',
+  ACTIVITY_FETCH_DETAIL:      'Activity retrieved successfully.',
+  ACTIVITY_NOT_FOUND:         'Activity not found.',
 });
