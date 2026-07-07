@@ -13,6 +13,8 @@ import {
   logFacultyConflict,
   logFacultyDeptNotFound,
 } from './faculty.logger.js';
+import { activityService } from '../activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
 
 /**
  * Faculty Service
@@ -344,6 +346,17 @@ export const createFaculty = async (data, adminEmail, requestMeta = {}) => {
     requestMeta
   );
 
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.FACULTY,
+    action: ACTIVITY_ACTIONS.CREATE,
+    entityType: 'Faculty',
+    entityId: faculty._id,
+    description: `Created faculty ${faculty.fullName} (${faculty.employeeId})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
+
   return faculty.toPublicJSON();
 };
 
@@ -412,6 +425,17 @@ export const updateFaculty = async (id, data, adminEmail, requestMeta = {}) => {
     requestMeta
   );
 
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.FACULTY,
+    action: ACTIVITY_ACTIONS.UPDATE,
+    entityType: 'Faculty',
+    entityId: faculty._id,
+    description: `Updated faculty ${faculty.fullName} (${faculty.employeeId})`,
+    metadata: { updates, adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
+
   return faculty.toPublicJSON();
 };
 
@@ -448,6 +472,17 @@ export const softDeleteFaculty = async (id, adminEmail, requestMeta = {}) => {
     adminEmail,
     requestMeta
   );
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.FACULTY,
+    action: ACTIVITY_ACTIONS.DELETE,
+    entityType: 'Faculty',
+    entityId: faculty._id,
+    description: `Soft-deleted faculty ${faculty.fullName} (${faculty.employeeId})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.MEDIUM
+  }).catch(() => {});
 };
 
 /**
@@ -485,6 +520,17 @@ export const restoreFaculty = async (id, adminEmail, requestMeta = {}) => {
     adminEmail,
     requestMeta
   );
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.FACULTY,
+    action: ACTIVITY_ACTIONS.RESTORE,
+    entityType: 'Faculty',
+    entityId: faculty._id,
+    description: `Restored faculty ${faculty.fullName} (${faculty.employeeId})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
 
   return faculty.toPublicJSON();
 };

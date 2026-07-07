@@ -13,6 +13,8 @@ import {
   logStudentConflict,
   logStudentDeptNotFound,
 } from './student.logger.js';
+import { activityService } from '../activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
 
 const makeError = (message, status) => {
   const err = new Error(message);
@@ -244,6 +246,17 @@ export const createStudent = async (data, adminEmail, requestMeta = {}) => {
     requestMeta
   );
 
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.STUDENT,
+    action: ACTIVITY_ACTIONS.CREATE,
+    entityType: 'Student',
+    entityId: student._id,
+    description: `Created student ${student.fullName} (${student.rollNumber})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
+
   return student.toPublicJSON();
 };
 
@@ -298,6 +311,17 @@ export const updateStudent = async (id, data, adminEmail, requestMeta = {}) => {
     requestMeta
   );
 
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.STUDENT,
+    action: ACTIVITY_ACTIONS.UPDATE,
+    entityType: 'Student',
+    entityId: student._id,
+    description: `Updated student ${student.fullName} (${student.rollNumber})`,
+    metadata: { updates, adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
+
   return student.toPublicJSON();
 };
 
@@ -324,6 +348,17 @@ export const softDeleteStudent = async (id, adminEmail, requestMeta = {}) => {
     adminEmail,
     requestMeta
   );
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.STUDENT,
+    action: ACTIVITY_ACTIONS.DELETE,
+    entityType: 'Student',
+    entityId: student._id,
+    description: `Soft-deleted student ${student.fullName} (${student.rollNumber})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.MEDIUM
+  }).catch(() => {});
 };
 
 export const restoreStudent = async (id, adminEmail, requestMeta = {}) => {
@@ -351,6 +386,17 @@ export const restoreStudent = async (id, adminEmail, requestMeta = {}) => {
     adminEmail,
     requestMeta
   );
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.STUDENT,
+    action: ACTIVITY_ACTIONS.RESTORE,
+    entityType: 'Student',
+    entityId: student._id,
+    description: `Restored student ${student.fullName} (${student.rollNumber})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
 
   return student.toPublicJSON();
 };

@@ -9,6 +9,8 @@ import {
   logSyncFailed,
   logProviderError
 } from './sync.logger.js';
+import { activityService } from '../../modules/activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
 
 /**
  * Sync Service
@@ -85,12 +87,48 @@ class SyncService {
    */
   async fetchRawAttendanceLogs(provider, fromTime, toTime) {
     logSyncStarted({ deviceId: provider.device._id, fromTime, toTime });
+    
+    activityService.recordActivity({
+      module: ACTIVITY_MODULES.SYNCHRONIZATION,
+      action: ACTIVITY_ACTIONS.SYNC,
+      entityType: 'Device',
+      entityId: provider.device._id,
+      description: `Sync started for device ${provider.device.deviceName}`,
+      metadata: { fromTime, toTime },
+      status: ACTIVITY_STATUS.SUCCESS,
+      severity: ACTIVITY_SEVERITY.LOW
+    }).catch(() => {});
+
     try {
       const logs = await provider.fetchAttendanceLogs(fromTime, toTime);
       logSyncCompleted({ deviceId: provider.device._id, logCount: logs.length });
+      
+      activityService.recordActivity({
+        module: ACTIVITY_MODULES.SYNCHRONIZATION,
+        action: ACTIVITY_ACTIONS.SYNC,
+        entityType: 'Device',
+        entityId: provider.device._id,
+        description: `Sync completed for device ${provider.device.deviceName}`,
+        metadata: { logCount: logs.length },
+        status: ACTIVITY_STATUS.SUCCESS,
+        severity: ACTIVITY_SEVERITY.LOW
+      }).catch(() => {});
+
       return logs;
     } catch (error) {
       logSyncFailed({ deviceId: provider.device._id, error: error.message });
+      
+      activityService.recordActivity({
+        module: ACTIVITY_MODULES.SYNCHRONIZATION,
+        action: ACTIVITY_ACTIONS.SYNC,
+        entityType: 'Device',
+        entityId: provider.device._id,
+        description: `Sync failed for device ${provider.device.deviceName}`,
+        metadata: { error: error.message },
+        status: ACTIVITY_STATUS.FAILED,
+        severity: ACTIVITY_SEVERITY.HIGH
+      }).catch(() => {});
+
       throw provider.standardizeError(error, true);
     }
   }

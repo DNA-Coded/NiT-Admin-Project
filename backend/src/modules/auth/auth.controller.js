@@ -3,6 +3,8 @@ import { sendSuccess, sendError } from '../../helpers/index.js';
 import { MESSAGES } from '../../constants/index.js';
 import { loginAdmin } from './auth.service.js';
 import { extractRequestMeta, logLogout } from './auth.logger.js';
+import { activityService } from '../activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
 
 /**
  * Auth Controller
@@ -55,10 +57,25 @@ export const logout = asyncHandler(async (req, res) => {
   // JWT is stateless: no server-side session to invalidate.
   // The client is responsible for discarding the token.
   // Token blacklisting / refresh-token revocation are out of scope for this phase.
+  const requestMeta = extractRequestMeta(req);
+  const adminEmail = req.admin?.email ?? 'unknown';
+
   logLogout(
-    { email: req.admin?.email ?? 'unknown', role: req.admin?.role ?? 'unknown' },
-    extractRequestMeta(req)
+    { email: adminEmail, role: req.admin?.role ?? 'unknown' },
+    requestMeta
   );
+
+  if (req.admin?._id) {
+    activityService.recordActivity({
+      module: ACTIVITY_MODULES.AUTH,
+      action: ACTIVITY_ACTIONS.LOGOUT,
+      description: `Logout for ${adminEmail}`,
+      performedBy: req.admin._id,
+      metadata: { role: req.admin.role, ...requestMeta },
+      status: ACTIVITY_STATUS.SUCCESS,
+      severity: ACTIVITY_SEVERITY.LOW
+    }).catch(() => {});
+  }
 
   return sendSuccess(res, null, MESSAGES.LOGOUT_SUCCESS, 200);
 });

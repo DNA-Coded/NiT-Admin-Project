@@ -10,6 +10,8 @@ import {
   logFailureCountUpdated,
   logHealthReset,
 } from './health.logger.js';
+import { activityService } from '../../modules/activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
 
 const makeError = (message, status) => {
   const err = new Error(message);
@@ -114,6 +116,17 @@ class HealthService {
       logDeviceOffline({ deviceId, deviceCode: device.deviceCode });
     }
 
+    activityService.recordActivity({
+      module: ACTIVITY_MODULES.DEVICE,
+      action: ACTIVITY_ACTIONS.HEALTH,
+      entityType: 'Device',
+      entityId: device._id,
+      description: `Device ${device.deviceCode} health status updated to ${device.healthStatus}`,
+      metadata: { oldStatus, newStatus: device.healthStatus, adminEmail },
+      status: ACTIVITY_STATUS.SUCCESS,
+      severity: newStatus === DEVICE_HEALTH_STATUS.OFFLINE ? ACTIVITY_SEVERITY.HIGH : ACTIVITY_SEVERITY.MEDIUM
+    }).catch(() => {});
+
     return device.toPublicJSON();
   }
 
@@ -142,6 +155,17 @@ class HealthService {
       logHealthStatusChanged({ deviceId, oldStatus, newStatus: DEVICE_HEALTH_STATUS.ERROR });
     }
 
+    activityService.recordActivity({
+      module: ACTIVITY_MODULES.DEVICE,
+      action: ACTIVITY_ACTIONS.HEALTH,
+      entityType: 'Device',
+      entityId: device._id,
+      description: `Error recorded for device ${device.deviceCode}: ${errorMessage}`,
+      metadata: { error: errorMessage, adminEmail },
+      status: ACTIVITY_STATUS.FAILED,
+      severity: ACTIVITY_SEVERITY.HIGH
+    }).catch(() => {});
+
     return device.toPublicJSON();
   }
 
@@ -164,6 +188,17 @@ class HealthService {
 
     logHealthReset({ deviceId, updatedBy: adminEmail });
     
+    activityService.recordActivity({
+      module: ACTIVITY_MODULES.DEVICE,
+      action: ACTIVITY_ACTIONS.HEALTH,
+      entityType: 'Device',
+      entityId: device._id,
+      description: `Health metrics reset for device ${device.deviceCode}`,
+      metadata: { adminEmail },
+      status: ACTIVITY_STATUS.SUCCESS,
+      severity: ACTIVITY_SEVERITY.LOW
+    }).catch(() => {});
+
     return device.toPublicJSON();
   }
 

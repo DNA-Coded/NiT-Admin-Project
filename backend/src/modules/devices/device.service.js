@@ -17,6 +17,8 @@ import {
   logDeviceNotFound,
   logDeviceConflict,
 } from './device.logger.js';
+import { activityService } from '../activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
 
 const makeError = (message, status) => {
   const err = new Error(message);
@@ -250,6 +252,17 @@ export const createDevice = async (data, adminEmail, requestMeta = {}) => {
     requestMeta
   );
 
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.DEVICE,
+    action: ACTIVITY_ACTIONS.CREATE,
+    entityType: 'Device',
+    entityId: device._id,
+    description: `Created device ${device.deviceName} (${device.deviceCode})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
+
   return device.toPublicJSON();
 };
 
@@ -332,6 +345,17 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
     requestMeta
   );
 
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.DEVICE,
+    action: ACTIVITY_ACTIONS.UPDATE,
+    entityType: 'Device',
+    entityId: device._id,
+    description: `Updated device ${device.deviceName} (${device.deviceCode})`,
+    metadata: { updates, adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
+
   return device.toPublicJSON();
 };
 
@@ -362,6 +386,17 @@ export const updateDeviceStatus = async (id, status, adminEmail, requestMeta = {
     requestMeta
   );
 
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.DEVICE,
+    action: ACTIVITY_ACTIONS.UPDATE,
+    entityType: 'Device',
+    entityId: device._id,
+    description: `Updated status for device ${device.deviceCode} to ${status}`,
+    metadata: { oldStatus, newStatus: status, adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.MEDIUM
+  }).catch(() => {});
+
   return device.toPublicJSON();
 };
 
@@ -388,6 +423,17 @@ export const softDeleteDevice = async (id, adminEmail, requestMeta = {}) => {
     adminEmail,
     requestMeta
   );
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.DEVICE,
+    action: ACTIVITY_ACTIONS.DELETE,
+    entityType: 'Device',
+    entityId: device._id,
+    description: `Soft-deleted device ${device.deviceCode}`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.HIGH
+  }).catch(() => {});
 };
 
 export const restoreDevice = async (id, adminEmail, requestMeta = {}) => {
@@ -413,6 +459,17 @@ export const restoreDevice = async (id, adminEmail, requestMeta = {}) => {
     adminEmail,
     requestMeta
   );
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.DEVICE,
+    action: ACTIVITY_ACTIONS.RESTORE,
+    entityType: 'Device',
+    entityId: device._id,
+    description: `Restored device ${device.deviceCode}`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
 
   return device.toPublicJSON();
 };

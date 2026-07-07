@@ -15,6 +15,8 @@ import {
   logAttendanceNotFound,
   logAttendanceConflict,
 } from './attendance.logger.js';
+import { activityService } from '../activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
 
 const makeError = (message, status) => {
   const err = new Error(message);
@@ -325,6 +327,17 @@ export const createAttendance = async (data, adminEmail, requestMeta = {}) => {
     requestMeta
   );
 
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.ATTENDANCE,
+    action: ACTIVITY_ACTIONS.CREATE,
+    entityType: 'Attendance',
+    entityId: record._id,
+    description: `Created attendance record ${record.attendanceCode} for ${record.person.fullName}`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
+
   return record.toPublicJSON();
 };
 
@@ -433,6 +446,17 @@ export const softDeleteAttendance = async (id, adminEmail, requestMeta = {}) => 
     adminEmail,
     requestMeta
   );
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.ATTENDANCE,
+    action: ACTIVITY_ACTIONS.DELETE,
+    entityType: 'Attendance',
+    entityId: record._id,
+    description: `Soft-deleted attendance record ${record.attendanceCode}`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.MEDIUM
+  }).catch(() => {});
 };
 
 export const restoreAttendance = async (id, adminEmail, requestMeta = {}) => {
@@ -465,6 +489,17 @@ export const restoreAttendance = async (id, adminEmail, requestMeta = {}) => {
     adminEmail,
     requestMeta
   );
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.ATTENDANCE,
+    action: ACTIVITY_ACTIONS.RESTORE,
+    entityType: 'Attendance',
+    entityId: record._id,
+    description: `Restored attendance record ${record.attendanceCode}`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
 
   return record.toPublicJSON();
 };
@@ -534,6 +569,17 @@ export const correctAttendance = async (id, data, adminEmail, requestMeta = {}) 
     adminEmail,
     requestMeta
   );
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.ATTENDANCE,
+    action: ACTIVITY_ACTIONS.CORRECTION,
+    entityType: 'Attendance',
+    entityId: record._id,
+    description: `Corrected attendance record ${record.attendanceCode}`,
+    metadata: { oldStatus: originalStatus, newStatus: record.status, reason: correctionReason, adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.MEDIUM
+  }).catch(() => {});
 
   return record.toPublicJSON();
 };

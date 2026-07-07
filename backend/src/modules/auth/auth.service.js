@@ -9,6 +9,8 @@ import {
   logLoginFailedPassword,
   logLoginInactiveAccount,
 } from './auth.logger.js';
+import { activityService } from '../activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
 
 /**
  * Auth Service
@@ -76,9 +78,16 @@ export const loginAdmin = async (email, candidatePassword, requestMeta = {}) => 
   // 1. Find admin — password field is excluded by schema default, so select it explicitly
   const admin = await Admin.findOne({ email: email.toLowerCase().trim() }).select('+password');
 
-  // 2. Unknown email → treat identically to wrong password (avoid user enumeration)
   if (!admin) {
     logLoginFailedNotFound(email, requestMeta);
+    activityService.recordActivity({
+      module: ACTIVITY_MODULES.AUTH,
+      action: ACTIVITY_ACTIONS.LOGIN,
+      description: `Failed login attempt (email not found) for ${email}`,
+      metadata: { email, ...requestMeta },
+      status: ACTIVITY_STATUS.FAILED,
+      severity: ACTIVITY_SEVERITY.MEDIUM
+    }).catch(() => {});
     const err = new Error(MESSAGES.INVALID_CREDENTIALS);
     err.statusCode = 401;
     throw err;
@@ -88,6 +97,15 @@ export const loginAdmin = async (email, candidatePassword, requestMeta = {}) => 
   //    the password is correct for a disabled account via timing differences.
   if (!admin.isActive) {
     logLoginInactiveAccount(admin.email, requestMeta);
+    activityService.recordActivity({
+      module: ACTIVITY_MODULES.AUTH,
+      action: ACTIVITY_ACTIONS.LOGIN,
+      description: `Failed login attempt (inactive account) for ${admin.email}`,
+      performedBy: admin._id,
+      metadata: { email: admin.email, ...requestMeta },
+      status: ACTIVITY_STATUS.FAILED,
+      severity: ACTIVITY_SEVERITY.MEDIUM
+    }).catch(() => {});
     const err = new Error(MESSAGES.ACCOUNT_INACTIVE);
     err.statusCode = 403;
     throw err;
@@ -97,6 +115,15 @@ export const loginAdmin = async (email, candidatePassword, requestMeta = {}) => 
   const isPasswordValid = await admin.comparePassword(candidatePassword);
   if (!isPasswordValid) {
     logLoginFailedPassword(admin.email, requestMeta);
+    activityService.recordActivity({
+      module: ACTIVITY_MODULES.AUTH,
+      action: ACTIVITY_ACTIONS.LOGIN,
+      description: `Failed login attempt (invalid password) for ${admin.email}`,
+      performedBy: admin._id,
+      metadata: { email: admin.email, ...requestMeta },
+      status: ACTIVITY_STATUS.FAILED,
+      severity: ACTIVITY_SEVERITY.MEDIUM
+    }).catch(() => {});
     const err = new Error(MESSAGES.INVALID_CREDENTIALS);
     err.statusCode = 401;
     throw err;
@@ -119,6 +146,16 @@ export const loginAdmin = async (email, candidatePassword, requestMeta = {}) => 
   });
 
   logLoginSuccess({ email: admin.email, role: admin.role }, requestMeta);
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.AUTH,
+    action: ACTIVITY_ACTIONS.LOGIN,
+    description: `Successful login for ${admin.email}`,
+    performedBy: admin._id,
+    metadata: { role: admin.role, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
 
   return {
     accessToken,

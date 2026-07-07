@@ -4,6 +4,8 @@ import { CSVFormatter } from './formatters/csv.formatter.js';
 import { ExcelFormatter } from './formatters/excel.formatter.js';
 import { PDFFormatter } from './formatters/pdf.formatter.js';
 import { EXPORT_REPORT_TYPES, EXPORT_FORMATS } from './exports.constants.js';
+import { activityService } from '../activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
 
 export const generateExport = async (reportType, format, filters, adminEmail) => {
   const startTime = Date.now();
@@ -74,6 +76,15 @@ export const generateExport = async (reportType, format, filters, adminEmail) =>
     const duration = Date.now() - startTime;
     const fileSize = fileBuffer.length;
     await exportHistoryService.markExportSuccess(historyRecord.exportId, fileSize, duration);
+
+    activityService.recordActivity({
+      module: ACTIVITY_MODULES.EXPORT,
+      action: ACTIVITY_ACTIONS.EXPORT,
+      description: `Generated ${reportType} export in ${format} format`,
+      metadata: { reportType, format, filters, adminEmail, duration, fileSize },
+      status: ACTIVITY_STATUS.SUCCESS,
+      severity: ACTIVITY_SEVERITY.LOW
+    }).catch(() => {});
 
     // 5. Return payload for controller
     return {

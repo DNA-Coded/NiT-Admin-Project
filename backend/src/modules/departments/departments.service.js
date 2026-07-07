@@ -10,6 +10,9 @@ import {
   logDepartmentNotFound,
   logDepartmentConflict,
 } from './departments.logger.js';
+import { activityService } from '../activity/activity.service.js';
+import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
+import Admin from '../auth/auth.model.js';
 
 /**
  * Department Service
@@ -205,6 +208,20 @@ export const createDepartment = async (data, adminEmail, requestMeta = {}) => {
 
   logDepartmentCreated({ id: dept._id, name: dept.name, code: dept.code }, adminEmail, requestMeta);
 
+  // We need to resolve adminEmail to an ObjectId if performedBy expects ObjectId.
+  // We'll leave performedBy null if not passed an ID, or we can look it up.
+  // For now, we put adminEmail in metadata.
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.DEPARTMENT,
+    action: ACTIVITY_ACTIONS.CREATE,
+    entityType: 'Department',
+    entityId: dept._id,
+    description: `Created department ${dept.name} (${dept.code})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
+
   return dept.toPublicJSON();
 };
 
@@ -256,6 +273,17 @@ export const updateDepartment = async (id, data, adminEmail, requestMeta = {}) =
 
   logDepartmentUpdated({ id: dept._id, name: dept.name, code: dept.code }, adminEmail, requestMeta);
 
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.DEPARTMENT,
+    action: ACTIVITY_ACTIONS.UPDATE,
+    entityType: 'Department',
+    entityId: dept._id,
+    description: `Updated department ${dept.name} (${dept.code})`,
+    metadata: { updates, adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
+
   return dept.toPublicJSON();
 };
 
@@ -288,6 +316,17 @@ export const softDeleteDepartment = async (id, adminEmail, requestMeta = {}) => 
   await dept.save();
 
   logDepartmentDeleted({ id: dept._id, name: dept.name, code: dept.code }, adminEmail, requestMeta);
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.DEPARTMENT,
+    action: ACTIVITY_ACTIONS.DELETE,
+    entityType: 'Department',
+    entityId: dept._id,
+    description: `Soft-deleted department ${dept.name} (${dept.code})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.MEDIUM
+  }).catch(() => {});
 };
 
 /**
@@ -319,6 +358,17 @@ export const restoreDepartment = async (id, adminEmail, requestMeta = {}) => {
   await dept.save();
 
   logDepartmentRestored({ id: dept._id, name: dept.name, code: dept.code }, adminEmail, requestMeta);
+
+  activityService.recordActivity({
+    module: ACTIVITY_MODULES.DEPARTMENT,
+    action: ACTIVITY_ACTIONS.RESTORE,
+    entityType: 'Department',
+    entityId: dept._id,
+    description: `Restored department ${dept.name} (${dept.code})`,
+    metadata: { adminEmail, ...requestMeta },
+    status: ACTIVITY_STATUS.SUCCESS,
+    severity: ACTIVITY_SEVERITY.LOW
+  }).catch(() => {});
 
   return dept.toPublicJSON();
 };
