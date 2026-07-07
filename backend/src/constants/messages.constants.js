@@ -155,4 +155,10 @@ export const MESSAGES = Object.freeze({
   ACTIVITY_FETCH_LIST:        'Activities retrieved successfully.',
   ACTIVITY_FETCH_DETAIL:      'Activity retrieved successfully.',
   ACTIVITY_NOT_FOUND:         'Activity not found.',
+
+  // ─── System Settings ────────────────────────────────────────────────────────
+  SETTINGS_UPDATED:           'System settings updated successfully.',
+  SETTINGS_RESET:             'System settings reset to defaults successfully.',
+  SETTINGS_NOT_FOUND:         'System settings not found.',
+  SETTINGS_NO_CHANGES:        'No changes detected in settings.',
 });

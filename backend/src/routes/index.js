@@ -27,11 +27,8 @@ import exportsRoutes from '../modules/exports/exports.routes.js';
 import activityRoutes from '../modules/activity/activity.routes.js';
 
 // Future routes — import and mount here as each module is built:
-// import attendanceRoutes from './attendance.routes.js';
-// import deviceRoutes     from './device.routes.js';
 // import payrollRoutes    from './payroll.routes.js';
-// import reportRoutes     from './report.routes.js';
-// import settingsRoutes   from './settings.routes.js';
+import settingsRoutes   from '../modules/settings/settings.routes.js';
 
 const router = Router();
 
@@ -49,12 +46,9 @@ router.use('/dashboard',   dashboardRoutes);
 router.use('/reports',     reportsRoutes);
 router.use('/exports',     exportsRoutes);
 router.use('/activity',    activityRoutes);
+router.use('/settings',    settingsRoutes);
 
 // Future mounts:
-// router.use('/attendance', attendanceRoutes);
-// router.use('/devices',    deviceRoutes);
 // router.use('/payroll',    payrollRoutes);
-// router.use('/reports',    reportRoutes);
-// router.use('/settings',   settingsRoutes);
 
 export default router;

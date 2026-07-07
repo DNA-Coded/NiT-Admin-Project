@@ -73,7 +73,10 @@ export {
   ACTIVITY_STATUS_VALUES,
   ACTIVITY_SEVERITY,
   ACTIVITY_SEVERITY_VALUES,
-  ACTIVITY_SORT_FIELDS,
   ACTIVITY_SORT_ORDERS,
   ACTIVITY_PAGINATION,
 } from '../modules/activity/activity.constants.js';
+export {
+  DEFAULT_SETTINGS,
+  SETTINGS_VALIDATION,
+} from '../modules/settings/settings.constants.js';
