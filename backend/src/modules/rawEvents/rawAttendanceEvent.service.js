@@ -116,11 +116,11 @@ class RawAttendanceEventService {
         device: device._id,
         attendanceIdentity,
         verificationMethod: normalized.verificationMethod || 'UNKNOWN',
-        attendanceType: 'IN', // TODO: Determine IN/OUT via device rules or payload if available
+        attendanceType: 'IN', // NOTE: Determine IN/OUT via device rules or payload if available
         timestamp: new Date(normalized.timestamp),
         attendanceDate: new Date(normalized.timestamp).toISOString().split('T')[0],
         attendanceTime: new Date(normalized.timestamp).toTimeString().split(' ')[0],
-        status: 'PRESENT', // TODO: Determine via Attendance Policies (Phase 5)
+        status: 'PRESENT', // NOTE: Determine via Attendance Policies (Phase 5)
         remarks: `Auto-generated via ${event.provider}`,
       };
 

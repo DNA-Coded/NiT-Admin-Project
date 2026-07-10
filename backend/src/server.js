@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './config/env.config.js';
 import app from './app.js';
 import connectDB from './config/db.js';
 import logger from './config/logger.config.js';
@@ -26,3 +26,29 @@ process.on('uncaughtException', (err) => {
   logger.error(`Uncaught Exception: ${err.message}`, { stack: err.stack });
   server.close(() => process.exit(1));
 });
+
+// ─── Graceful Shutdown ────────────────────────────────────────────────────────
+const gracefulShutdown = async (signal) => {
+  logger.info(`Received ${signal}. Shutting down gracefully.`);
+  server.close(async () => {
+    logger.info('HTTP server closed.');
+    try {
+      const mongoose = (await import('mongoose')).default;
+      await mongoose.connection.close();
+      logger.info('MongoDB connection closed.');
+      process.exit(0);
+    } catch (err) {
+      logger.error('Error during MongoDB connection closure', err);
+      process.exit(1);
+    }
+  });
+  
+  // Force shutdown after 10 seconds
+  setTimeout(() => {
+    logger.error('Could not close connections in time, forcefully shutting down');
+    process.exit(1);
+  }, 10000);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

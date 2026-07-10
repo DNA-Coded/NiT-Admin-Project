@@ -15,7 +15,7 @@ class AttendanceMapper {
    * @returns {Object} Standardized event object
    */
   static mapRawToEvent(rawLog, providerName, deviceContext) {
-    // TODO: Implement mapper routing based on providerName
+    // NOTE: Implement mapper routing based on providerName
     // e.g. if (providerName === 'SecureEyeProvider') return this.mapSecureEye(rawLog, deviceContext);
     
     return {

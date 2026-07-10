@@ -1,10 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import compression from 'compression';
 
 import corsOptions from './config/cors.config.js';
 import logger from './config/logger.config.js';
 import serverConfig from './config/server.config.js';
+import globalLimiter from './config/rateLimit.config.js';
 import apiRoutes from './routes/index.js';
 import { notFound, errorHandler } from './middleware/error.middleware.js';
 
@@ -15,14 +19,26 @@ const app = express();
 
 // ─── Core Middleware ──────────────────────────────────────────────────────────
 
+// Set security HTTP headers
+app.use(helmet());
+
+// Apply global rate limiting to all requests
+app.use(globalLimiter);
+
 // Enable CORS with configured options
 app.use(cors(corsOptions));
 
-// Parse incoming JSON payloads
-app.use(express.json());
+// Compress response bodies
+app.use(compression());
+
+// Parse incoming JSON payloads with size limit
+app.use(express.json({ limit: '10kb' }));
 
 // Parse URL-encoded payloads (form data)
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Sanitize data against NoSQL query injection
+app.use(mongoSanitize());
 
 // HTTP request logger — piped through Winston so all logs go to one place
 if (!serverConfig.isTest) {

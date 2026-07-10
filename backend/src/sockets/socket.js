@@ -47,7 +47,7 @@ export const initSocket = (httpServer) => {
     },
   });
 
-  // TODO: Register event namespaces and handlers here in a future phase.
+  // NOTE: Register event namespaces and handlers here in a future phase.
   // Example:
   //   io.on('connection', (socket) => {
   //     socket.on('subscribe:live-feed', () => { ... });

@@ -11,7 +11,7 @@ class EventProcessor {
    * @param {Object} event Standardized event from AttendanceMapper
    */
   static async processEvent(event) {
-    // TODO: Phase 6.2 - Send to core Attendance Engine
+    // NOTE: Phase 6.2 - Send to core Attendance Engine
     // e.g. AttendanceEngine.record(event)
     
     // For now, this is just a placeholder

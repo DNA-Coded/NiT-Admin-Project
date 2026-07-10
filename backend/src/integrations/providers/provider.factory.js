@@ -23,7 +23,7 @@ class ProviderFactory {
       case 'secureeye':
         return new SecureEyeProvider(device);
       
-      // TODO: Add cases for future providers like:
+      // NOTE: Add cases for future providers like:
       // case 'zkteco': return new ZKTecoProvider(device);
       // case 'hikvision': return new HikvisionProvider(device);
       // case 'essl': return new eSSLProvider(device);

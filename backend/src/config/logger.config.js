@@ -1,4 +1,5 @@
 import winston from 'winston';
+import 'winston-daily-rotate-file';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -37,16 +38,24 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       format: process.env.NODE_ENV === 'production' ? prodFormat : devFormat,
     }),
-    // File transport — errors only
-    new winston.transports.File({
-      filename: path.join(logsDir, 'error.log'),
+    // File transport — errors only (daily rotate)
+    new winston.transports.DailyRotateFile({
+      dirname: logsDir,
+      filename: 'error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
       level: 'error',
       format: prodFormat,
+      maxFiles: '14d',
+      maxSize: '20m',
     }),
-    // File transport — all levels combined
-    new winston.transports.File({
-      filename: path.join(logsDir, 'combined.log'),
+    // File transport — all levels combined (daily rotate)
+    new winston.transports.DailyRotateFile({
+      dirname: logsDir,
+      filename: 'combined-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
       format: prodFormat,
+      maxFiles: '14d',
+      maxSize: '20m',
     }),
   ],
   // Do not exit on handled exceptions
