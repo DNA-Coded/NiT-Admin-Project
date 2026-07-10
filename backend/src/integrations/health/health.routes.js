@@ -17,12 +17,7 @@ import {
 
 const router = Router();
 
-// Only Super Admins and Admins should manage health configurations and status
-router.use(authenticate);
-router.use(authorize(
-  [ROLES.SUPER_ADMIN, ROLES.ADMIN],
-  [PERMISSIONS.DEVICES_MANAGE]
-));
+
 
 /**
  * @swagger
@@ -56,6 +51,13 @@ router.get('/', getAllDevicesHealth);
  *         description: Device health details retrieved successfully
  */
 router.get('/:deviceId', validateDeviceId, getDeviceHealth);
+
+// Only Super Admins and Admins should manage health configurations and status
+router.use(authenticate);
+router.use(authorize(
+  [ROLES.SUPER_ADMIN, ROLES.ADMIN],
+  [PERMISSIONS.DEVICES_MANAGE]
+));
 
 /**
  * @swagger
