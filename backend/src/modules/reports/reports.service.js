@@ -1,5 +1,5 @@
 import Faculty from '../faculty/faculty.model.js';
-import Student from '../students/student.model.js';
+
 import Device from '../devices/device.model.js';
 import Attendance from '../attendance/attendance.model.js';
 import SyncJob from '../../integrations/sync/sync.model.js';
@@ -7,8 +7,7 @@ import {
   DEVICE_STATUS, 
   DEVICE_HEALTH_STATUS, 
   ATTENDANCE_RECORD_STATUS,
-  FACULTY_STATUS,
-  STUDENT_STATUS
+  FACULTY_STATUS
 } from '../../constants/index.js';
 import { REPORT_PAGINATION } from './reports.constants.js';
 
@@ -16,41 +15,23 @@ import { REPORT_PAGINATION } from './reports.constants.js';
  * Pre-resolve person IDs based on demographic filters
  */
 const resolvePersonIds = async (filters) => {
-  const { department, semester, section, batch, academicSession } = filters;
-  const personFiltersPresent = department || semester || section || batch || academicSession;
+  const { department } = filters;
+  const personFiltersPresent = department;
   
   if (!personFiltersPresent) return null;
 
-  const studentQuery = { isActive: true };
   const facultyQuery = { isActive: true };
-  let checkStudent = false;
   let checkFaculty = false;
 
   if (department) {
-    studentQuery.department = department;
     facultyQuery.department = department;
-    checkStudent = true;
     checkFaculty = true;
-  }
-  
-  if (semester || section || batch || academicSession) {
-    if (semester) studentQuery.semester = semester;
-    if (section) studentQuery.section = section;
-    if (batch) studentQuery.batch = batch;
-    if (academicSession) studentQuery.academicSession = academicSession;
-    checkStudent = true;
-    // If student specific filters are passed without department, we don't need to check faculty
-    if (!department) checkFaculty = false;
   }
 
   const ids = [];
   if (checkFaculty) {
     const facs = await Faculty.find(facultyQuery).select('_id').lean();
     ids.push(...facs.map(f => f._id));
-  }
-  if (checkStudent) {
-    const stds = await Student.find(studentQuery).select('_id').lean();
-    ids.push(...stds.map(s => s._id));
   }
 
   return ids;
@@ -146,48 +127,7 @@ export const getFacultyReport = async (filters) => {
   };
 };
 
-export const getStudentReport = async (filters) => {
-  const page = parseInt(filters.page, 10) || REPORT_PAGINATION.DEFAULT_PAGE;
-  const limit = parseInt(filters.limit, 10) || REPORT_PAGINATION.DEFAULT_LIMIT;
-  const skip = (page - 1) * limit;
 
-  const query = { isActive: true };
-  if (filters.department) query.department = filters.department;
-  if (filters.semester) query.semester = filters.semester;
-  if (filters.section) query.section = filters.section;
-  if (filters.batch) query.batch = filters.batch;
-  if (filters.academicSession) query.academicSession = filters.academicSession;
-  if (filters.status) query.status = filters.status;
-
-  const [totalStudents, active, inactive, data] = await Promise.all([
-    Student.countDocuments(query),
-    Student.countDocuments({ ...query, status: STUDENT_STATUS.ACTIVE }),
-    Student.countDocuments({ ...query, status: { $ne: STUDENT_STATUS.ACTIVE } }),
-    Student.find(query)
-      .sort({ [filters.sortBy || 'createdAt']: filters.sortOrder === 'asc' ? 1 : -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate('department', 'name code')
-      .lean()
-  ]);
-
-  return {
-    filters,
-    summary: { totalStudents, active, inactive },
-    data: data.map(doc => ({
-      id: doc._id,
-      firstName: doc.firstName,
-      lastName: doc.lastName,
-      rollNumber: doc.rollNumber,
-      department: doc.department?.name,
-      semester: doc.semester,
-      section: doc.section,
-      batch: doc.batch,
-      status: doc.status
-    })),
-    pagination: { page, limit }
-  };
-};
 
 export const getDeviceReport = async (filters) => {
   const page = parseInt(filters.page, 10) || REPORT_PAGINATION.DEFAULT_PAGE;

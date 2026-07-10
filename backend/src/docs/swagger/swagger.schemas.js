@@ -57,20 +57,7 @@ const schemas = {
       status: { type: 'string', example: 'ACTIVE' },
     },
   },
-  Student: {
-    type: 'object',
-    properties: {
-      id: { type: 'string', example: '60d0fe4f5311236168a109ca' },
-      rollNumber: { type: 'string', example: 'CS2025001' },
-      registrationNumber: { type: 'string', example: 'REG987654321' },
-      name: { type: 'string', example: 'Alice Smith' },
-      email: { type: 'string', example: 'alice.smith@student.nit.ac.in' },
-      departmentId: { type: 'string', example: '60d0fe4f5311236168a109ca' },
-      semester: { type: 'integer', example: 3 },
-      attendanceIdentity: { type: 'string', example: 'BIO-3322' },
-      status: { type: 'string', example: 'ACTIVE' },
-    },
-  },
+
   Device: {
     type: 'object',
     properties: {
@@ -87,7 +74,7 @@ const schemas = {
     type: 'object',
     properties: {
       id: { type: 'string', example: '60d0fe4f5311236168a109ca' },
-      personType: { type: 'string', example: 'STUDENT' },
+      personType: { type: 'string', example: 'FACULTY' },
       personId: { type: 'string', example: '60d0fe4f5311236168a109ca' },
       attendanceIdentity: { type: 'string', example: 'BIO-3322' },
       timestamp: { type: 'string', format: 'date-time' },

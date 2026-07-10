@@ -34,16 +34,10 @@ const attendanceSchema = new Schema(
       },
     },
 
-    personModelName: {
-      type: String,
-      required: true,
-      enum: ['Faculty', 'Student'],
-    },
-
     person: {
       type:     Schema.Types.ObjectId,
       required: [true, 'Person reference is required.'],
-      refPath:  'personModelName',
+      ref:      'Faculty',
     },
 
     device: {
@@ -151,15 +145,6 @@ const attendanceSchema = new Schema(
   }
 );
 
-// ─── Pre-save Hook ─────────────────────────────────────────────────────────────
-attendanceSchema.pre('validate', function (next) {
-  if (this.personType === 'FACULTY') {
-    this.personModelName = 'Faculty';
-  } else if (this.personType === 'STUDENT') {
-    this.personModelName = 'Student';
-  }
-  next();
-});
 
 // ─── Indexes ──────────────────────────────────────────────────────────────────
 attendanceSchema.index({ attendanceDate: 1, person: 1, isActive: 1 });

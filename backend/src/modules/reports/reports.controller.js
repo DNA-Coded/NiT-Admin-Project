@@ -62,30 +62,7 @@ export const getFacultyReport = async (req, res, next) => {
   }
 };
 
-export const getStudentReport = async (req, res, next) => {
-  try {
-    const adminEmail = req.admin?.email;
-    const requestMeta = buildRequestMeta(req);
-    const filters = { ...req.query };
 
-    reportsLogger.logReportRequested(adminEmail, 'STUDENT', filters, requestMeta);
-    const report = await reportsService.getStudentReport(filters);
-    reportsLogger.logReportGenerated(adminEmail, 'STUDENT', report.summary);
-
-    activityService.recordActivity({
-      module: ACTIVITY_MODULES.REPORT,
-      action: ACTIVITY_ACTIONS.REPORT,
-      description: `Generated Student report with ${report.summary.totalStudents} records`,
-      metadata: { adminEmail, filters, summary: report.summary, ...requestMeta },
-      status: ACTIVITY_STATUS.SUCCESS,
-      severity: ACTIVITY_SEVERITY.LOW
-    }).catch(() => {});
-
-    return sendSuccess(res, report, MESSAGES.REPORT_GENERATED);
-  } catch (error) {
-    next(error);
-  }
-};
 
 export const getDeviceReport = async (req, res, next) => {
   try {

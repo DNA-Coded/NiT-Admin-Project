@@ -2,7 +2,7 @@ import RawAttendanceEvent from './rawAttendanceEvent.model.js';
 import { PROCESSING_STATUS } from './rawAttendanceEvent.constants.js';
 import { createAttendance } from '../attendance/attendance.service.js';
 import Faculty from '../faculty/faculty.model.js';
-import Student from '../students/student.model.js';
+
 import Device from '../devices/device.model.js';
 import { MESSAGES } from '../../constants/index.js';
 import {
@@ -100,11 +100,6 @@ class RawAttendanceEventService {
 
       let person = await Faculty.findOne({ attendanceIdentity, isActive: true }).select('_id').lean();
       let personType = 'FACULTY';
-      
-      if (!person) {
-        person = await Student.findOne({ attendanceIdentity, isActive: true }).select('_id').lean();
-        personType = 'STUDENT';
-      }
 
       if (!person) throw new Error(`Unrecognized attendance identity: ${attendanceIdentity}`);
 

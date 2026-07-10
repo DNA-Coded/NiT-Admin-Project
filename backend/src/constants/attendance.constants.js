@@ -6,7 +6,6 @@
 
 export const PERSON_TYPES = Object.freeze({
   FACULTY: 'FACULTY',
-  STUDENT: 'STUDENT',
 });
 
 export const PERSON_TYPES_VALUES = Object.freeze(Object.values(PERSON_TYPES));

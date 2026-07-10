@@ -4,7 +4,7 @@ import { validateReportFilters } from './reports.validator.js';
 import {
   getAttendanceReport,
   getFacultyReport,
-  getStudentReport,
+
   getDeviceReport,
   getSynchronizationReport,
 } from './reports.controller.js';
@@ -37,19 +37,7 @@ router.get('/attendance', authenticate, validateReportFilters, getAttendanceRepo
  *         description: Faculty report generated successfully
  */
 router.get('/faculty', authenticate, validateReportFilters, getFacultyReport);
-/**
- * @swagger
- * /reports/students:
- *   get:
- *     summary: Generate student report
- *     tags: [Reports]
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: Student report generated successfully
- */
-router.get('/students', authenticate, validateReportFilters, getStudentReport);
+
 /**
  * @swagger
  * /reports/devices:

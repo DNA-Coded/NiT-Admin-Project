@@ -34,14 +34,7 @@ export {
   FACULTY_SORT_ORDERS,
   FACULTY_PAGINATION,
 } from './faculty.constants.js';
-export {
-  STUDENT_STATUS,
-  STUDENT_STATUS_VALUES,
-  SEMESTERS,
-  STUDENT_SORT_FIELDS,
-  STUDENT_SORT_ORDERS,
-  STUDENT_PAGINATION,
-} from './student.constants.js';
+
 export {
   DEVICE_CATEGORIES,
   DEVICE_CATEGORIES_VALUES,

@@ -8,7 +8,7 @@ const { Schema } = mongoose;
  * Admin Schema
  *
  * Represents an administrative user who can log into the NiT Admin system.
- * Regular faculty/students are NOT users — they only interact via biometric devices.
+ * Regular faculty are NOT users — they only interact via biometric devices.
  */
 const adminSchema = new Schema(
   {

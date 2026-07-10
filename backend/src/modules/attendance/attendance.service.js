@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import Attendance from './attendance.model.js';
 import Device from '../devices/device.model.js';
 import Faculty from '../faculty/faculty.model.js';
-import Student from '../students/student.model.js';
 import { MESSAGES } from '../../constants/index.js';
 import {
   logAttendanceListFetched,
@@ -38,7 +37,7 @@ const assertDeviceExists = async (deviceId) => {
 const assertPersonExistsAndMatchesIdentity = async (personId, personType, attendanceIdentity) => {
   if (!personId || !personType || !attendanceIdentity) return;
 
-  const Model = personType === 'FACULTY' ? Faculty : Student;
+  const Model = Faculty;
   const person = await Model.findById(personId).populate('department').lean();
 
   if (!person) {
@@ -165,11 +164,8 @@ export const listAttendance = async (query = {}, requestMeta = {}) => {
   if (department && mongoose.Types.ObjectId.isValid(department)) {
     // Optimization: fetch matching person IDs first to avoid heavy aggregation on Attendance
     const deptId = new mongoose.Types.ObjectId(department);
-    const [faculties, students] = await Promise.all([
-      Faculty.find({ department: deptId }).select('_id').lean(),
-      Student.find({ department: deptId }).select('_id').lean()
-    ]);
-    const personIds = [...faculties.map(f => f._id), ...students.map(s => s._id)];
+    const faculties = await Faculty.find({ department: deptId }).select('_id').lean();
+    const personIds = faculties.map(f => f._id);
     
     // If filtering by department and no people found, result is strictly 0
     if (personIds.length === 0) {

@@ -1,6 +1,5 @@
 import Department from '../departments/departments.model.js';
 import Faculty from '../faculty/faculty.model.js';
-import Student from '../students/student.model.js';
 import Device from '../devices/device.model.js';
 import Attendance from '../attendance/attendance.model.js';
 import SyncJob from '../../integrations/sync/sync.model.js';
@@ -18,7 +17,6 @@ export const getDashboardOverview = async () => {
   const [
     totalDepartments,
     totalFaculty,
-    totalStudents,
     totalDevices,
     
     // Device Status Counts
@@ -45,7 +43,6 @@ export const getDashboardOverview = async () => {
     // Summary
     Department.countDocuments({ isActive: true }),
     Faculty.countDocuments({ isActive: true }),
-    Student.countDocuments({ isActive: true }),
     Device.countDocuments({ isActive: true }),
 
     // Devices
@@ -74,7 +71,6 @@ export const getDashboardOverview = async () => {
     summary: {
       totalDepartments,
       totalFaculty,
-      totalStudents,
       totalDevices
     },
     devices: {
@@ -136,7 +132,6 @@ export const getDashboardAnalytics = async () => {
     attendanceAgg,
     departmentAgg,
     facultyAgg,
-    studentAgg,
     deviceAgg,
     syncAgg
   ] = await Promise.all([
@@ -174,19 +169,9 @@ export const getDashboardAnalytics = async () => {
         }
       },
       {
-        $lookup: {
-          from: 'students',
-          localField: '_id',
-          foreignField: 'department',
-          pipeline: [{ $match: { isActive: true } }, { $project: { _id: 1 } }],
-          as: 'students'
-        }
-      },
-      {
         $addFields: {
           totalFaculty: { $size: '$faculties' },
-          totalStudents: { $size: '$students' },
-          allPersonIds: { $concatArrays: ['$faculties._id', '$students._id'] }
+          allPersonIds: '$faculties._id'
         }
       },
       {
@@ -211,14 +196,13 @@ export const getDashboardAnalytics = async () => {
         $project: {
           department: '$name',
           totalFaculty: 1,
-          totalStudents: 1,
           attendancePercentage: {
             $cond: [
-              { $eq: [{ $add: ['$totalFaculty', '$totalStudents'] }, 0] },
+              { $eq: ['$totalFaculty', 0] },
               0,
               {
                 $multiply: [
-                  { $divide: [{ $size: '$todayAttendances' }, { $add: ['$totalFaculty', '$totalStudents'] }] },
+                  { $divide: [{ $size: '$todayAttendances' }, '$totalFaculty'] },
                   100
                 ]
               }
@@ -239,16 +223,7 @@ export const getDashboardAnalytics = async () => {
       }
     ]),
 
-    // 4. Student Analytics
-    Student.aggregate([
-      {
-        $facet: {
-          total: [{ $count: 'count' }],
-          active: [{ $match: { isActive: true } }, { $count: 'count' }],
-          inactive: [{ $match: { isActive: false } }, { $count: 'count' }]
-        }
-      }
-    ]),
+
 
     // 5. Device Analytics
     Device.aggregate([
@@ -295,11 +270,6 @@ export const getDashboardAnalytics = async () => {
       total: getCount(facultyAgg[0].total),
       active: getCount(facultyAgg[0].active),
       inactive: getCount(facultyAgg[0].inactive)
-    },
-    students: {
-      total: getCount(studentAgg[0].total),
-      active: getCount(studentAgg[0].active),
-      inactive: getCount(studentAgg[0].inactive)
     },
     devices: {
       total: getCount(deviceAgg[0].total),
@@ -498,21 +468,17 @@ export const getFilteredDashboardData = async (filters, { page, limit }) => {
   const {
     from, to,
     department, faculty, designation, facultyStatus,
-    semester, section, batch, academicSession, studentStatus,
     attendanceType, verificationMethod, correctionStatus,
     device, deviceCategory, healthStatus, connectionStatus,
     syncStatus, provider
   } = filters;
 
   let matchedPersonIds = null;
-  const personFiltersPresent = department || faculty || designation || facultyStatus ||
-                               semester || section || batch || academicSession || studentStatus;
+  const personFiltersPresent = department || faculty || designation || facultyStatus;
 
   if (personFiltersPresent) {
     const facultyQuery = { isActive: true };
-    const studentQuery = { isActive: true };
     let checkFaculty = false;
-    let checkStudent = false;
 
     // Faculty-specific filters
     if (faculty || designation || facultyStatus) {
@@ -522,35 +488,16 @@ export const getFilteredDashboardData = async (filters, { page, limit }) => {
       checkFaculty = true;
     }
 
-    // Student-specific filters
-    if (semester || section || batch || academicSession || studentStatus) {
-      if (semester) studentQuery.semester = semester;
-      if (section) studentQuery.section = section;
-      if (batch) studentQuery.batch = batch;
-      if (academicSession) studentQuery.academicSession = academicSession;
-      if (studentStatus) studentQuery.status = studentStatus;
-      checkStudent = true;
-    }
-
     // Shared filters (department)
     if (department) {
       facultyQuery.department = department;
-      studentQuery.department = department;
-      // If neither specific was requested, check both (they both have departments)
-      if (!checkFaculty && !checkStudent) {
-        checkFaculty = true;
-        checkStudent = true;
-      }
+      checkFaculty = true;
     }
 
     const ids = [];
     if (checkFaculty) {
       const facs = await Faculty.find(facultyQuery).select('_id').lean();
       ids.push(...facs.map(f => f._id));
-    }
-    if (checkStudent) {
-      const stds = await Student.find(studentQuery).select('_id').lean();
-      ids.push(...stds.map(s => s._id));
     }
     
     matchedPersonIds = ids;

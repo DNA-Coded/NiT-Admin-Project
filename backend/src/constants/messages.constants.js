@@ -66,23 +66,7 @@ export const MESSAGES = Object.freeze({
   FACULTY_INVALID_DESIGNATION:       'Invalid designation. Please select from the allowed values.',
   FACULTY_INVALID_STATUS:            'Invalid status. Allowed values are: ACTIVE, ON_LEAVE, RETIRED, SUSPENDED.',
 
-  // ─── Student ─────────────────────────────────────────────────────────────────
-  STUDENT_FETCH_LIST:   'Students retrieved successfully.',
-  STUDENT_FETCH_DETAIL: 'Student retrieved successfully.',
-  STUDENT_CREATED:      'Student created successfully.',
-  STUDENT_UPDATED:      'Student updated successfully.',
-  STUDENT_DELETED:      'Student deactivated successfully.',
-  STUDENT_RESTORED:     'Student restored successfully.',
-  STUDENT_NOT_FOUND:                 'Student not found.',
-  STUDENT_ROLL_NUMBER_TAKEN:         'A student with this roll number already exists.',
-  STUDENT_REG_NUMBER_TAKEN:          'A student with this registration number already exists.',
-  STUDENT_EMAIL_TAKEN:               'A student with this email address already exists.',
-  STUDENT_ATTENDANCE_IDENTITY_TAKEN: 'This attendance identity is already registered to another student.',
-  STUDENT_ALREADY_ACTIVE:            'Student record is already active.',
-  STUDENT_ALREADY_INACTIVE:          'Student record is already inactive.',
-  STUDENT_NO_CHANGES:                'No fields were provided to update.',
-  STUDENT_INVALID_STATUS:            'Invalid status.',
-  STUDENT_INVALID_SEMESTER:          'Invalid semester.',
+
 
   // ─── Device ──────────────────────────────────────────────────────────────────
   DEVICE_FETCH_LIST:          'Devices retrieved successfully.',

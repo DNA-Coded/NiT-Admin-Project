@@ -15,7 +15,7 @@ import systemHealthRoutes from '../modules/health/health.routes.js';
 import authRoutes       from '../modules/auth/auth.routes.js';
 import departmentRoutes from '../modules/departments/departments.routes.js';
 import facultyRoutes    from '../modules/faculty/faculty.routes.js';
-import studentRoutes    from '../modules/students/student.routes.js';
+
 import deviceRoutes     from '../modules/devices/device.routes.js';
 import attendanceRoutes from '../modules/attendance/attendance.routes.js';
 import syncRoutes       from '../integrations/sync/sync.routes.js';
@@ -36,7 +36,7 @@ router.use('/system-health', systemHealthRoutes);
 router.use('/auth',        authRoutes);
 router.use('/departments', departmentRoutes);
 router.use('/faculty',     facultyRoutes);
-router.use('/students',    studentRoutes);
+
 router.use('/devices',     deviceRoutes);
 router.use('/attendance',  attendanceRoutes);
 router.use('/sync',        syncRoutes);
