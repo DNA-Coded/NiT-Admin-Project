@@ -21,7 +21,7 @@ export const notFound = (req, res, next) => {
  * Stack traces are included in `data` in development, omitted in production.
  */
 export const errorHandler = (err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  const statusCode = err.status || err.statusCode || (res.statusCode === 200 ? 500 : res.statusCode);
 
   // Log server errors (5xx) at error level, client errors (4xx) at warn
   if (statusCode >= 500) {
