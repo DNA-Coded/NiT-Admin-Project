@@ -16,6 +16,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './docs/swagger/swagger.config.js';
 
 const app = express();
+app.set('trust proxy', 1);
 
 // ─── Core Middleware ──────────────────────────────────────────────────────────
 
