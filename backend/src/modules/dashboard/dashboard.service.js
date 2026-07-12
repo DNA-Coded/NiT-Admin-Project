@@ -1,4 +1,5 @@
 import Department from '../departments/departments.model.js';
+import mongoose from 'mongoose';
 import Faculty from '../faculty/faculty.model.js';
 import Device from '../devices/device.model.js';
 import Attendance from '../attendance/attendance.model.js';
@@ -490,6 +491,9 @@ export const getFilteredDashboardData = async (filters, { page, limit }) => {
 
     // Shared filters (department)
     if (department) {
+      if (!mongoose.Types.ObjectId.isValid(department)) {
+        throw { statusCode: 422, message: 'Invalid department ID format.' };
+      }
       facultyQuery.department = department;
       checkFaculty = true;
     }
@@ -519,7 +523,12 @@ export const getFilteredDashboardData = async (filters, { page, limit }) => {
   } else if (correctionStatus === 'UNCORRECTED') {
     attendanceQuery.status = { $ne: ATTENDANCE_RECORD_STATUS.CORRECTED };
   }
-  if (device) attendanceQuery.device = device;
+  if (device) {
+    if (!mongoose.Types.ObjectId.isValid(device)) {
+      throw { statusCode: 422, message: 'Invalid device ID format.' };
+    }
+    attendanceQuery.device = device;
+  }
   if (matchedPersonIds !== null) {
     attendanceQuery.person = { $in: matchedPersonIds };
   }
