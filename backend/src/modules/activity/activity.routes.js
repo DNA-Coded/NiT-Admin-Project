@@ -2,11 +2,12 @@ import { Router } from 'express';
 import { getActivities, getActivityById, searchActivities, filterActivities } from './activity.controller.js';
 import { validateQuery, validateParams } from './activity.validator.js';
 
+import { authenticate } from '../auth/auth.middleware.js';
+
 const router = Router();
 
 // Protect these routes as per the overall system authentication strategy
-// For now we map them directly, normally we would add `protect, authorize(['ADMIN'])` here.
-// Example: router.use(protect, authorize(['ADMIN']));
+router.use(authenticate);
 
 /**
  * @swagger
