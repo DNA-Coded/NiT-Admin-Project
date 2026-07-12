@@ -66,7 +66,7 @@ class SettingsService {
   /**
    * Update the settings document partially.
    */
-  async updateSettings(updates, adminEmail, requestMeta = {}) {
+  async updateSettings(updates, adminEmail, adminId, requestMeta = {}) {
     let settings = await Settings.findOne();
     if (!settings) {
       settings = await this.initializeSettings();
@@ -105,6 +105,7 @@ class SettingsService {
       module: ACTIVITY_MODULES.SETTINGS || 'SETTINGS',
       action: ACTIVITY_ACTIONS.UPDATE || 'UPDATE',
       description: `System settings were updated by ${adminEmail}`,
+      performedBy: adminId,
       metadata: { updates, adminEmail, ...requestMeta },
       status: ACTIVITY_STATUS.SUCCESS,
       severity: ACTIVITY_SEVERITY.MEDIUM
@@ -116,7 +117,7 @@ class SettingsService {
   /**
    * Reset settings to their default values.
    */
-  async resetSettings(adminEmail, requestMeta = {}) {
+  async resetSettings(adminEmail, adminId, requestMeta = {}) {
     let settings = await Settings.findOne();
     if (!settings) {
       settings = await this.initializeSettings();
@@ -134,6 +135,7 @@ class SettingsService {
       module: ACTIVITY_MODULES.SETTINGS || 'SETTINGS',
       action: ACTIVITY_ACTIONS.RESET || 'RESET',
       description: `System settings were reset to defaults by ${adminEmail}`,
+      performedBy: adminId,
       metadata: { adminEmail, ...requestMeta },
       status: ACTIVITY_STATUS.SUCCESS,
       severity: ACTIVITY_SEVERITY.HIGH

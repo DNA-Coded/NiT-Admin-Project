@@ -34,10 +34,11 @@ export const updateSettings = asyncHandler(async (req, res, next) => {
   }
 
   const adminEmail = req.admin?.email || 'system';
+  const adminId = req.admin?.id || req.admin?._id;
   const requestMeta = extractRequestMeta(req);
 
   try {
-    const updatedSettings = await settingsService.updateSettings(value, adminEmail, requestMeta);
+    const updatedSettings = await settingsService.updateSettings(value, adminEmail, adminId, requestMeta);
     return sendSuccess(res, updatedSettings, MESSAGES.SETTINGS_UPDATED || 'Settings updated successfully.', 200);
   } catch (err) {
     if (!err.statusCode) throw err;
@@ -52,9 +53,10 @@ export const updateSettings = asyncHandler(async (req, res, next) => {
  */
 export const resetSettings = asyncHandler(async (req, res) => {
   const adminEmail = req.admin?.email || 'system';
+  const adminId = req.admin?.id || req.admin?._id;
   const requestMeta = extractRequestMeta(req);
 
-  const settings = await settingsService.resetSettings(adminEmail, requestMeta);
+  const settings = await settingsService.resetSettings(adminEmail, adminId, requestMeta);
 
   return sendSuccess(res, settings, MESSAGES.SETTINGS_RESET || 'Settings reset to defaults successfully.', 200);
 });
