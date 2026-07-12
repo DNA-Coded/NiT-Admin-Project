@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import fs from 'fs';
 
 const API_BASE = 'http://localhost:5000/api/v1/reports';
@@ -25,7 +26,7 @@ async function runQA() {
         let res = await fetch(`${ROOT_API}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: 'superadmin@nit.ac.in', password: 'SuperAdmin@123' })
+            body: JSON.stringify({ email: process.env.SUPER_ADMIN_EMAIL, password: process.env.SUPER_ADMIN_PASSWORD })
         });
         const loginData = await res.json();
         const token = loginData?.data?.accessToken;

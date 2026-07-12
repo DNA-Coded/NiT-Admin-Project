@@ -21,7 +21,10 @@ export default function Login() {
 
     // Minimal mocked login flow: replace with real auth call as needed
     setTimeout(() => {
-      if (username !== 'superadmin@nit.ac.in' || password !== 'SuperAdmin@123') {
+      const superAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL;
+      const superAdminPassword = import.meta.env.VITE_SUPER_ADMIN_PASSWORD;
+
+      if (username !== superAdminEmail || password !== superAdminPassword) {
         setError('Invalid credentials. Please use the seeder credentials.');
         setLoading(false);
         return;
@@ -52,7 +55,7 @@ export default function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full border rounded px-3 py-2"
-              placeholder="superadmin@nit.ac.in"
+              placeholder={import.meta.env.VITE_SUPER_ADMIN_EMAIL || "admin@nit.ac.in"}
               required
             />
           </div>
