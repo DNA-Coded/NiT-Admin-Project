@@ -277,7 +277,7 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
 
   const updates = {};
   for (const field of allowedFields) {
-    if (Object.prototype.hasOwnProperty.call(data, field)) {
+    if (data[field] !== undefined) {
       updates[field] = data[field];
     }
   }
@@ -333,7 +333,7 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
     );
   }
 
-  Object.assign(device, updates);
+  device.set(updates);
   device.updatedBy = adminEmail;
   await device.save();
 

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate, authorize } from '../../modules/auth/auth.middleware.js';
-import { ROLES, PERMISSIONS } from '../../constants/index.js';
+import { ROLES } from '../../constants/index.js';
 import {
   getAllDevicesHealth,
   getDeviceHealth,
@@ -55,8 +55,7 @@ router.get('/:deviceId', validateDeviceId, getDeviceHealth);
 // Only Super Admins and Admins should manage health configurations and status
 router.use(authenticate);
 router.use(authorize(
-  [ROLES.SUPER_ADMIN, ROLES.ADMIN],
-  [PERMISSIONS.DEVICES_MANAGE]
+  ROLES.SUPER_ADMIN, ROLES.ADMIN
 ));
 
 /**
