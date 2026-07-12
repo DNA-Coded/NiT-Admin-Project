@@ -380,7 +380,7 @@ export const updateFaculty = async (id, data, adminEmail, requestMeta = {}) => {
 
   const updates = {};
   for (const field of allowedFields) {
-    if (Object.prototype.hasOwnProperty.call(data, field)) {
+    if (data[field] !== undefined) {
       updates[field] = data[field];
     }
   }
@@ -413,7 +413,8 @@ export const updateFaculty = async (id, data, adminEmail, requestMeta = {}) => {
   );
 
   // Apply updates and stamp audit fields
-  Object.assign(faculty, updates);
+  console.log("UPDATES OBJ:", updates);
+  faculty.set(updates);
   faculty.updatedBy = adminEmail;
   await faculty.save();
 
