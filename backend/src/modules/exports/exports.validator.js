@@ -14,7 +14,8 @@ export const validateExportRequest = (req, res, next) => {
   }
 
   if (errors.length > 0) {
-    return handleValidationErrors(res, errors);
+    req.validationErrors = errors;
+    return handleValidationErrors(req, res, next);
   }
 
   // Pass it onto the reports validation directly since the parameters are highly coupled
