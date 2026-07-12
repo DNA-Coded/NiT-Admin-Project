@@ -14,6 +14,8 @@ import {
   logAttendanceRestored,
   logAttendanceNotFound,
   logAttendanceConflict,
+  logAttendanceDuplicateRejected,
+  logAttendanceInvalidRejected,
 } from './attendance.logger.js';
 import { activityService } from '../activity/activity.service.js';
 import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
