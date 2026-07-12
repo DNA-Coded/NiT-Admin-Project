@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Attendance from './attendance.model.js';
+import { buildUpdatePayload } from '../../utils/update.util.js';
 import Device from '../devices/device.model.js';
 import Faculty from '../faculty/faculty.model.js';
 import { MESSAGES } from '../../constants/index.js';
@@ -344,12 +345,7 @@ export const updateAttendance = async (id, data, adminEmail, requestMeta = {}) =
     'status', 'remarks',
   ];
 
-  const updates = {};
-  for (const field of allowedFields) {
-    if (Object.prototype.hasOwnProperty.call(data, field)) {
-      updates[field] = data[field];
-    }
-  }
+  const updates = buildUpdatePayload(data, allowedFields);
 
   if (Object.keys(updates).length === 0) {
     throw makeError(MESSAGES.ATTENDANCE_NO_CHANGES, 400);
@@ -399,7 +395,7 @@ export const updateAttendance = async (id, data, adminEmail, requestMeta = {}) =
     );
   }
 
-  Object.assign(record, updates);
+  record.set(updates);
   record.updatedBy = adminEmail;
   await record.save();
 

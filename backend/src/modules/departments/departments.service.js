@@ -1,4 +1,5 @@
 import Department from './departments.model.js';
+import { buildUpdatePayload } from '../../utils/update.util.js';
 import { MESSAGES } from '../../constants/index.js';
 import {
   logDepartmentListFetched,
@@ -238,13 +239,7 @@ export const createDepartment = async (data, adminEmail, requestMeta = {}) => {
  */
 export const updateDepartment = async (id, data, adminEmail, requestMeta = {}) => {
   const allowedFields = ['name', 'code', 'description'];
-  const updates = {};
-
-  for (const field of allowedFields) {
-    if (data[field] !== undefined) {
-      updates[field] = data[field];
-    }
-  }
+  const updates = buildUpdatePayload(data, allowedFields);
 
   if (Object.keys(updates).length === 0) {
     throw makeError(MESSAGES.DEPARTMENT_NO_CHANGES, 400);
@@ -267,7 +262,7 @@ export const updateDepartment = async (id, data, adminEmail, requestMeta = {}) =
   }
 
   // Apply field updates and stamp updatedBy
-  Object.assign(dept, updates);
+  dept.set(updates);
   dept.updatedBy = adminEmail;
   await dept.save();
 

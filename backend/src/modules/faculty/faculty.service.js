@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Faculty from './faculty.model.js';
+import { buildUpdatePayload } from '../../utils/update.util.js';
 import Department from '../departments/departments.model.js';
 import { MESSAGES } from '../../constants/index.js';
 import {
@@ -378,12 +379,7 @@ export const updateFaculty = async (id, data, adminEmail, requestMeta = {}) => {
     'status', 'joiningDate', 'profileImage',
   ];
 
-  const updates = {};
-  for (const field of allowedFields) {
-    if (data[field] !== undefined) {
-      updates[field] = data[field];
-    }
-  }
+  const updates = buildUpdatePayload(data, allowedFields);
 
   if (Object.keys(updates).length === 0) {
     throw makeError(MESSAGES.FACULTY_NO_CHANGES, 400);
@@ -413,7 +409,6 @@ export const updateFaculty = async (id, data, adminEmail, requestMeta = {}) => {
   );
 
   // Apply updates and stamp audit fields
-  console.log("UPDATES OBJ:", updates);
   faculty.set(updates);
   faculty.updatedBy = adminEmail;
   await faculty.save();

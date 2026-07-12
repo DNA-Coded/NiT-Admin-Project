@@ -1,4 +1,5 @@
 import Device from './device.model.js';
+import { buildUpdatePayload } from '../../utils/update.util.js';
 import Department from '../departments/departments.model.js';
 import { MESSAGES } from '../../constants/index.js';
 import {
@@ -275,12 +276,7 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
     'isAttendanceEnabled', 'isDefaultDevice',
   ];
 
-  const updates = {};
-  for (const field of allowedFields) {
-    if (data[field] !== undefined) {
-      updates[field] = data[field];
-    }
-  }
+  const updates = buildUpdatePayload(data, allowedFields);
 
   if (Object.keys(updates).length === 0) {
     throw makeError(MESSAGES.DEVICE_NO_CHANGES, 400);

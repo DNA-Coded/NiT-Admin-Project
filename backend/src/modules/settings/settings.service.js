@@ -124,7 +124,7 @@ class SettingsService {
     }
 
     // Overwrite all groups with defaults
-    Object.assign(settings, DEFAULT_SETTINGS);
+    settings.set(DEFAULT_SETTINGS);
     settings.updatedBy = adminEmail;
     await settings.save();
 
