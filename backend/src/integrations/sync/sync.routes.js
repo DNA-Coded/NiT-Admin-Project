@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate, authorize } from '../../modules/auth/auth.middleware.js';
-import { ROLES, PERMISSIONS } from '../../constants/index.js';
+import { ROLES } from '../../constants/index.js';
 import {
   listSyncHistory,
   getSyncJob,
@@ -21,8 +21,7 @@ const router = Router();
 // Only Super Admins and Admins should manage syncs
 router.use(authenticate);
 router.use(authorize(
-  [ROLES.SUPER_ADMIN, ROLES.ADMIN],
-  [PERMISSIONS.DEVICES_MANAGE, PERMISSIONS.ATTENDANCE_MANAGE]
+  ROLES.SUPER_ADMIN, ROLES.ADMIN
 ));
 
 /**
