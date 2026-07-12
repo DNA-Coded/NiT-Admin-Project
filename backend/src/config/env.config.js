@@ -11,6 +11,8 @@ const envVarsSchema = Joi.object({
   MONGODB_URI: Joi.string().required().description('MongoDB Connection URI'),
   JWT_SECRET: Joi.string().required().description('JWT Secret Key'),
   JWT_EXPIRES_IN: Joi.string().default('1d').description('JWT Expiration Time'),
+  SUPER_ADMIN_EMAIL: Joi.string().email().required().description('Super Admin Email'),
+  SUPER_ADMIN_PASSWORD: Joi.string().required().description('Super Admin Password'),
 }).unknown();
 
 const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
