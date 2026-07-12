@@ -56,7 +56,8 @@ export const validateReportFilters = (req, res, next) => {
   }
 
   if (errors.length > 0) {
-    return handleValidationErrors(res, errors);
+    req.validationErrors = errors;
+    return handleValidationErrors(req, res, next);
   }
 
   next();
