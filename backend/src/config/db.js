@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import logger from './logger.config.js';
+import { env } from './env.config.js';
 
 /**
  * Connect to MongoDB Database
@@ -10,7 +11,7 @@ import logger from './logger.config.js';
  */
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/nit-admin';
+    const mongoURI = env.MONGODB_URI;
     const conn = await mongoose.connect(mongoURI, {
       maxPoolSize: 10, // Maintain up to 10 socket connections
       serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds

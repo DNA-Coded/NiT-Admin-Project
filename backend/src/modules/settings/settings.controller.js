@@ -29,7 +29,7 @@ export const updateSettings = asyncHandler(async (req, res, next) => {
   
   if (error) {
     const err = new Error(error.details.map((x) => x.message).join(', '));
-    err.statusCode = 400;
+    err.statusCode = 422;
     return next(err);
   }
 

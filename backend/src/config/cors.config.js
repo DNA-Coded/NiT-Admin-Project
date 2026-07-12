@@ -4,11 +4,11 @@
  * (local dev, staging, production) without code changes.
  */
 
-const envOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
-  : ['http://localhost:5173', 'http://localhost:3000'];
+import { env } from './env.config.js';
 
-const allowedOrigins = [...envOrigins, `http://localhost:${process.env.PORT || 5000}`];
+const envOrigins = env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim());
+
+const allowedOrigins = [...envOrigins, `http://localhost:${env.PORT}`];
 
 const corsOptions = {
   origin: (origin, callback) => {

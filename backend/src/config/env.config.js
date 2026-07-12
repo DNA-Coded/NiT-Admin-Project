@@ -13,6 +13,7 @@ const envVarsSchema = Joi.object({
   JWT_EXPIRES_IN: Joi.string().default('1d').description('JWT Expiration Time'),
   SUPER_ADMIN_EMAIL: Joi.string().email().required().description('Super Admin Email'),
   SUPER_ADMIN_PASSWORD: Joi.string().required().description('Super Admin Password'),
+  ALLOWED_ORIGINS: Joi.string().default('http://localhost:5173').description('CORS Allowed Origins (comma separated)'),
 }).unknown();
 
 const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
