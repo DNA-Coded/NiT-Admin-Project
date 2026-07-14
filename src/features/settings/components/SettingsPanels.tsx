@@ -1,16 +1,25 @@
 import React, { useState } from 'react';
-import {
-  mockOrgSettings,
-  mockAttendanceRules,
-  mockShifts,
-  mockHolidays,
-  mockUserRoles,
-} from '@/mocks/settings';
 import { DEPARTMENTS } from '@/constants';
 import { ActivityPanel } from '@/features/activity/components/ActivityPanel';
+import type { 
+  SettingsOrganization, 
+  SettingsAcademic, 
+  SettingsAttendance, 
+  SettingsNotifications, 
+  SettingsDevices, 
+  SettingsSecurity, 
+  SettingsBackendModel 
+} from '../types/settings.api.types';
+
+type UpdateDraftFn = (section: keyof SettingsBackendModel, field: string, value: any) => void;
 
 /* 1. Organization Panel */
-export const OrgSettingsPanel: React.FC = () => {
+export const OrgSettingsPanel: React.FC<{
+  data: SettingsOrganization;
+  academicData: SettingsAcademic;
+  timezone: string;
+  onChange: UpdateDraftFn;
+}> = ({ data, academicData, timezone, onChange }) => {
   return (
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col gap-6 font-body-sm text-body-sm">
       <div className="border-b border-outline-variant pb-3">
@@ -22,54 +31,54 @@ export const OrgSettingsPanel: React.FC = () => {
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Institution Name</label>
           <input
-            className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface"
-            readOnly
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
             type="text"
-            value={mockOrgSettings.name}
+            value={data.organizationName}
+            onChange={(e) => onChange('organization', 'organizationName', e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Time Zone</label>
           <input
-            className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface"
-            readOnly
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
             type="text"
-            value={mockOrgSettings.timeZone}
+            value={timezone}
+            onChange={(e) => onChange('system', 'timezone', e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Contact Email</label>
           <input
-            className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface"
-            readOnly
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
             type="email"
-            value={mockOrgSettings.email}
+            value={data.contactEmail}
+            onChange={(e) => onChange('organization', 'contactEmail', e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Contact Number</label>
           <input
-            className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface"
-            readOnly
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
             type="text"
-            value={mockOrgSettings.contactNumber}
+            value={data.contactPhone}
+            onChange={(e) => onChange('organization', 'contactPhone', e.target.value)}
           />
         </div>
         <div className="md:col-span-2 flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Address</label>
           <textarea
-            className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface resize-none h-20"
-            readOnly
-            value={mockOrgSettings.address}
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface resize-none h-20 focus:border-primary outline-none"
+            value={data.address}
+            onChange={(e) => onChange('organization', 'address', e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Current Academic Year</label>
           <input
-            className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface"
-            readOnly
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
             type="text"
-            value={mockOrgSettings.academicYear}
+            value={academicData.currentAcademicSession}
+            onChange={(e) => onChange('academic', 'currentAcademicSession', e.target.value)}
           />
         </div>
       </div>
@@ -78,7 +87,10 @@ export const OrgSettingsPanel: React.FC = () => {
 };
 
 /* 2. Attendance Rules Panel */
-export const AttendanceRulesPanel: React.FC = () => {
+export const AttendanceRulesPanel: React.FC<{
+  data: SettingsAttendance;
+  onChange: UpdateDraftFn;
+}> = ({ data, onChange }) => {
   return (
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col gap-6 font-body-sm text-body-sm">
       <div className="border-b border-outline-variant pb-3">
@@ -92,7 +104,8 @@ export const AttendanceRulesPanel: React.FC = () => {
           <input
             className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
             type="time"
-            defaultValue={mockAttendanceRules.officeStartTime}
+            value={data.workingHoursStart}
+            onChange={(e) => onChange('attendance', 'workingHoursStart', e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -100,7 +113,8 @@ export const AttendanceRulesPanel: React.FC = () => {
           <input
             className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
             type="time"
-            defaultValue={mockAttendanceRules.officeEndTime}
+            value={data.workingHoursEnd}
+            onChange={(e) => onChange('attendance', 'workingHoursEnd', e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -108,49 +122,51 @@ export const AttendanceRulesPanel: React.FC = () => {
           <input
             className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
             type="number"
-            defaultValue={mockAttendanceRules.gracePeriodMins}
+            value={data.gracePeriodMinutes}
+            onChange={(e) => onChange('attendance', 'gracePeriodMinutes', Number(e.target.value))}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Minimum Working Hours for Present</label>
           <input
-            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none opacity-80"
             type="number"
-            defaultValue={mockAttendanceRules.minWorkingHours}
+            defaultValue={8}
+            onChange={() => {}}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Half-Day Threshold Hours</label>
           <input
-            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none opacity-80"
             type="number"
-            defaultValue={mockAttendanceRules.halfDayThresholdHours}
+            defaultValue={4}
+            onChange={() => {}}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Overtime Threshold Hours</label>
           <input
-            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none opacity-80"
             type="number"
-            defaultValue={mockAttendanceRules.overtimeThresholdHours}
+            defaultValue={9}
+            onChange={() => {}}
           />
         </div>
         <div className="md:col-span-2 flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Weekend Policy</label>
           <input
-            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none"
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none opacity-80"
             type="text"
-            defaultValue={mockAttendanceRules.weekendPolicy}
+            defaultValue={'Saturday (Half-day), Sunday (Off)'}
+            onChange={() => {}}
           />
         </div>
       </div>
       <div className="border-t border-outline-variant pt-4 flex justify-end gap-3">
-        <button
-          className="px-4 py-2 bg-primary text-white font-label-md rounded-lg hover:opacity-90 transition-all font-bold shadow-sm"
-          onClick={() => alert('Simulating rules update... (Settings are read-only prior to backend API configuration)')}
-        >
-          Update Rules
-        </button>
+        <p className="text-label-sm text-on-surface-variant italic mr-auto mt-2">
+          Use the Save Changes button in the header to persist changes.
+        </p>
       </div>
     </div>
   );
@@ -164,23 +180,8 @@ export const WorkingHoursPanel: React.FC = () => {
         <h3 className="font-headline-md text-headline-md text-primary font-bold">Shift Schedule Templates</h3>
         <p className="text-on-surface-variant font-medium mt-1">Predefined working schedule cards mapped to staff shifts.</p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {mockShifts.map((sh) => (
-          <div key={sh.id} className="bg-surface border border-outline-variant/60 rounded-lg p-4 flex flex-col gap-2.5">
-            <div className="flex justify-between items-start">
-              <h4 className="font-bold text-primary text-label-md">{sh.name}</h4>
-              <span className="text-[10px] bg-success/10 text-success font-bold px-2 py-0.5 rounded border border-success/20">
-                {sh.status}
-              </span>
-            </div>
-            <div className="text-[12px] text-on-surface-variant space-y-1">
-              <p>Timing: <span className="font-bold text-on-surface">{sh.startTime} - {sh.endTime}</span></p>
-              <p>Break Duration: <span className="font-medium text-on-surface">{sh.breakDurationMins} mins</span></p>
-              <p className="truncate">Depts: <span className="font-medium text-on-surface">{sh.assignedDepartments.join(', ')}</span></p>
-            </div>
-          </div>
-        ))}
+      <div className="text-center py-8 italic text-on-surface-variant bg-surface border border-outline-variant/60 rounded-lg">
+        No shifts configured. (Feature deferred)
       </div>
     </div>
   );
@@ -192,40 +193,12 @@ export const ShiftManagementPanel: React.FC = () => {
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
       <div className="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
         <h3 className="font-headline-md text-headline-md text-primary font-bold">Shift Management Matrix</h3>
-        <button
-          className="px-3.5 py-1.5 bg-primary text-white font-label-sm text-label-sm rounded-lg hover:opacity-95 font-bold"
-          onClick={() => alert('New shift form template... (Simulated Action)')}
-        >
+        <button className="px-3.5 py-1.5 bg-primary text-white font-label-sm text-label-sm rounded-lg opacity-50 cursor-not-allowed font-bold" disabled>
           Add Shift Template
         </button>
       </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <caption className="sr-only"> Shift details and assigned college departments table.</caption>
-          <thead className="bg-surface-container-high/30 text-label-md text-outline uppercase tracking-wider">
-            <tr>
-              <th className="px-6 py-4 font-label-md">Shift Name</th>
-              <th className="px-6 py-4 font-label-md">Timing</th>
-              <th className="px-6 py-4 font-label-md">Break Time</th>
-              <th className="px-6 py-4 font-label-md">Departments</th>
-              <th className="px-6 py-4 font-label-md text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-outline-variant font-body-sm text-body-sm text-on-surface">
-            {mockShifts.map((sh) => (
-              <tr key={sh.id} className="hover:bg-surface-container-low transition-colors">
-                <td className="px-6 py-4 font-bold text-primary">{sh.name}</td>
-                <td className="px-6 py-4 font-mono font-bold">{sh.startTime} - {sh.endTime}</td>
-                <td className="px-6 py-4">{sh.breakDurationMins} mins</td>
-                <td className="px-6 py-4 max-w-[200px] truncate">{sh.assignedDepartments.join(', ')}</td>
-                <td className="px-6 py-4 text-right">
-                  <button className="text-primary hover:underline font-bold text-label-sm">Edit</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="p-8 text-center italic text-on-surface-variant">
+        Shift management module is currently not available.
       </div>
     </div>
   );
@@ -237,40 +210,12 @@ export const HolidayCalendarPanel: React.FC = () => {
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
       <div className="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
         <h3 className="font-headline-md text-headline-md text-primary font-bold">Academic Holiday List</h3>
-        <button
-          className="px-3.5 py-1.5 bg-primary text-white font-label-sm text-label-sm rounded-lg hover:opacity-95 font-bold"
-          onClick={() => alert('Add Holiday template... (Simulated Action)')}
-        >
+        <button className="px-3.5 py-1.5 bg-primary text-white font-label-sm text-label-sm rounded-lg opacity-50 cursor-not-allowed font-bold" disabled>
           Add Holiday
         </button>
       </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <caption className="sr-only"> Holiday list for NIT academic calendar.</caption>
-          <thead className="bg-surface-container-high/30 text-label-md text-outline uppercase tracking-wider">
-            <tr>
-              <th className="px-6 py-4 font-label-md">Holiday Name</th>
-              <th className="px-6 py-4 font-label-md">Date</th>
-              <th className="px-6 py-4 font-label-md">Type</th>
-              <th className="px-6 py-4 font-label-md">Description</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-outline-variant font-body-sm text-body-sm text-on-surface">
-            {mockHolidays.map((hol) => (
-              <tr key={hol.id} className="hover:bg-surface-container-low transition-colors">
-                <td className="px-6 py-4 font-bold text-primary">{hol.name}</td>
-                <td className="px-6 py-4 font-mono">{hol.date}</td>
-                <td className="px-6 py-4">
-                  <span className="bg-primary/5 text-primary border border-primary/20 px-2 py-0.5 rounded font-label-sm text-[11px] font-bold">
-                    {hol.type}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-on-surface-variant max-w-[250px] truncate">{hol.description}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="p-8 text-center italic text-on-surface-variant">
+        Holiday calendar module is currently not available.
       </div>
     </div>
   );
@@ -330,33 +275,18 @@ export const UserRolesPanel: React.FC = () => {
         <h3 className="font-headline-md text-headline-md text-primary font-bold">Access Permissions & Roles</h3>
         <p className="text-on-surface-variant font-medium mt-1">Administrator role hierarchies. Read-only policy mapping.</p>
       </div>
-
-      <div className="grid grid-cols-1 gap-4">
-        {mockUserRoles.map((role) => (
-          <div key={role.roleName} className="bg-surface border border-outline-variant/60 rounded-lg p-5 flex flex-col gap-3">
-            <div>
-              <h4 className="font-bold text-primary text-label-md">{role.roleName}</h4>
-              <p className="text-[12px] text-on-surface-variant leading-relaxed mt-1 font-medium">{role.description}</p>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-outline-variant/30">
-              {role.permissions.map((p) => (
-                <span
-                  key={p}
-                  className="bg-primary/5 text-primary border border-primary/20 px-2 py-0.5 rounded text-[10px] font-bold font-mono"
-                >
-                  {p}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="text-center py-8 italic text-on-surface-variant bg-surface border border-outline-variant/60 rounded-lg">
+        No custom roles configured. (Feature deferred)
       </div>
     </div>
   );
 };
 
 /* 8. Notifications Panel */
-export const NotificationsPanel: React.FC = () => {
+export const NotificationsPanel: React.FC<{
+  data: SettingsNotifications;
+  onChange: UpdateDraftFn;
+}> = ({ data, onChange }) => {
   return (
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col gap-6 font-body-sm text-body-sm">
       <div className="border-b border-outline-variant pb-3">
@@ -371,7 +301,12 @@ export const NotificationsPanel: React.FC = () => {
             <h4 className="font-bold text-on-surface">Email Summaries</h4>
             <p className="text-[12px] text-on-surface-variant leading-normal mt-0.5">Send daily/weekly reports to registrar email.</p>
           </div>
-          <input className="rounded border-outline-variant text-primary focus:ring-primary w-5 h-5 cursor-pointer" type="checkbox" defaultChecked />
+          <input 
+            className="rounded border-outline-variant text-primary focus:ring-primary w-5 h-5 cursor-pointer" 
+            type="checkbox" 
+            checked={data.enableEmailNotifications} 
+            onChange={(e) => onChange('notifications', 'enableEmailNotifications', e.target.checked)}
+          />
         </div>
 
         {/* SMS Toggle */}
@@ -380,7 +315,12 @@ export const NotificationsPanel: React.FC = () => {
             <h4 className="font-bold text-on-surface">Hardware Outage SMS</h4>
             <p className="text-[12px] text-on-surface-variant leading-normal mt-0.5">Alert system administrator instantly on biometric offline.</p>
           </div>
-          <input className="rounded border-outline-variant text-primary focus:ring-primary w-5 h-5 cursor-pointer" type="checkbox" defaultChecked />
+          <input 
+            className="rounded border-outline-variant text-primary focus:ring-primary w-5 h-5 cursor-pointer" 
+            type="checkbox" 
+            checked={data.enableSystemNotifications} 
+            onChange={(e) => onChange('notifications', 'enableSystemNotifications', e.target.checked)}
+          />
         </div>
 
         {/* Push Notification */}
@@ -389,7 +329,12 @@ export const NotificationsPanel: React.FC = () => {
             <h4 className="font-bold text-on-surface">Web Push Alerts</h4>
             <p className="text-[12px] text-on-surface-variant leading-normal mt-0.5">Flash instant notifications on live dashboard.</p>
           </div>
-          <input className="rounded border-outline-variant text-primary focus:ring-primary w-5 h-5 cursor-pointer" type="checkbox" defaultChecked />
+          <input 
+            className="rounded border-outline-variant text-primary focus:ring-primary w-5 h-5 cursor-pointer" 
+            type="checkbox" 
+            checked={data.enableSystemNotifications} 
+            onChange={(e) => onChange('notifications', 'enableSystemNotifications', e.target.checked)}
+          />
         </div>
       </div>
     </div>
@@ -397,7 +342,10 @@ export const NotificationsPanel: React.FC = () => {
 };
 
 /* 9. Device Config Panel */
-export const DeviceConfigPanel: React.FC = () => {
+export const DeviceConfigPanel: React.FC<{
+  data: SettingsDevices;
+  onChange: UpdateDraftFn;
+}> = ({ data, onChange }) => {
   return (
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col gap-6 font-body-sm text-body-sm">
       <div className="border-b border-outline-variant pb-3">
@@ -408,19 +356,24 @@ export const DeviceConfigPanel: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Default Synchronization Interval</label>
-          <input className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface" readOnly type="text" value="Every 60 Seconds" />
+          <input className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface opacity-80" readOnly type="text" value="Every 60 Seconds" />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Offline Retry Policy</label>
-          <input className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface" readOnly type="text" value="10 attempts, then raise critical warning" />
+          <input className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface opacity-80" readOnly type="text" value="10 attempts, then raise critical warning" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="font-label-sm text-label-sm text-outline">Device Connection Timeout</label>
-          <input className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface" readOnly type="text" value="3000ms" />
+          <label className="font-label-sm text-label-sm text-outline">Device Connection Timeout (ms)</label>
+          <input className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface opacity-80" readOnly type="text" value="3000ms" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="font-label-sm text-label-sm text-outline">Health Check Handshake Frequency</label>
-          <input className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface" readOnly type="text" value="Every 10 Seconds" />
+          <label className="font-label-sm text-label-sm text-outline">Health Check Handshake Frequency (seconds)</label>
+          <input 
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none" 
+            type="number" 
+            value={data.heartbeatTimeout} 
+            onChange={(e) => onChange('devices', 'heartbeatTimeout', Number(e.target.value))}
+          />
         </div>
       </div>
     </div>
@@ -428,7 +381,10 @@ export const DeviceConfigPanel: React.FC = () => {
 };
 
 /* 10. Security Settings Panel */
-export const SecurityPanel: React.FC = () => {
+export const SecurityPanel: React.FC<{
+  data: SettingsSecurity;
+  onChange: UpdateDraftFn;
+}> = ({ data, onChange }) => {
   return (
     <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col gap-6 font-body-sm text-body-sm">
       <div className="border-b border-outline-variant pb-3">
@@ -439,13 +395,36 @@ export const SecurityPanel: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="font-label-sm text-label-sm text-outline">Password Minimum Character Length</label>
-          <input className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface" readOnly type="text" value="12 characters (requires alphanumeric)" />
+          <input className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface opacity-80" readOnly type="text" value="12 characters (requires alphanumeric)" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="font-label-sm text-label-sm text-outline">Inactive Session Expiration Timeout</label>
-          <input className="bg-surface border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface" readOnly type="text" value="15 Minutes" />
+          <label className="font-label-sm text-label-sm text-outline">Inactive Session Expiration Timeout (Minutes)</label>
+          <input 
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none" 
+            type="number" 
+            value={data.sessionTimeout} 
+            onChange={(e) => onChange('security', 'sessionTimeout', Number(e.target.value))}
+          />
         </div>
-        <div className="flex items-center justify-between p-4 bg-surface rounded-lg border border-outline-variant/60 md:col-span-2">
+        <div className="flex flex-col gap-1.5">
+          <label className="font-label-sm text-label-sm text-outline">Password Expiry (Days)</label>
+          <input 
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none" 
+            type="number" 
+            value={data.passwordExpiryDays} 
+            onChange={(e) => onChange('security', 'passwordExpiryDays', Number(e.target.value))}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="font-label-sm text-label-sm text-outline">Max Login Attempts</label>
+          <input 
+            className="bg-white border border-outline-variant rounded-lg px-3 py-2 font-medium text-on-surface focus:border-primary outline-none" 
+            type="number" 
+            value={data.maxLoginAttempts} 
+            onChange={(e) => onChange('security', 'maxLoginAttempts', Number(e.target.value))}
+          />
+        </div>
+        <div className="flex items-center justify-between p-4 bg-surface rounded-lg border border-outline-variant/60 md:col-span-2 mt-2">
           <div>
             <h4 className="font-bold text-on-surface">Enforce Two-Factor Authentication (2FA)</h4>
             <p className="text-[12px] text-on-surface-variant leading-normal mt-0.5">Enforce Google Authenticator pings for administrative access.</p>

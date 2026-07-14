@@ -17,16 +17,32 @@ import {
   AuditLogsPanel,
   SystemInfoPanel,
 } from '@/features/settings/components/SettingsPanels';
+import { useSettings } from '@/features/settings/hooks/useSettings';
+import { StatePlaceholder } from '@/components/shared/StatePlaceholder';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('org');
+  const {
+    draftSettings,
+    loading,
+    saving,
+    error,
+    saveError,
+    hasChanges,
+    updateDraft,
+    saveSettings,
+    resetToDefaults,
+    discardChanges,
+  } = useSettings();
 
   const renderContent = () => {
+    if (!draftSettings) return null;
+
     switch (activeTab) {
       case 'org':
-        return <OrgSettingsPanel />;
+        return <OrgSettingsPanel data={draftSettings.organization} academicData={draftSettings.academic} timezone={draftSettings.system.timezone} onChange={updateDraft} />;
       case 'rules':
-        return <AttendanceRulesPanel />;
+        return <AttendanceRulesPanel data={draftSettings.attendance} onChange={updateDraft} />;
       case 'hours':
         return <WorkingHoursPanel />;
       case 'shifts':
@@ -38,19 +54,21 @@ export default function Settings() {
       case 'roles':
         return <UserRolesPanel />;
       case 'notifications':
-        return <NotificationsPanel />;
+        return <NotificationsPanel data={draftSettings.notifications} onChange={updateDraft} />;
       case 'devices':
-        return <DeviceConfigPanel />;
+        return <DeviceConfigPanel data={draftSettings.devices} onChange={updateDraft} />;
       case 'security':
-        return <SecurityPanel />;
+        return <SecurityPanel data={draftSettings.security} onChange={updateDraft} />;
       case 'audit':
         return <AuditLogsPanel />;
       case 'system':
         return <SystemInfoPanel />;
       default:
-        return <OrgSettingsPanel />;
+        return <OrgSettingsPanel data={draftSettings.organization} academicData={draftSettings.academic} timezone={draftSettings.system.timezone} onChange={updateDraft} />;
     }
   };
+
+  const viewState = loading ? 'loading' : error ? 'error' : 'success';
 
   return (
     <div className="w-full flex flex-col min-h-[calc(100vh-120px)]">
@@ -62,7 +80,47 @@ export default function Settings() {
             Configure default institution timing thresholds, shift schedules, admin access roles, security keys, and hardware sync rules.
           </p>
         </div>
+
+        {/* Global Save Actions */}
+        <div className="flex items-center gap-3">
+          <button
+            className="px-4 py-2 bg-surface border border-outline-variant text-on-surface font-label-md rounded-lg hover:bg-surface-container-low transition-all font-bold disabled:opacity-50"
+            disabled={saving || loading}
+            onClick={resetToDefaults}
+          >
+            Reset Defaults
+          </button>
+          
+          {hasChanges && (
+            <button
+              className="px-4 py-2 bg-surface text-danger font-label-md rounded-lg hover:bg-danger/10 transition-all font-bold"
+              disabled={saving}
+              onClick={discardChanges}
+            >
+              Discard
+            </button>
+          )}
+
+          <button
+            className="px-6 py-2 bg-primary text-white font-label-md rounded-lg hover:opacity-90 transition-all font-bold shadow-sm disabled:opacity-50 flex items-center gap-2"
+            disabled={!hasChanges || saving || loading}
+            onClick={saveSettings}
+          >
+            {saving ? (
+              <><span className="material-symbols-outlined animate-spin text-[18px]">sync</span> Saving...</>
+            ) : (
+              'Save Changes'
+            )}
+          </button>
+        </div>
       </div>
+      
+      {saveError && (
+        <div className="mb-6 p-4 bg-error-container text-on-error-container border border-error/30 rounded-lg flex items-center gap-2 font-medium">
+          <span className="material-symbols-outlined">error</span>
+          {saveError.message || 'Failed to save settings. Please try again.'}
+        </div>
+      )}
 
       {/* Two-Column Workspace Layout */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
@@ -72,7 +130,11 @@ export default function Settings() {
         </div>
 
         {/* Right Column: Tab View panel details content */}
-        <div className="flex-1 w-full">{renderContent()}</div>
+        <div className="flex-1 w-full min-w-0">
+          <StatePlaceholder state={viewState}>
+            {renderContent()}
+          </StatePlaceholder>
+        </div>
       </div>
     </div>
   );
