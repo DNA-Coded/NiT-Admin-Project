@@ -1,24 +1,42 @@
-import React, { useState } from 'react';
-import type { CreateFacultyDTO } from '../types/faculty.api.types';
+import React, { useState, useEffect } from 'react';
+import type { UpdateFacultyDTO } from '../types/faculty.api.types';
+import type { Employee } from '@/types/employees';
 
-interface AddEmployeeDialogProps {
+interface EditEmployeeDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (data: CreateFacultyDTO) => Promise<void>;
+  employee: Employee | null;
+  onEdit: (id: string, data: UpdateFacultyDTO) => Promise<void>;
   departments: { id: string; name: string }[];
 }
 
-export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, onClose, onAdd, departments }) => {
+export const EditEmployeeDialog: React.FC<EditEmployeeDialogProps> = ({ isOpen, onClose, employee, onEdit, departments }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [departmentId, setDepartmentId] = useState('');
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (employee && isOpen) {
+      // Find department ID from name since Employee object only holds name
+      const dept = departments.find(d => d.name === employee.department);
+      if (dept) {
+        setDepartmentId(dept.id);
+      }
+    }
+  }, [employee, departments, isOpen]);
+
+  if (!isOpen || !employee) return null;
+
+  // Split name for pre-population
+  const nameParts = employee.name.split(' ');
+  const initialFirstName = nameParts[0] || '';
+  const initialLastName = nameParts.slice(1).join(' ') || '';
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    const data: CreateFacultyDTO = {
+    const data: UpdateFacultyDTO = {
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
       employeeId: formData.get('employeeId') as string,
@@ -27,16 +45,17 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
       phone: formData.get('phone') as string || undefined,
       department: formData.get('department') as string,
       designation: formData.get('designation') as string,
+      status: formData.get('status') as string,
       joiningDate: formData.get('joiningDate') as string || undefined,
     };
 
     try {
       setIsSubmitting(true);
       setError(null);
-      await onAdd(data);
+      await onEdit(employee.id, data);
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Failed to add employee');
+      setError(err.message || 'Failed to update employee');
     } finally {
       setIsSubmitting(false);
     }
@@ -52,7 +71,7 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
           <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-            <h3 className="font-headline-md text-headline-md text-on-background">Add New Employee</h3>
+            <h3 className="font-headline-md text-headline-md text-on-background">Edit Employee Profile</h3>
             <button
               aria-label="Close dialog"
               className="p-1 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all disabled:opacity-50"
@@ -64,10 +83,6 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
           </div>
 
           <form className="p-6 flex-1 overflow-y-auto no-scrollbar flex flex-col gap-4" onSubmit={handleSubmit}>
-            <p className="font-body-sm text-body-sm text-on-surface-variant">
-              Provide the personal and employment records of the new staff member below.
-            </p>
-
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-2">
                 {error}
@@ -83,8 +98,8 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                   id="firstName"
                   name="firstName"
                   required
+                  defaultValue={initialFirstName}
                   className="w-full px-3 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all"
-                  placeholder="First name"
                   type="text"
                   disabled={isSubmitting}
                 />
@@ -97,8 +112,8 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                   id="lastName"
                   name="lastName"
                   required
+                  defaultValue={initialLastName}
                   className="w-full px-3 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all"
-                  placeholder="Last name"
                   type="text"
                   disabled={isSubmitting}
                 />
@@ -114,8 +129,8 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                   id="employeeId"
                   name="employeeId"
                   required
+                  defaultValue={employee.employeeId}
                   className="w-full px-3 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all"
-                  placeholder="e.g. NIT-EMP-1042"
                   type="text"
                   disabled={isSubmitting}
                 />
@@ -128,8 +143,8 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                   id="attendanceIdentity"
                   name="attendanceIdentity"
                   required
+                  defaultValue={employee.attendanceIdentity}
                   className="w-full px-3 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all"
-                  placeholder="Biometric/RFID ID"
                   type="text"
                   disabled={isSubmitting}
                 />
@@ -144,8 +159,8 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                 <input
                   id="email"
                   name="email"
+                  defaultValue={employee.email}
                   className="w-full px-3 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all"
-                  placeholder="e.g. employee@nit.edu.in"
                   type="email"
                   disabled={isSubmitting}
                 />
@@ -157,8 +172,8 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                 <input
                   id="phone"
                   name="phone"
+                  defaultValue={employee.phone}
                   className="w-full px-3 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all"
-                  placeholder="e.g. +91 98765 43210"
                   type="tel"
                   disabled={isSubmitting}
                 />
@@ -175,6 +190,8 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                     id="department"
                     name="department"
                     required
+                    value={departmentId}
+                    onChange={(e) => setDepartmentId(e.target.value)}
                     className="w-full appearance-none pl-3 pr-8 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all cursor-pointer"
                     disabled={isSubmitting}
                   >
@@ -198,8 +215,8 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                   id="designation"
                   name="designation"
                   required
+                  defaultValue={employee.designation}
                   className="w-full px-3 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all"
-                  placeholder="e.g. Assistant Professor"
                   type="text"
                   disabled={isSubmitting}
                 />
@@ -208,21 +225,22 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1.5" htmlFor="employmentType">
-                  Employment Type *
+                <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1.5" htmlFor="status">
+                  Operational Status *
                 </label>
                 <div className="relative">
                   <select
-                    id="employmentType"
-                    name="employmentType"
+                    id="status"
+                    name="status"
                     required
+                    defaultValue={employee.status}
                     className="w-full appearance-none pl-3 pr-8 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all cursor-pointer"
                     disabled={isSubmitting}
                   >
-                    <option value="Full-time">Full-time</option>
-                    <option value="Part-time">Part-time</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Ad-hoc">Ad-hoc</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="ON_LEAVE">On Leave</option>
+                    <option value="RETIRED">Retired</option>
+                    <option value="SUSPENDED">Suspended</option>
                   </select>
                   <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">
                     arrow_drop_down
@@ -236,6 +254,7 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                 <input
                   id="joiningDate"
                   name="joiningDate"
+                  defaultValue={employee.joiningDate !== 'Not Available' ? employee.joiningDate : ''}
                   className="w-full px-3 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all cursor-pointer"
                   type="date"
                   disabled={isSubmitting}
@@ -260,10 +279,10 @@ export const AddEmployeeDialog: React.FC<AddEmployeeDialogProps> = ({ isOpen, on
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                    Registering...
+                    Saving...
                   </>
                 ) : (
-                  'Register Employee'
+                  'Save Changes'
                 )}
               </button>
             </div>

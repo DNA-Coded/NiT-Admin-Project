@@ -1,5 +1,4 @@
 export * from './dashboard';
-export * from './employees';
 export * from './attendance';
 export * from './devices';
 export * from './reports';

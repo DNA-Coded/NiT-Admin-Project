@@ -5,9 +5,20 @@ import { EmployeeStatusBadge } from './EmployeeStatusBadge';
 interface EmployeeDrawerProps {
   employee: Employee | null;
   onClose: () => void;
+  onEditClick: () => void;
+  onDelete: (id: string) => Promise<void>;
+  onRestore: (id: string) => Promise<void>;
+  isMutating: boolean;
 }
 
-export const EmployeeDrawer: React.FC<EmployeeDrawerProps> = ({ employee, onClose }) => {
+export const EmployeeDrawer: React.FC<EmployeeDrawerProps> = ({ 
+  employee, 
+  onClose,
+  onEditClick,
+  onDelete,
+  onRestore,
+  isMutating
+}) => {
   if (!employee) return null;
 
   // Helper to extract initials for avatar placeholder
@@ -46,12 +57,21 @@ export const EmployeeDrawer: React.FC<EmployeeDrawerProps> = ({ employee, onClos
         <div className="flex-1 p-6 flex flex-col gap-6">
           {/* Profile Overview */}
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-headline-lg font-bold text-2xl">
-              {getInitials(employee.name)}
+            <div className="w-16 h-16 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-headline-lg font-bold text-2xl relative">
+              {employee.avatarUrl ? (
+                <img src={employee.avatarUrl} alt={employee.name} className="w-full h-full rounded-full object-cover" />
+              ) : (
+                getInitials(employee.name)
+              )}
             </div>
             <div>
-              <h4 className="font-headline-md text-headline-md text-on-background">{employee.name}</h4>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">{employee.id}</p>
+              <div className="flex items-center gap-2">
+                <h4 className="font-headline-md text-headline-md text-on-background">{employee.name}</h4>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${employee.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {employee.isActive ? 'ACTIVE' : 'INACTIVE'}
+                </span>
+              </div>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">{employee.employeeId}</p>
               <div className="mt-1.5">
                 <EmployeeStatusBadge status={employee.status} />
               </div>
@@ -87,32 +107,32 @@ export const EmployeeDrawer: React.FC<EmployeeDrawerProps> = ({ employee, onClos
             <div className="flex flex-col gap-3 font-body-sm text-body-sm text-on-surface">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-[18px] text-outline">mail</span>
-                <span className="truncate">{employee.email}</span>
+                <span className="truncate">{employee.email || 'N/A'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-[18px] text-outline">call</span>
-                <span>{employee.phone}</span>
+                <span>{employee.phone || 'N/A'}</span>
               </div>
             </div>
           </div>
 
           {/* Assigned Biometric Device */}
           <div className="bg-surface-container-low border border-outline-variant p-4 rounded-lg flex flex-col gap-3">
-            <h5 className="font-label-md text-label-md text-primary font-bold">Biometric Device Mapping</h5>
+            <h5 className="font-label-md text-label-md text-primary font-bold">Biometric Mapping</h5>
             {employee.biometricDevice ? (
               <div className="flex flex-col gap-1.5 font-body-sm text-body-sm text-on-surface">
                 <div className="flex items-center gap-2 text-success font-medium">
-                  <span className="material-symbols-outlined text-[18px]">verified</span>
-                  <span>Registered ({employee.biometricDevice.name})</span>
+                  <span className="material-symbols-outlined text-[18px]">fingerprint</span>
+                  <span>{employee.attendanceIdentity}</span>
                 </div>
                 <p className="text-on-surface-variant text-[13px] pl-6.5">
-                  Location: {employee.biometricDevice.location}
+                  Device: {employee.biometricDevice.name}
                 </p>
               </div>
             ) : (
               <div className="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
                 <span className="material-symbols-outlined text-[18px] text-outline">cancel</span>
-                <span>No Biometric Device Registered</span>
+                <span>No Biometric Mapping</span>
               </div>
             )}
           </div>
@@ -148,6 +168,47 @@ export const EmployeeDrawer: React.FC<EmployeeDrawerProps> = ({ employee, onClos
             </div>
           </div>
         </div>
+
+        {/* Footer Actions */}
+        <div className="p-6 border-t border-outline-variant bg-surface-container-low flex flex-col gap-3">
+          <div className="flex justify-between w-full gap-3">
+            {employee.isActive ? (
+              <button 
+                className="border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-label-md text-label-md py-2 px-4 rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+                onClick={() => {
+                  if (confirm('Are you sure you want to deactivate this employee? They will no longer appear in active lists.')) {
+                    onDelete(employee.id).catch(() => {});
+                  }
+                }}
+                disabled={isMutating}
+              >
+                <span className="material-symbols-outlined text-sm">person_off</span>
+                Deactivate
+              </button>
+            ) : (
+              <button 
+                className="border border-green-200 bg-green-50 hover:bg-green-100 text-green-700 font-label-md text-label-md py-2 px-4 rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+                onClick={() => {
+                  onRestore(employee.id).catch(() => {});
+                }}
+                disabled={isMutating}
+              >
+                <span className="material-symbols-outlined text-sm">settings_backup_restore</span>
+                Restore
+              </button>
+            )}
+
+            <button 
+              className="bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-2 px-4 rounded transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+              onClick={onEditClick}
+              disabled={isMutating || !employee.isActive}
+            >
+              <span className="material-symbols-outlined text-sm">edit</span>
+              Edit
+            </button>
+          </div>
+        </div>
+
       </div>
     </>
   );

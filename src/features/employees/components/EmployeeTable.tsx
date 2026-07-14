@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { Employee } from '@/types/employees';
 import { EmployeeRow } from './EmployeeRow';
 import { StatePlaceholder, type ViewState } from '@/components/shared/StatePlaceholder';
@@ -7,26 +7,26 @@ interface EmployeeTableProps {
   employees: Employee[];
   viewState: ViewState;
   onSelectEmployee: (employee: Employee) => void;
+  currentPage: number;
+  totalPages: number;
+  totalEntries: number;
+  onPageChange: (page: number) => void;
+  loading?: boolean;
 }
 
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
   viewState,
   onSelectEmployee,
+  currentPage,
+  totalPages,
+  totalEntries,
+  onPageChange,
+  loading = false,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  // Pagination calculation
-  const totalEntries = employees.length;
-  const totalPages = Math.ceil(totalEntries / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalEntries);
-  const currentItems = employees.slice(startIndex, endIndex);
-
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+    if (page >= 1 && page <= totalPages && !loading) {
+      onPageChange(page);
     }
   };
 
@@ -48,7 +48,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant">
-              {currentItems.map((employee) => (
+              {employees.map((employee) => (
                 <EmployeeRow
                   key={employee.id}
                   employee={employee}
@@ -63,14 +63,14 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         {totalEntries > 0 && (
           <div className="px-4 py-3 border-t border-outline-variant bg-white flex items-center justify-between flex-wrap gap-2">
             <p className="font-body-sm text-body-sm text-on-surface-variant">
-              Showing {startIndex + 1} to {endIndex} of {totalEntries} entries
+              Showing total of {totalEntries} entries
             </p>
             <div className="flex items-center gap-1">
               {/* Prev Button */}
               <button
                 aria-label="Previous page"
                 className="p-1 text-on-surface-variant hover:bg-surface-container rounded disabled:opacity-50 transition-all duration-200"
-                disabled={currentPage === 1}
+                disabled={currentPage === 1 || loading}
                 onClick={() => handlePageChange(currentPage - 1)}
               >
                 <span className="material-symbols-outlined text-[20px]">chevron_left</span>
@@ -85,7 +85,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     currentPage === page
                       ? 'bg-primary text-white shadow-sm font-bold'
                       : 'text-on-surface hover:bg-surface-container'
-                  }`}
+                  } ${loading ? 'opacity-50 pointer-events-none' : ''}`}
                   onClick={() => handlePageChange(page)}
                 >
                   {page}
@@ -96,7 +96,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               <button
                 aria-label="Next page"
                 className="p-1 text-on-surface-variant hover:bg-surface-container rounded disabled:opacity-50 transition-all duration-200"
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || loading}
                 onClick={() => handlePageChange(currentPage + 1)}
               >
                 <span className="material-symbols-outlined text-[20px]">chevron_right</span>
