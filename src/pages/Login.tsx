@@ -28,8 +28,10 @@ export default function Login() {
 
     try {
       const response = await authService.login({ email: username, password });
-      if (response.data && response.data.token && response.data.admin) {
-        login(response.data.token, response.data.admin);
+      const token = response.data?.token || response.data?.accessToken;
+      
+      if (response.data && token && response.data.admin) {
+        login(token, response.data.admin);
         navigate(from, { replace: true });
       } else {
         setError('Unexpected response from server.');

@@ -13,7 +13,8 @@ export interface AuthResponse {
   message: string;
   data: {
     admin: Admin;
-    token: string;
+    accessToken: string;
+    token?: string; // Optional fallback
   };
 }
 
