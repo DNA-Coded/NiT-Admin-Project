@@ -5,9 +5,9 @@ import {
   mockShifts,
   mockHolidays,
   mockUserRoles,
-  mockAuditLogs,
 } from '@/mocks/settings';
 import { DEPARTMENTS } from '@/constants';
+import { ActivityPanel } from '@/features/activity/components/ActivityPanel';
 
 /* 1. Organization Panel */
 export const OrgSettingsPanel: React.FC = () => {
@@ -461,52 +461,7 @@ export const SecurityPanel: React.FC = () => {
 
 /* 11. Audit Logs Panel */
 export const AuditLogsPanel: React.FC = () => {
-  return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
-      <div className="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
-        <h3 className="font-headline-md text-headline-md text-primary font-bold">Platform Audit Logs Trail</h3>
-        <span className="text-label-sm text-outline font-semibold">Superadmin View</span>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <caption className="sr-only"> System administration and user activity logs table.</caption>
-          <thead className="bg-surface-container-high/30 text-label-md text-outline uppercase tracking-wider">
-            <tr>
-              <th className="px-6 py-4 font-label-md">Timestamp</th>
-              <th className="px-6 py-4 font-label-md">User</th>
-              <th className="px-6 py-4 font-label-md">Action</th>
-              <th className="px-6 py-4 font-label-md">Module</th>
-              <th className="px-6 py-4 font-label-md">IP Address</th>
-              <th className="px-6 py-4 font-label-md text-right">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-outline-variant font-body-sm text-body-sm text-on-surface">
-            {mockAuditLogs.map((log) => (
-              <tr key={log.id} className="hover:bg-surface-container-low transition-colors">
-                <td className="px-6 py-4 font-mono whitespace-nowrap">{log.timestamp}</td>
-                <td className="px-6 py-4 font-bold text-primary whitespace-nowrap">{log.user}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{log.action}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{log.module}</td>
-                <td className="px-6 py-4 font-mono text-on-surface-variant whitespace-nowrap">{log.ipAddress}</td>
-                <td className="px-6 py-4 text-right whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                      log.status === 'SUCCESS'
-                        ? 'bg-[#dcfce7] text-[#166534] border-success/15'
-                        : 'bg-[#fef3c7] text-[#92400e] border-warning/15'
-                    }`}
-                  >
-                    {log.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  return <ActivityPanel />;
 };
 
 /* 12. System Information Panel */
