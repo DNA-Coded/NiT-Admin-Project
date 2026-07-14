@@ -24,6 +24,17 @@ export interface AttendanceRecord {
   shift: string; // e.g. Regular (09:00 AM - 05:00 PM)
   breakSessions: BreakSession[];
   notes?: string;
+  attendanceType?: 'IN' | 'OUT';
+  remarks?: string | null;
+  attendanceCode?: string;
+  correctionHistory?: {
+    correctionReason: string;
+    correctedAt: string;
+    correctedBy: string;
+    originalStatus: string;
+    originalAttendanceType: string;
+    originalRemarks: string | null;
+  }[];
 }
 
 export interface AttendanceSummary {

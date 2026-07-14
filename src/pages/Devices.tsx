@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { Device, DeviceActivity, DeviceSummary } from '@/types/devices';
+import type { Device, DeviceSummary } from '@/types/devices';
+import type { ViewState } from '@/components/shared/StatePlaceholder';
 
 import { DeviceSummaryCards } from '@/features/devices/components/DeviceSummaryCards';
 import { DeviceGrid } from '@/features/devices/components/DeviceGrid';
@@ -8,16 +9,16 @@ import { DeviceActivityTable } from '@/features/devices/components/DeviceActivit
 import { CampusDeviceLayout } from '@/features/devices/components/CampusDeviceLayout';
 import { DeviceAlertsPanel } from '@/features/devices/components/DeviceAlertsPanel';
 import { useDevices } from '@/features/devices/hooks/useDevices';
+import { useSync } from '@/features/devices/hooks/useSync';
 import { AddDeviceDialog } from '@/features/devices/components/AddDeviceDialog';
 import { EditDeviceDialog } from '@/features/devices/components/EditDeviceDialog';
 import { departmentsService } from '@/features/departments/services/departments.service';
-import { mockDeviceActivities } from '@/mocks/devices';
 
 export default function Devices() {
   const {
     devices,
     meta,
-    loading,
+    loading: devicesLoading,
     filters,
     setFilters,
     page,
@@ -29,7 +30,17 @@ export default function Devices() {
     recoverDevice,
   } = useDevices();
 
-  const [activities] = useState<DeviceActivity[]>(mockDeviceActivities);
+  const {
+    activities,
+    loading: syncLoading,
+    error: syncError,
+    page: syncPage,
+    setPage: setSyncPage,
+    meta: syncMeta,
+    triggerSync,
+    retrySync,
+  } = useSync();
+
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -70,6 +81,14 @@ export default function Devices() {
       avgSyncDelaySecs: 12, // Still mock or calculated if backend provided
     };
   }, [devices, meta?.total]);
+
+  const syncViewState: ViewState = syncLoading && activities.length === 0
+    ? 'loading'
+    : syncError
+      ? 'error'
+      : activities.length === 0
+        ? 'empty'
+        : 'success';
 
   return (
     <div className="w-full flex flex-col min-h-[calc(100vh-120px)]">
@@ -141,7 +160,7 @@ export default function Devices() {
 
       {/* Grid listing */}
       <div className="mb-4">
-        {loading && devices.length === 0 ? (
+        {devicesLoading && devices.length === 0 ? (
           <div className="flex justify-center items-center py-20">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
@@ -160,7 +179,7 @@ export default function Devices() {
             <button
               aria-label="Previous page"
               className="p-1 text-on-surface-variant hover:bg-surface-container rounded disabled:opacity-50 transition-all duration-200"
-              disabled={!meta.hasPrevPage || loading}
+              disabled={!meta.hasPrevPage || devicesLoading}
               onClick={() => setPage(p => p - 1)}
             >
               <span className="material-symbols-outlined text-[20px]">chevron_left</span>
@@ -173,7 +192,7 @@ export default function Devices() {
                   page === p
                     ? 'bg-primary text-white shadow-sm font-bold'
                     : 'text-on-surface hover:bg-surface-container'
-                } ${loading ? 'opacity-50 pointer-events-none' : ''}`}
+                } ${devicesLoading ? 'opacity-50 pointer-events-none' : ''}`}
                 onClick={() => setPage(p)}
               >
                 {p}
@@ -182,7 +201,7 @@ export default function Devices() {
             <button
               aria-label="Next page"
               className="p-1 text-on-surface-variant hover:bg-surface-container rounded disabled:opacity-50 transition-all duration-200"
-              disabled={!meta.hasNextPage || loading}
+              disabled={!meta.hasNextPage || devicesLoading}
               onClick={() => setPage(p => p + 1)}
             >
               <span className="material-symbols-outlined text-[20px]">chevron_right</span>
@@ -199,7 +218,17 @@ export default function Devices() {
       {/* Details logs and alerts panel */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <DeviceActivityTable activities={activities} viewState={'success'} />
+          <DeviceActivityTable 
+            activities={activities} 
+            viewState={syncViewState}
+            currentPage={syncPage}
+            totalPages={syncMeta.totalPages}
+            totalEntries={syncMeta.total}
+            limit={syncMeta.limit}
+            onPageChange={setSyncPage}
+            onRetry={retrySync}
+            isRetrying={syncLoading}
+          />
         </div>
         <div>
           <DeviceAlertsPanel />
@@ -213,6 +242,7 @@ export default function Devices() {
         onEditClick={() => setIsEditOpen(true)}
         onDelete={removeDevice}
         onRestore={recoverDevice}
+        onSync={triggerSync}
         isMutating={isMutating}
       />
 

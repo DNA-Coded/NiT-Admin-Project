@@ -7,6 +7,7 @@ interface DeviceDrawerProps {
   onEditClick: () => void;
   onDelete: (id: string) => void;
   onRestore: (id: string) => void;
+  onSync: (deviceId: string, provider: string) => void;
   isMutating?: boolean;
 }
 
@@ -16,6 +17,7 @@ export const DeviceDrawer: React.FC<DeviceDrawerProps> = ({
   onEditClick,
   onDelete,
   onRestore,
+  onSync,
   isMutating
 }) => {
   if (!device) return null;
@@ -158,11 +160,11 @@ export const DeviceDrawer: React.FC<DeviceDrawerProps> = ({
               </button>
               <button
                 className="flex-1 bg-surface-container-high text-on-surface py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container-highest transition-colors shadow-sm font-bold flex items-center justify-center gap-2"
-                onClick={() => alert('Checking cloud update servers... (Simulated Action)')}
+                onClick={() => onSync(device.id, device.manufacturer || 'UNKNOWN')}
                 disabled={isMutating}
               >
-                <span className="material-symbols-outlined text-[18px]">system_update</span>
-                Update
+                <span className="material-symbols-outlined text-[18px]">sync</span>
+                Sync Data
               </button>
             </div>
 

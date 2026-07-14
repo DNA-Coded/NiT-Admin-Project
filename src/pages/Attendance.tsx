@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
-import { mockAttendanceRecords, mockAttendanceSummary } from '@/mocks/attendance';
-import type { AttendanceRecord, AttendanceFilterState } from '@/types/attendance';
+import { useState } from 'react';
+import type { AttendanceRecord } from '@/types/attendance';
 import type { ViewState } from '@/components/shared/StatePlaceholder';
 import { AttendanceSummaryCards } from '@/features/attendance/components/AttendanceSummaryCards';
 import { AttendanceFilters } from '@/features/attendance/components/AttendanceFilters';
@@ -8,94 +7,57 @@ import { AttendanceTable } from '@/features/attendance/components/AttendanceTabl
 import { AttendanceCalendar } from '@/features/attendance/components/AttendanceCalendar';
 import { AttendanceDrawer } from '@/features/attendance/components/AttendanceDrawer';
 import { ExportMenu } from '@/features/attendance/components/ExportMenu';
-
-const initialFilters: AttendanceFilterState = {
-  startDate: '',
-  endDate: '',
-  department: '',
-  employeeSearch: '',
-  status: '',
-  shift: '',
-  device: '',
-};
+import { useAttendance } from '@/features/attendance/hooks/useAttendance';
+import { mockAttendanceSummary } from '@/mocks/attendance'; // Summary is still mocked since backend doesn't have a summary endpoint
 
 export default function Attendance() {
   const [viewMode, setViewMode] = useState<'table' | 'calendar'>('table');
-  const [filters, setFilters] = useState<AttendanceFilterState>(initialFilters);
-  const [viewState, setViewState] = useState<ViewState>('loading');
   const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
 
-  // Extract unique shifts and devices dynamically from mock data for filters
-  const uniqueShifts = Array.from(
-    new Set(mockAttendanceRecords.map((rec) => rec.shift))
-  ).sort();
-  const uniqueDevices = Array.from(
-    new Set(mockAttendanceRecords.map((rec) => rec.deviceUsed).filter(Boolean))
-  ) as string[];
+  const {
+    records,
+    loading,
+    error,
+    filters,
+    setFilters,
+    page,
+    setPage,
+    meta,
+    correctRecord,
+  } = useAttendance();
 
-  // Simulate network fetch when filters change
-  useEffect(() => {
-    setViewState('loading');
-    const timer = setTimeout(() => {
-      setViewState('success');
-    }, 450);
-    return () => clearTimeout(timer);
-  }, [filters]);
-
-  const handleFilterChange = (key: keyof AttendanceFilterState, value: string) => {
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
     }));
+    setPage(1); // Reset to page 1 when filter changes
   };
 
   const handleReset = () => {
-    setFilters(initialFilters);
+    setFilters({
+      startDate: '',
+      endDate: '',
+      department: '',
+      employeeSearch: '',
+      status: '',
+      shift: '',
+      device: '',
+    });
+    setPage(1);
   };
 
-  // Filter records dynamically
-  const filteredRecords = mockAttendanceRecords.filter((rec) => {
-    // Employee Search (Name or ID)
-    const matchesEmployee =
-      filters.employeeSearch === '' ||
-      rec.employeeName.toLowerCase().includes(filters.employeeSearch.toLowerCase()) ||
-      rec.employeeId.toLowerCase().includes(filters.employeeSearch.toLowerCase());
+  const currentViewState: ViewState = loading 
+    ? 'loading' 
+    : error 
+      ? 'error' 
+      : records.length === 0 
+        ? 'empty' 
+        : 'success';
 
-    // Department Filter
-    const matchesDept =
-      filters.department === '' || rec.department === filters.department;
-
-    // Status Filter
-    const matchesStatus =
-      filters.status === '' || rec.status === filters.status;
-
-    // Shift Filter
-    const matchesShift = filters.shift === '' || rec.shift === filters.shift;
-
-    // Device Filter
-    const matchesDevice = filters.device === '' || rec.deviceUsed === filters.device;
-
-    // Start Date Filter
-    const matchesStartDate =
-      filters.startDate === '' || new Date(rec.date) >= new Date(filters.startDate);
-
-    // End Date Filter
-    const matchesEndDate =
-      filters.endDate === '' || new Date(rec.date) <= new Date(filters.endDate);
-
-    return (
-      matchesEmployee &&
-      matchesDept &&
-      matchesStatus &&
-      matchesShift &&
-      matchesDevice &&
-      matchesStartDate &&
-      matchesEndDate
-    );
-  });
-
-  const currentViewState =
-    viewState === 'success' && filteredRecords.length === 0 ? 'empty' : viewState;
+  // Hardcode these since dynamic derivation from current paginated page is not useful
+  const uniqueDevices = ['Main Gate Biometric', 'CS Block Face Rec']; 
+  const uniqueShifts = ['Regular Shift (09:00 AM - 05:00 PM)', 'Morning Shift (08:30 AM - 04:30 PM)', 'Early Guard (07:00 AM - 03:00 PM)'];
 
   return (
     <div className="w-full flex flex-col min-h-[calc(100vh-120px)]">
@@ -153,9 +115,14 @@ export default function Attendance() {
       <div className="flex-1">
         {viewMode === 'table' ? (
           <AttendanceTable
-            records={filteredRecords}
+            records={records}
             viewState={currentViewState}
             onSelectRecord={setSelectedRecord}
+            currentPage={page}
+            totalPages={meta.totalPages}
+            totalEntries={meta.total}
+            limit={meta.limit}
+            onPageChange={setPage}
           />
         ) : (
           <AttendanceCalendar />
@@ -163,7 +130,11 @@ export default function Attendance() {
       </div>
 
       {/* Detailed Side Drawer */}
-      <AttendanceDrawer record={selectedRecord} onClose={() => setSelectedRecord(null)} />
+      <AttendanceDrawer 
+        record={selectedRecord} 
+        onClose={() => setSelectedRecord(null)} 
+        onCorrect={correctRecord}
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { AttendanceRecord } from '@/types/attendance';
 import { AttendanceRow } from './AttendanceRow';
 import { StatePlaceholder, type ViewState } from '@/components/shared/StatePlaceholder';
@@ -7,25 +7,29 @@ interface AttendanceTableProps {
   records: AttendanceRecord[];
   viewState: ViewState;
   onSelectRecord: (record: AttendanceRecord) => void;
+  currentPage: number;
+  totalPages: number;
+  totalEntries: number;
+  limit: number;
+  onPageChange: (page: number) => void;
 }
 
 export const AttendanceTable: React.FC<AttendanceTableProps> = ({
   records,
   viewState,
   onSelectRecord,
+  currentPage,
+  totalPages,
+  totalEntries,
+  limit,
+  onPageChange,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  const totalEntries = records.length;
-  const totalPages = Math.ceil(totalEntries / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalEntries);
-  const currentItems = records.slice(startIndex, endIndex);
+  const startIndex = (currentPage - 1) * limit;
+  const endIndex = Math.min(startIndex + limit, totalEntries);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      onPageChange(page);
     }
   };
 
@@ -47,7 +51,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant">
-              {currentItems.map((record) => (
+              {records.map((record) => (
                 <AttendanceRow
                   key={record.id}
                   record={record}
@@ -62,7 +66,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
         {totalEntries > 0 && (
           <div className="bg-surface-container-lowest px-4 py-3 border-t border-outline-variant flex items-center justify-between flex-wrap gap-2 sm:px-6">
             <p className="text-sm text-on-surface-variant font-body-sm">
-              Showing <span className="font-medium text-on-surface">{startIndex + 1}</span> to{' '}
+              Showing <span className="font-medium text-on-surface">{totalEntries === 0 ? 0 : startIndex + 1}</span> to{' '}
               <span className="font-medium text-on-surface">{endIndex}</span> of{' '}
               <span className="font-medium text-on-surface">{totalEntries}</span> results
             </p>
@@ -98,7 +102,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
                 <button
                   aria-label="Next page"
                   className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-outline-variant bg-surface-container-lowest text-sm font-medium text-on-surface-variant hover:bg-surface-container disabled:opacity-50 transition-all duration-200"
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages || totalPages === 0}
                   onClick={() => handlePageChange(currentPage + 1)}
                 >
                   <span className="material-symbols-outlined text-[20px]">chevron_right</span>
