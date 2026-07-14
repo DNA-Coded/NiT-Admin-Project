@@ -8,6 +8,8 @@ import { AddEmployeeDialog } from '@/features/employees/components/AddEmployeeDi
 import { EditEmployeeDialog } from '@/features/employees/components/EditEmployeeDialog';
 import { useEmployees } from '@/features/employees/hooks/useEmployees';
 import { departmentsService } from '@/features/departments/services/departments.service';
+import { ExportMenu } from '@/components/shared/ExportMenu';
+import { useExport } from '@/features/exports/hooks/useExport';
 
 export default function Employees() {
   const {
@@ -25,6 +27,8 @@ export default function Employees() {
     removeEmployee,
     recoverEmployee,
   } = useEmployees();
+
+  const { exportData, isExporting, error: exportError } = useExport();
 
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -100,15 +104,27 @@ export default function Employees() {
             Manage, filter, and view all registered academic and administrative staff. {meta?.total ? `(${meta.total} total)` : ''}
           </p>
         </div>
-        <button
-          aria-label="Add new employee"
-          className="bg-primary text-on-primary font-label-md text-label-md px-5 py-2.5 rounded-lg flex items-center gap-2 hover:bg-primary-container transition-colors shadow-sm self-start md:self-auto shrink-0"
-          onClick={() => setIsAddOpen(true)}
-        >
-          <span className="material-symbols-outlined text-[20px]">person_add</span>
-          Add Employee
-        </button>
+        <div className="flex gap-3 self-start md:self-auto shrink-0">
+          <ExportMenu 
+            onExport={(format) => exportData('FACULTY', format, filters)} 
+            isExporting={isExporting} 
+          />
+          <button
+            aria-label="Add new employee"
+            className="bg-primary text-on-primary font-label-md text-label-md px-5 py-2.5 rounded-lg flex items-center gap-2 hover:bg-primary-container transition-colors shadow-sm"
+            onClick={() => setIsAddOpen(true)}
+          >
+            <span className="material-symbols-outlined text-[20px]">person_add</span>
+            Add Employee
+          </button>
+        </div>
       </div>
+
+      {exportError && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded text-sm">
+          Failed to export: {exportError.message}
+        </div>
+      )}
 
       {/* Advanced Filters */}
       <FilterBar

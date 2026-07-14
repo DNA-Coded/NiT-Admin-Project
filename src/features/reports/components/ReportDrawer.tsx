@@ -4,13 +4,17 @@ import type { ReportItem } from '@/types/reports';
 interface ReportDrawerProps {
   report: ReportItem | null;
   onClose: () => void;
+  onExport: (type: string, format: string) => void;
+  isExporting?: boolean;
 }
 
-export const ReportDrawer: React.FC<ReportDrawerProps> = ({ report, onClose }) => {
+export const ReportDrawer: React.FC<ReportDrawerProps> = ({ report, onClose, onExport, isExporting }) => {
   if (!report) return null;
 
-  const handleAction = (act: string) => {
-    alert(`Triggering ${act} on ${report.name}... (Simulated Action)`);
+  const handleAction = (format: string) => {
+    if (!isExporting) {
+      onExport(report.type, format);
+    }
   };
 
   return (
@@ -122,17 +126,27 @@ export const ReportDrawer: React.FC<ReportDrawerProps> = ({ report, onClose }) =
           {/* Export triggers */}
           <div className="flex gap-3 mt-auto border-t border-outline-variant pt-4 shrink-0">
             <button
-              className="flex-1 bg-primary text-on-primary py-2.5 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm font-bold flex items-center justify-center gap-1.5"
-              onClick={() => handleAction('PDF Download')}
+              className="flex-1 bg-primary text-on-primary py-2.5 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm font-bold flex items-center justify-center gap-1.5 disabled:opacity-60"
+              onClick={() => handleAction('PDF')}
+              disabled={isExporting}
             >
-              <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+              {isExporting ? (
+                <div className="w-[18px] h-[18px] border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+              )}
               PDF
             </button>
             <button
-              className="flex-1 bg-white text-secondary border border-outline-variant py-2.5 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors font-bold flex items-center justify-center gap-1.5"
-              onClick={() => handleAction('Excel Export')}
+              className="flex-1 bg-white text-secondary border border-outline-variant py-2.5 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors font-bold flex items-center justify-center gap-1.5 disabled:opacity-60"
+              onClick={() => handleAction('XLSX')}
+              disabled={isExporting}
             >
-              <span className="material-symbols-outlined text-[18px]">description</span>
+              {isExporting ? (
+                <div className="w-[18px] h-[18px] border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <span className="material-symbols-outlined text-[18px]">description</span>
+              )}
               Excel
             </button>
           </div>

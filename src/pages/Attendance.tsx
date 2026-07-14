@@ -6,8 +6,9 @@ import { AttendanceFilters } from '@/features/attendance/components/AttendanceFi
 import { AttendanceTable } from '@/features/attendance/components/AttendanceTable';
 import { AttendanceCalendar } from '@/features/attendance/components/AttendanceCalendar';
 import { AttendanceDrawer } from '@/features/attendance/components/AttendanceDrawer';
-import { ExportMenu } from '@/features/attendance/components/ExportMenu';
+import { ExportMenu } from '@/components/shared/ExportMenu';
 import { useAttendance } from '@/features/attendance/hooks/useAttendance';
+import { useExport } from '@/features/exports/hooks/useExport';
 import { mockAttendanceSummary } from '@/mocks/attendance'; // Summary is still mocked since backend doesn't have a summary endpoint
 
 export default function Attendance() {
@@ -25,6 +26,8 @@ export default function Attendance() {
     meta,
     correctRecord,
   } = useAttendance();
+
+  const { exportData, isExporting, error: exportError } = useExport();
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters((prev) => ({
@@ -95,9 +98,18 @@ export default function Attendance() {
           </div>
 
           {/* Export Action Dropdown */}
-          <ExportMenu />
+          <ExportMenu 
+            onExport={(format) => exportData('ATTENDANCE', format, filters)} 
+            isExporting={isExporting} 
+          />
         </div>
       </div>
+
+      {exportError && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded text-sm">
+          Failed to export: {exportError.message}
+        </div>
+      )}
 
       {/* Summary Cards */}
       <AttendanceSummaryCards summary={mockAttendanceSummary} />

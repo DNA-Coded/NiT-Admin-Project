@@ -11,6 +11,8 @@ interface ReportsTableProps {
   totalEntries: number;
   limit: number;
   onPageChange: (page: number) => void;
+  onDownload: (type: string, format: string) => void;
+  isExporting?: boolean;
 }
 
 export const ReportsTable: React.FC<ReportsTableProps> = ({
@@ -21,7 +23,9 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({
   totalPages,
   totalEntries,
   limit,
-  onPageChange
+  onPageChange,
+  onDownload,
+  isExporting
 }) => {
   const startIndex = (currentPage - 1) * limit;
   const endIndex = Math.min(startIndex + limit, totalEntries);
@@ -45,9 +49,11 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({
     }
   };
 
-  const handleDownload = (e: React.MouseEvent, name: string) => {
+  const handleDownload = (e: React.MouseEvent, type: string) => {
     e.stopPropagation();
-    alert(`Downloading ${name}... (Simulated Action)`);
+    if (!isExporting) {
+      onDownload(type, 'CSV');
+    }
   };
 
   return (
@@ -96,10 +102,15 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({
                   <td className="py-4 px-6 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                     <button
                       aria-label={`Download ${rep.name}`}
-                      className="text-primary hover:text-primary-container transition-colors p-1.5 rounded hover:bg-surface-container-low"
-                      onClick={(e) => handleDownload(e, rep.name)}
+                      className="text-primary hover:text-primary-container transition-colors p-1.5 rounded hover:bg-surface-container-low disabled:opacity-50"
+                      onClick={(e) => handleDownload(e, rep.type)}
+                      disabled={isExporting}
                     >
-                      <span className="material-symbols-outlined text-[18px]">download</span>
+                      {isExporting ? (
+                        <div className="w-[18px] h-[18px] border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <span className="material-symbols-outlined text-[18px]">download</span>
+                      )}
                     </button>
                   </td>
                 </tr>

@@ -13,6 +13,8 @@ import { useSync } from '@/features/devices/hooks/useSync';
 import { AddDeviceDialog } from '@/features/devices/components/AddDeviceDialog';
 import { EditDeviceDialog } from '@/features/devices/components/EditDeviceDialog';
 import { departmentsService } from '@/features/departments/services/departments.service';
+import { ExportMenu } from '@/components/shared/ExportMenu';
+import { useExport } from '@/features/exports/hooks/useExport';
 
 export default function Devices() {
   const {
@@ -29,6 +31,8 @@ export default function Devices() {
     removeDevice,
     recoverDevice,
   } = useDevices();
+
+  const { exportData, isExporting, error: exportError } = useExport();
 
   const {
     activities,
@@ -101,13 +105,10 @@ export default function Devices() {
           </p>
         </div>
         <div className="flex gap-3 self-start md:self-auto">
-          <button
-            aria-label="Export device logs"
-            className="px-4 py-2 bg-white border border-outline text-primary font-label-md rounded-lg hover:bg-surface-container-low transition-colors shadow-sm"
-            onClick={() => alert('Exporting devices list logs... (Simulated Action)')}
-          >
-            Export Logs
-          </button>
+          <ExportMenu 
+            onExport={(format) => exportData('DEVICE', format, filters)} 
+            isExporting={isExporting} 
+          />
           <button
             aria-label="Register new device"
             className="px-4 py-2 bg-primary text-white font-label-md rounded-lg hover:bg-primary-container transition-colors shadow-sm font-bold flex items-center gap-2"
@@ -118,6 +119,12 @@ export default function Devices() {
           </button>
         </div>
       </div>
+
+      {exportError && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded text-sm">
+          Failed to export: {exportError.message}
+        </div>
+      )}
 
       {/* KPI Cards Summary */}
       <DeviceSummaryCards summary={summary} />

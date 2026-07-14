@@ -9,6 +9,8 @@ import { QuickReportCard } from '@/features/reports/components/QuickReportCard';
 import { ReportsTable } from '@/features/reports/components/ReportsTable';
 import { ReportDrawer } from '@/features/reports/components/ReportDrawer';
 import { useReports } from '@/features/reports/hooks/useReports';
+import { useExport } from '@/features/exports/hooks/useExport';
+import type { ExportFormat, ExportReportType } from '@/features/exports/services/export.service';
 
 export default function Reports() {
   const {
@@ -49,6 +51,17 @@ export default function Reports() {
     }
   };
 
+  const { exportData, isExporting, error: exportError } = useExport();
+
+  const handleExportReport = (reportTypeStr: string, format: ExportFormat) => {
+    let type: ExportReportType = 'ATTENDANCE';
+    if (reportTypeStr.includes('Faculty') || reportTypeStr.includes('Employee')) type = 'FACULTY';
+    else if (reportTypeStr.includes('Device')) type = 'DEVICE';
+    else if (reportTypeStr.includes('Sync')) type = 'SYNCHRONIZATION';
+
+    exportData(type, format, filters);
+  };
+
   return (
     <div className="w-full flex flex-col min-h-[calc(100vh-120px)]">
       {/* Page Header */}
@@ -73,6 +86,12 @@ export default function Reports() {
           Generate Report
         </button>
       </div>
+
+      {exportError && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded text-sm">
+          Failed to export: {exportError.message}
+        </div>
+      )}
 
       {/* KPI Cards Bento Grid */}
       {kpis && <ReportsSummaryCards metrics={kpis} />}
@@ -163,11 +182,18 @@ export default function Reports() {
           totalEntries={meta.total}
           limit={meta.limit}
           onPageChange={setPage}
+          onDownload={(type, format) => handleExportReport(type, format as ExportFormat)}
+          isExporting={isExporting}
         />
       </div>
 
       {/* Report Preview Drawer */}
-      <ReportDrawer report={selectedReport} onClose={() => setSelectedReport(null)} />
+      <ReportDrawer 
+        report={selectedReport} 
+        onClose={() => setSelectedReport(null)} 
+        onExport={(type, format) => handleExportReport(type, format as ExportFormat)}
+        isExporting={isExporting}
+      />
     </div>
   );
 }
