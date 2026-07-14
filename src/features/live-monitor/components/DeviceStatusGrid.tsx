@@ -28,11 +28,11 @@ export const DeviceStatusGrid: React.FC<DeviceStatusGridProps> = ({ devices }) =
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-outline text-[18px]">
-                  {device.name.toLowerCase().includes('face') ? 'face' : 'fingerprint'}
+                  {device.deviceName.toLowerCase().includes('face') ? 'face' : 'fingerprint'}
                 </span>
-                <span className="font-label-md text-label-md text-on-surface font-bold">
-                  {device.name}
-                </span>
+                <h4 className="font-label-md text-label-md text-on-surface font-bold truncate">
+                  {device.deviceName}
+                </h4>
               </div>
               {/* Online/Offline Badge */}
               <div className="flex items-center gap-1.5">

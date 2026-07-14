@@ -4,9 +4,20 @@ import type { Device } from '@/types/devices';
 interface DeviceDrawerProps {
   device: Device | null;
   onClose: () => void;
+  onEditClick: () => void;
+  onDelete: (id: string) => void;
+  onRestore: (id: string) => void;
+  isMutating?: boolean;
 }
 
-export const DeviceDrawer: React.FC<DeviceDrawerProps> = ({ device, onClose }) => {
+export const DeviceDrawer: React.FC<DeviceDrawerProps> = ({ 
+  device, 
+  onClose,
+  onEditClick,
+  onDelete,
+  onRestore,
+  isMutating
+}) => {
   if (!device) return null;
 
   return (
@@ -37,17 +48,17 @@ export const DeviceDrawer: React.FC<DeviceDrawerProps> = ({ device, onClose }) =
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-primary-fixed text-primary flex items-center justify-center font-headline-lg font-bold text-xl">
               <span className="material-symbols-outlined text-[32px]">
-                {device.deviceType === 'FACE' ? 'face' : 'fingerprint'}
+                {device.deviceCategory === 'FACE' ? 'face' : 'fingerprint'}
               </span>
             </div>
             <div>
               <h4 className="font-headline-md text-headline-md text-on-background font-bold">
-                {device.name}
+                {device.deviceName}
               </h4>
               <p className="font-body-sm text-body-sm text-on-surface-variant">SN: {device.serialNumber}</p>
               <div className="mt-1 flex items-center gap-2">
                 <span className="bg-primary-fixed text-primary px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-bold">
-                  {device.deviceType}
+                  {device.deviceCategory}
                 </span>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
@@ -80,7 +91,7 @@ export const DeviceDrawer: React.FC<DeviceDrawerProps> = ({ device, onClose }) =
               </div>
               <div>
                 <span className="block text-on-surface-variant font-label-sm text-label-sm">Assigned Block Dept</span>
-                {device.department}
+                {device.assignedDepartment}
               </div>
             </div>
           </div>
@@ -133,20 +144,67 @@ export const DeviceDrawer: React.FC<DeviceDrawerProps> = ({ device, onClose }) =
             </div>
           </div>
 
-          {/* Diagnostics Actions */}
-          <div className="flex gap-3 mt-auto border-t border-outline-variant pt-4 shrink-0">
-            <button
-              className="flex-1 bg-primary text-on-primary py-2.5 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm font-bold"
-              onClick={() => alert('Triggering network diagnostics check... (Simulated Action)')}
-            >
-              Ping Diagnostic
-            </button>
-            <button
-              className="flex-1 bg-white text-secondary border border-outline-variant py-2.5 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors font-bold"
-              onClick={() => alert('Checking cloud update servers... (Simulated Action)')}
-            >
-              Update Firmware
-            </button>
+          {/* Diagnostics & Management Actions */}
+          <div className="flex flex-col gap-3 mt-auto border-t border-outline-variant pt-4 shrink-0">
+            {/* Action Row 1: Diagnostics (Simulated) */}
+            <div className="flex gap-3">
+              <button
+                className="flex-1 bg-surface-container-high text-on-surface py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container-highest transition-colors shadow-sm font-bold flex items-center justify-center gap-2"
+                onClick={() => alert('Triggering network diagnostics check... (Simulated Action)')}
+                disabled={isMutating}
+              >
+                <span className="material-symbols-outlined text-[18px]">network_ping</span>
+                Ping
+              </button>
+              <button
+                className="flex-1 bg-surface-container-high text-on-surface py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container-highest transition-colors shadow-sm font-bold flex items-center justify-center gap-2"
+                onClick={() => alert('Checking cloud update servers... (Simulated Action)')}
+                disabled={isMutating}
+              >
+                <span className="material-symbols-outlined text-[18px]">system_update</span>
+                Update
+              </button>
+            </div>
+
+            {/* Action Row 2: Management */}
+            <div className="flex gap-3">
+              <button
+                className="flex-1 bg-primary text-on-primary py-2.5 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm font-bold flex items-center justify-center gap-2"
+                onClick={onEditClick}
+                disabled={isMutating}
+              >
+                <span className="material-symbols-outlined text-[18px]">edit</span>
+                Edit
+              </button>
+
+              {device.isActive ? (
+                <button
+                  className="flex-1 bg-error text-on-error py-2.5 rounded-lg font-label-md text-label-md hover:bg-error-container transition-colors shadow-sm font-bold flex items-center justify-center gap-2"
+                  onClick={() => {
+                    if (window.confirm(`Are you sure you want to deactivate ${device.deviceName}?`)) {
+                      onDelete(device.id);
+                    }
+                  }}
+                  disabled={isMutating}
+                >
+                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                  Deactivate
+                </button>
+              ) : (
+                <button
+                  className="flex-1 bg-success-bg text-success-text border border-success/30 py-2.5 rounded-lg font-label-md text-label-md hover:bg-success/20 transition-colors shadow-sm font-bold flex items-center justify-center gap-2"
+                  onClick={() => {
+                    if (window.confirm(`Are you sure you want to restore ${device.deviceName}?`)) {
+                      onRestore(device.id);
+                    }
+                  }}
+                  disabled={isMutating}
+                >
+                  <span className="material-symbols-outlined text-[18px]">restore</span>
+                  Restore
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

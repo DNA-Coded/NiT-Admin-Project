@@ -39,12 +39,12 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onSelect }) => {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-surface-container-high rounded flex items-center justify-center text-primary shrink-0">
             <span className="material-symbols-outlined text-[24px]">
-              {device.deviceType === 'FACE' ? 'face' : 'fingerprint'}
+              {device.deviceCategory === 'FACE' ? 'face' : 'fingerprint'}
             </span>
           </div>
           <div className="overflow-hidden">
             <h4 className="font-label-md text-label-md text-primary font-bold truncate leading-tight">
-              {device.name}
+              {device.deviceName}
             </h4>
             <p className="text-[11px] text-outline truncate leading-none mt-0.5">ID: {device.id}</p>
           </div>
@@ -73,11 +73,11 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onSelect }) => {
         </div>
         <div className="flex justify-between">
           <span className="text-outline">Assigned Dept</span>
-          <span className="font-medium truncate max-w-[150px]">{device.department}</span>
+          <span className="font-medium truncate max-w-[150px]">{device.assignedDepartment}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-outline">Type</span>
-          <span className="font-bold">{device.deviceType}</span>
+          <span className="text-outline">Category</span>
+          <span className="font-bold">{device.deviceCategory}</span>
         </div>
       </div>
 

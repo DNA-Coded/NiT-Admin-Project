@@ -38,7 +38,7 @@ export const CampusDeviceLayout: React.FC<CampusDeviceLayoutProps> = ({ devices,
                 >
                   <div className="overflow-hidden pr-2">
                     <p className="font-label-sm text-[12px] text-on-surface font-bold truncate leading-tight">
-                      {item.name}
+                      {item.deviceName}
                     </p>
                     <p className="text-[10px] text-outline truncate leading-none mt-0.5">{item.room}</p>
                   </div>

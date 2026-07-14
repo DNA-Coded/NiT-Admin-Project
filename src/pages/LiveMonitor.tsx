@@ -41,6 +41,8 @@ export default function LiveMonitor() {
       const id = idsPool[Math.floor(Math.random() * idsPool.length)];
       const dept = deptsPool[Math.floor(Math.random() * deptsPool.length)];
       const device = devicesPool[Math.floor(Math.random() * devicesPool.length)];
+      const deviceName = device.name;
+      const deviceLocation = device.location;
       const actionType: 'Check In' | 'Check Out' =
         Math.random() > 0.35 ? 'Check In' : 'Check Out';
       const statusVal = statusesPool[Math.floor(Math.random() * statusesPool.length)];
@@ -51,8 +53,8 @@ export default function LiveMonitor() {
         employeeName: name,
         employeeId: id,
         department: dept,
-        deviceName: device.name,
-        deviceLocation: device.location,
+        deviceName: deviceName,
+        deviceLocation: deviceLocation,
         eventType: actionType,
         status: statusVal,
         isNew: true,
@@ -97,7 +99,7 @@ export default function LiveMonitor() {
       // 3. Update device events count
       setDevices((prevDevices) =>
         prevDevices.map((d) => {
-          if (d.name === device.name) {
+          if (d.deviceName === deviceName) {
             return {
               ...d,
               lastPing: 'Just now',

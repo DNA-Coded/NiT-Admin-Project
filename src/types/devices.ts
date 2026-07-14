@@ -1,21 +1,43 @@
-export type DeviceType = 'FINGERPRINT' | 'FACE' | 'HYBRID';
-export type DeviceHealthStatus = 'HEALTHY' | 'WARNING' | 'CRITICAL';
+export type DeviceCategory = 'FINGERPRINT' | 'FACE' | 'HYBRID' | 'RFID';
+export type DeviceHealthStatus = 'HEALTHY' | 'WARNING' | 'CRITICAL' | 'OFFLINE';
 
 export interface Device {
   id: string;
-  name: string;
+  deviceCode: string;
+  deviceName: string;
+  deviceCategory: DeviceCategory;
+  supportedVerificationMethods: string[];
+  manufacturer: string;
+  model: string;
+  serialNumber: string;
+  firmwareVersion: string;
+  ipAddress: string;
+  macAddress: string;
+  port: number;
+  campus: string;
   building: string;
   floor: string;
   room: string;
-  department: string;
-  deviceType: DeviceType;
+  locationDescription: string;
+  assignedDepartment: string;
+  connectionMode: string;
+  heartbeatInterval: number;
+  isAttendanceEnabled: boolean;
+  isDefaultDevice: boolean;
   status: 'ONLINE' | 'OFFLINE' | 'ERROR';
-  lastSync: string;
-  firmwareVersion: string;
-  ipAddress: string;
-  totalEventsToday: number;
   healthStatus: DeviceHealthStatus;
-  serialNumber: string;
+  failureCount: number;
+  uptime: number;
+  downtime: number;
+  lastHealthCheck: string;
+  lastSeen: string;
+  lastSync: string;
+  lastHeartbeat: string;
+  lastError: string;
+  isActive: boolean;
+  
+  // Frontend Specific mappings / Fallbacks
+  totalEventsToday: number;
   installationDate: string;
   lastPing: string;
 }

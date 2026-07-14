@@ -1,4 +1,4 @@
-import type { Device, DeviceSummary, DeviceActivity } from '@/types/devices';
+import type { DeviceSummary, DeviceActivity } from '@/types/devices';
 
 export const mockDeviceSummary: DeviceSummary = {
   totalDevices: 24,
@@ -9,15 +9,15 @@ export const mockDeviceSummary: DeviceSummary = {
   avgSyncDelaySecs: 14,
 };
 
-export const mockDevices: Device[] = [
+export const mockDevices: any[] = [
   {
     id: 'DEV-001',
-    name: 'ZKTeco-MG-01',
+    deviceName: 'ZKTeco-MG-01',
     building: 'Security Block',
     floor: 'Ground Floor',
     room: 'Main Entry Left',
-    department: 'All Departments',
-    deviceType: 'FINGERPRINT',
+    assignedDepartment: 'All Departments',
+    deviceCategory: 'FINGERPRINT',
     status: 'ONLINE',
     lastSync: '2 mins ago',
     firmwareVersion: 'v2.4.12',
@@ -30,12 +30,12 @@ export const mockDevices: Device[] = [
   },
   {
     id: 'DEV-002',
-    name: 'HIK-SB-03',
+    deviceName: 'HIK-SB-03',
     building: 'Science Block',
     floor: 'Ground Floor',
     room: 'East Block Entrance',
-    department: 'Science Dept',
-    deviceType: 'FACE',
+    assignedDepartment: 'Science Dept',
+    deviceCategory: 'FACE',
     status: 'ONLINE',
     lastSync: '14 mins ago',
     firmwareVersion: 'v1.8.3',
@@ -48,12 +48,12 @@ export const mockDevices: Device[] = [
   },
   {
     id: 'DEV-003',
-    name: 'ZKTeco-LB-01',
+    deviceName: 'ZKTeco-LB-01',
     building: 'Central Library',
     floor: 'Ground Floor',
     room: 'Main Library Door',
-    department: 'Library Services',
-    deviceType: 'HYBRID',
+    assignedDepartment: 'Library Services',
+    deviceCategory: 'HYBRID',
     status: 'OFFLINE',
     lastSync: '5 hours ago',
     firmwareVersion: 'v2.4.10',
@@ -66,12 +66,12 @@ export const mockDevices: Device[] = [
   },
   {
     id: 'DEV-004',
-    name: 'HIK-AD-02',
+    deviceName: 'HIK-AD-02',
     building: 'Administrative Block',
     floor: '1st Floor',
     room: 'Registry Gate Front',
-    department: 'Administration',
-    deviceType: 'FACE',
+    assignedDepartment: 'Administration',
+    deviceCategory: 'FACE',
     status: 'ONLINE',
     lastSync: '1 min ago',
     firmwareVersion: 'v1.8.3',
@@ -84,12 +84,12 @@ export const mockDevices: Device[] = [
   },
   {
     id: 'DEV-005',
-    name: 'ZKTeco-CS-02',
+    deviceName: 'ZKTeco-CS-02',
     building: 'Computer Science block',
     floor: '2nd Floor',
     room: 'Lab 4 Entrance',
-    department: 'Computer Science',
-    deviceType: 'FINGERPRINT',
+    assignedDepartment: 'Computer Science',
+    deviceCategory: 'FINGERPRINT',
     status: 'ONLINE',
     lastSync: 'Just now',
     firmwareVersion: 'v2.4.12',
@@ -102,12 +102,12 @@ export const mockDevices: Device[] = [
   },
   {
     id: 'DEV-006',
-    name: 'HIK-AR-01',
+    deviceName: 'HIK-AR-01',
     building: 'Arts block',
     floor: 'Ground Floor',
     room: 'Arts Side Entrance',
-    department: 'Arts Dept',
-    deviceType: 'FACE',
+    assignedDepartment: 'Arts Dept',
+    deviceCategory: 'FACE',
     status: 'ONLINE',
     lastSync: '5 mins ago',
     firmwareVersion: 'v1.8.1',
