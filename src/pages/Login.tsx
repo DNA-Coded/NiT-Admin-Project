@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/hooks/useAuth';
+import { authService } from '@/features/auth/services/auth.service';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -10,30 +11,38 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation() as any;
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Minimal mocked login flow: replace with real auth call as needed
-    setTimeout(() => {
-      const superAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL;
-      const superAdminPassword = import.meta.env.VITE_SUPER_ADMIN_PASSWORD;
-
-      if (username !== superAdminEmail || password !== superAdminPassword) {
-        setError('Invalid credentials. Please use the seeder credentials.');
-        setLoading(false);
-        return;
+    try {
+      const response = await authService.login({ email: username, password });
+      if (response.data && response.data.token && response.data.admin) {
+        login(response.data.token, response.data.admin);
+        navigate(from, { replace: true });
+      } else {
+        setError('Unexpected response from server.');
       }
-
-      login();
+    } catch (err: any) {
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('An error occurred during login. Please try again.');
+      }
+    } finally {
       setLoading(false);
-      navigate(from, { replace: true });
-    }, 600);
+    }
   };
 
   return (

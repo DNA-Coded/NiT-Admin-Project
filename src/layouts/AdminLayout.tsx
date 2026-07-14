@@ -2,15 +2,22 @@ import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { NAVIGATION_ITEMS, ROUTES } from '@/constants';
 import { useAuth } from '@/hooks/useAuth';
+import { authService } from '@/features/auth/services/auth.service';
 
 export function AdminLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate(ROUTES.LOGIN, { replace: true });
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch (e) {
+      console.error('Logout failed:', e);
+    } finally {
+      logout();
+      navigate(ROUTES.LOGIN, { replace: true });
+    }
   };
 
   return (
