@@ -1,11 +1,5 @@
-import { useState, useEffect } from 'react';
-import {
-  mockKPIMetrics,
-  mockMonthlyAttendanceTrend,
-  mockLateArrivalsByDept,
-  mockReportItems,
-} from '@/mocks/reports';
-import type { ReportItem, ReportFilterState } from '@/types/reports';
+import { useState } from 'react';
+import type { ReportItem } from '@/types/reports';
 import type { ViewState } from '@/components/shared/StatePlaceholder';
 import { ReportsSummaryCards } from '@/features/reports/components/ReportsSummaryCards';
 import { ReportsFilterBar } from '@/features/reports/components/ReportsFilterBar';
@@ -14,68 +8,45 @@ import { DepartmentComparisonChart } from '@/features/reports/components/Departm
 import { QuickReportCard } from '@/features/reports/components/QuickReportCard';
 import { ReportsTable } from '@/features/reports/components/ReportsTable';
 import { ReportDrawer } from '@/features/reports/components/ReportDrawer';
-
-const initialFilters: ReportFilterState = {
-  dateRange: '',
-  department: '',
-  employeeType: '',
-  status: '',
-  shift: '',
-  device: '',
-  reportType: '',
-  search: '',
-};
+import { useReports } from '@/features/reports/hooks/useReports';
 
 export default function Reports() {
-  const [filters, setFilters] = useState<ReportFilterState>(initialFilters);
-  const [viewState, setViewState] = useState<ViewState>('loading');
+  const {
+    filters,
+    handleFilterChange,
+    resetFilters,
+    reportsHistory,
+    kpis,
+    trendData,
+    loading,
+    error,
+    page,
+    setPage,
+    meta,
+    generateQuickReport,
+  } = useReports();
+
   const [selectedReport, setSelectedReport] = useState<ReportItem | null>(null);
 
   // Extract unique filters options dynamically
   const uniqueShifts = ['Regular Shift (09:00 AM - 05:00 PM)', 'Morning Shift (08:30 AM - 04:30 PM)'];
   const uniqueDevices = ['Main Gate Biometric', 'CS Block Face Rec', 'Arts Faculty West'];
-  const reportTypes = ['Daily Attendance', 'Monthly Attendance', 'Department Summary', 'Device Health', 'Payroll Attendance Summary'];
+  const reportTypes = ['Attendance Report', 'Faculty Summary', 'Device Health', 'Sync Analytics'];
 
-  // Simulate network load when filters change
-  useEffect(() => {
-    setViewState('loading');
-    const timer = setTimeout(() => {
-      setViewState('success');
-    }, 450);
-    return () => clearTimeout(timer);
-  }, [filters]);
+  const currentViewState: ViewState = loading && reportsHistory.length === 0
+    ? 'loading'
+    : error
+      ? 'error'
+      : reportsHistory.length === 0
+        ? 'empty'
+        : 'success';
 
-  const handleFilterChange = (key: keyof ReportFilterState, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
-
-  const handleReset = () => {
-    setFilters(initialFilters);
-  };
-
-  // Filter logs dynamically
-  const filteredReports = mockReportItems.filter((rep) => {
-    const matchesSearch =
-      filters.search === '' ||
-      rep.name.toLowerCase().includes(filters.search.toLowerCase());
-
-    const matchesType =
-      filters.reportType === '' || rep.type === filters.reportType;
-
-    const matchesRange =
-      filters.dateRange === '' || rep.dateRange.includes(filters.dateRange) || filters.dateRange === 'Last 30 Days'; // mock pass-through
-
-    return matchesSearch && matchesType && matchesRange;
-  });
-
-  const currentViewState =
-    viewState === 'success' && filteredReports.length === 0 ? 'empty' : viewState;
-
-  const handleQuickReportClick = (title: string) => {
-    alert(`Generating quick report: ${title}... (Simulated Action)`);
+  const handleQuickReportClick = async (title: string) => {
+    try {
+      await generateQuickReport(title);
+    } catch (err) {
+      // Error is handled in the hook, maybe display a toast if implemented
+    }
   };
 
   return (
@@ -91,15 +62,20 @@ export default function Reports() {
         <button
           aria-label="Generate new report"
           className="bg-primary text-on-primary font-label-md text-label-md px-5 py-2.5 rounded-lg flex items-center gap-2 hover:bg-primary-container transition-colors shadow-sm self-start md:self-auto shrink-0"
-          onClick={() => handleQuickReportClick('Custom Summary')}
+          onClick={() => handleQuickReportClick('Daily Attendance')}
+          disabled={loading}
         >
-          <span className="material-symbols-outlined text-[20px]">add_chart</span>
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <span className="material-symbols-outlined text-[20px]">add_chart</span>
+          )}
           Generate Report
         </button>
       </div>
 
       {/* KPI Cards Bento Grid */}
-      <ReportsSummaryCards metrics={mockKPIMetrics} />
+      {kpis && <ReportsSummaryCards metrics={kpis} />}
 
       {/* Filter Section */}
       <ReportsFilterBar
@@ -108,16 +84,28 @@ export default function Reports() {
         reportTypes={reportTypes}
         shifts={uniqueShifts}
         onFilterChange={handleFilterChange}
-        onReset={handleReset}
+        onReset={resetFilters}
       />
 
       {/* Analytics Visual Charts Grids */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
-          <AttendanceTrendChart data={mockMonthlyAttendanceTrend} />
+          {trendData.length > 0 ? (
+            <AttendanceTrendChart data={trendData} />
+          ) : (
+            <div className="h-full min-h-[300px] flex items-center justify-center bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm text-on-surface-variant font-body-sm">
+              No trend data available for the selected period
+            </div>
+          )}
         </div>
         <div>
-          <DepartmentComparisonChart data={mockLateArrivalsByDept} />
+          {/* Mocking Department Comparison Chart because we lack a dedicated backend endpoint for it */}
+          <DepartmentComparisonChart data={[
+            { label: 'Computer Science', value: 45 },
+            { label: 'Life Sciences', value: 30 },
+            { label: 'Administrative', value: 65 },
+            { label: 'Library Services', value: 15 },
+          ]} />
         </div>
       </div>
 
@@ -167,9 +155,14 @@ export default function Reports() {
       {/* Generated Reports Table */}
       <div className="flex-1">
         <ReportsTable
-          reports={filteredReports}
+          reports={reportsHistory}
           viewState={currentViewState}
           onSelect={setSelectedReport}
+          currentPage={page}
+          totalPages={meta.totalPages}
+          totalEntries={meta.total}
+          limit={meta.limit}
+          onPageChange={setPage}
         />
       </div>
 

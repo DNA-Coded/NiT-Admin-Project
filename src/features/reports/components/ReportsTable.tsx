@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { ReportItem } from '@/types/reports';
 import { StatePlaceholder, type ViewState } from '@/components/shared/StatePlaceholder';
 
@@ -6,21 +6,29 @@ interface ReportsTableProps {
   reports: ReportItem[];
   viewState: ViewState;
   onSelect: (report: ReportItem) => void;
+  currentPage: number;
+  totalPages: number;
+  totalEntries: number;
+  limit: number;
+  onPageChange: (page: number) => void;
 }
 
-export const ReportsTable: React.FC<ReportsTableProps> = ({ reports, viewState, onSelect }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  const totalEntries = reports.length;
-  const totalPages = Math.ceil(totalEntries / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalEntries);
-  const currentItems = reports.slice(startIndex, endIndex);
+export const ReportsTable: React.FC<ReportsTableProps> = ({
+  reports,
+  viewState,
+  onSelect,
+  currentPage,
+  totalPages,
+  totalEntries,
+  limit,
+  onPageChange
+}) => {
+  const startIndex = (currentPage - 1) * limit;
+  const endIndex = Math.min(startIndex + limit, totalEntries);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      onPageChange(page);
     }
   };
 
@@ -65,7 +73,7 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ reports, viewState, 
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant font-body-sm text-body-sm text-on-surface">
-              {currentItems.map((rep) => (
+              {reports.map((rep) => (
                 <tr
                   key={rep.id}
                   className="hover:bg-surface-container-low transition-colors cursor-pointer"
@@ -103,7 +111,7 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ reports, viewState, 
         {totalEntries > 0 && (
           <div className="px-6 py-4 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-between flex-wrap gap-2">
             <span className="text-body-sm text-on-surface-variant">
-              Showing {startIndex + 1}-{endIndex} of {totalEntries} records
+              Showing {totalEntries === 0 ? 0 : startIndex + 1}-{endIndex} of {totalEntries} records
             </span>
             <div className="flex gap-2">
               <button
@@ -117,7 +125,7 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ reports, viewState, 
               <button
                 aria-label="Next page"
                 className="p-1.5 border border-outline-variant rounded-lg hover:bg-surface-container-low disabled:opacity-50 transition-all"
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || totalPages === 0}
                 onClick={() => handlePageChange(currentPage + 1)}
               >
                 <span className="material-symbols-outlined text-[18px]">chevron_right</span>
