@@ -4,30 +4,47 @@ interface DepartmentDrawerProps {
   department: Department | null;
   onClose: () => void;
   onEditClick: () => void;
+  onDelete?: (id: string) => Promise<void>;
+  onRestore?: (id: string) => Promise<void>;
+  isMutating?: boolean;
 }
 
-export function DepartmentDrawer({ department, onClose, onEditClick }: DepartmentDrawerProps) {
+export function DepartmentDrawer({ department, onClose, onEditClick, onDelete, onRestore, isMutating }: DepartmentDrawerProps) {
   if (!department) return null;
+
+  const handleDelete = async () => {
+    if (onDelete) await onDelete(department.id);
+  };
+
+  const handleRestore = async () => {
+    if (onRestore) await onRestore(department.id);
+  };
 
   return (
     <>
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-300"
-        onClick={onClose}
+        onClick={() => !isMutating && onClose()}
       />
 
       {/* Drawer Body */}
       <div className="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-surface-container-lowest border-l border-outline-variant shadow-2xl z-50 flex flex-col transition-transform duration-300 animate-in slide-in-from-right">
         {/* Header */}
         <div className="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-          <div>
-            <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">Department Details</span>
+          <div className="flex flex-col gap-1">
+            <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider flex items-center gap-2">
+              Department Details
+              <span className={`px-2 py-0.5 rounded text-xs font-bold ${department.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {department.isActive ? 'ACTIVE' : 'INACTIVE'}
+              </span>
+            </span>
             <h2 className="font-headline-sm text-headline-sm font-bold text-primary mt-1">{department.name}</h2>
           </div>
           <button 
-            className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors"
+            className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors disabled:opacity-50"
             onClick={onClose}
+            disabled={isMutating}
           >
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -104,32 +121,53 @@ export function DepartmentDrawer({ department, onClose, onEditClick }: Departmen
             </div>
           </div>
 
-          {/* Future Backend Integration Warning */}
-          <div className="bg-surface-container-high border border-outline-variant rounded-lg p-4">
-            <span className="font-label-xs text-label-xs font-semibold text-on-surface flex items-center gap-1.5 mb-1">
-              <span className="material-symbols-outlined text-sm text-amber-600">info</span>
-              Future API Integration
-            </span>
-            <p className="font-body-xs text-body-xs text-on-surface-variant leading-relaxed">
-              When connected to the backend, administrators will be able to edit specific parameters, update department members directly, sync rules to hardware endpoints, and review custom attendance patterns.
-            </p>
-          </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-outline-variant bg-surface-container-low flex justify-end gap-3">
-          <button 
-            className="border border-outline hover:bg-surface-container-high text-primary font-label-md text-label-md py-2 px-4 rounded transition-colors"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-          <button 
-            className="bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-2 px-4 rounded transition-colors shadow-sm"
-            onClick={onEditClick}
-          >
-            Edit Department
-          </button>
+        <div className="p-6 border-t border-outline-variant bg-surface-container-low flex flex-col gap-3">
+          <div className="flex justify-between w-full gap-3">
+            {department.isActive ? (
+              <button 
+                className="border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-label-md text-label-md py-2 px-4 rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+                onClick={() => {
+                  if (confirm('Are you sure you want to deactivate this department?')) {
+                    handleDelete();
+                  }
+                }}
+                disabled={isMutating}
+              >
+                <span className="material-symbols-outlined text-sm">delete</span>
+                Deactivate
+              </button>
+            ) : (
+              <button 
+                className="border border-green-200 bg-green-50 hover:bg-green-100 text-green-700 font-label-md text-label-md py-2 px-4 rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+                onClick={handleRestore}
+                disabled={isMutating}
+              >
+                <span className="material-symbols-outlined text-sm">restore</span>
+                Restore
+              </button>
+            )}
+
+            <div className="flex gap-3 ml-auto">
+              <button 
+                className="border border-outline hover:bg-surface-container-high text-primary font-label-md text-label-md py-2 px-4 rounded transition-colors disabled:opacity-50"
+                onClick={onClose}
+                disabled={isMutating}
+              >
+                Close
+              </button>
+              <button 
+                className="bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-2 px-4 rounded transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+                onClick={onEditClick}
+                disabled={isMutating || !department.isActive}
+              >
+                <span className="material-symbols-outlined text-sm">edit</span>
+                Edit
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </>

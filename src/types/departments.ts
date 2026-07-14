@@ -9,6 +9,7 @@ export interface Department {
   description?: string;
   officeLocation?: string;
   budgetCode?: string;
+  isActive?: boolean;
 }
 
 export interface DepartmentFilter {

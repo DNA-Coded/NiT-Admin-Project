@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import type { Department } from '@/types/departments';
-import { mockDepartments } from '@/mocks/departments';
+import { useState, useEffect } from 'react';
+import { useDepartments } from '@/features/departments/hooks/useDepartments';
 import { DepartmentSummaryCards } from '@/features/departments/components/DepartmentSummaryCards';
 import { DepartmentTable } from '@/features/departments/components/DepartmentTable';
 import { DepartmentDrawer } from '@/features/departments/components/DepartmentDrawer';
@@ -9,54 +8,33 @@ import { EditDepartmentDialog } from '@/features/departments/components/EditDepa
 import { StatePlaceholder } from '@/components/shared/StatePlaceholder';
 
 export default function Departments() {
-  const [departments, setDepartments] = useState<Department[]>(mockDepartments);
-  const [selectedDept, setSelectedDept] = useState<Department | null>(null);
+  const {
+    departments,
+    meta,
+    loading,
+    error,
+    searchQuery,
+    setSearchQuery,
+    setPage,
+    isMutating,
+    createDepartment,
+    updateDepartment,
+    removeDepartment,
+    recoverDepartment,
+    refetch,
+  } = useDepartments();
+
+  const [selectedDeptId, setSelectedDeptId] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  // States to satisfy mandatory UI requirements
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // Filter departments based on search query
-  const filteredDepartments = departments.filter((dept) =>
-    dept.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    dept.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    dept.hodName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Initial fetch
+  useEffect(() => {
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleAddDepartment = (newDept: Omit<Department, 'id' | 'staffCount' | 'deviceCount' | 'attendanceRate'>) => {
-    const created: Department = {
-      ...newDept,
-      id: `dept-${Date.now()}`,
-      staffCount: 0,
-      deviceCount: 0,
-      attendanceRate: 100.0,
-    };
-    setDepartments((prev) => [created, ...prev]);
-  };
-
-  const handleEditDepartment = (id: string, updatedDept: Partial<Department>) => {
-    setDepartments((prev) => 
-      prev.map(dept => dept.id === id ? { ...dept, ...updatedDept } : dept)
-    );
-    // Also update selectedDept if it's currently selected
-    if (selectedDept?.id === id) {
-      setSelectedDept((prev) => prev ? { ...prev, ...updatedDept } : null);
-    }
-  };
-
-  const triggerError = () => {
-    setError('Failed to fetch departments. Please try again.');
-  };
-
-  const triggerLoading = () => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1200);
-  };
-
-  // No early return for loading and error, we handle them inline below
+  const selectedDept = departments.find(d => d.id === selectedDeptId) || null;
 
   return (
     <div className="space-y-6">
@@ -70,14 +48,9 @@ export default function Departments() {
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <button 
-            onClick={triggerError}
-            className="px-4 py-2 border border-outline hover:bg-surface-container-high text-primary font-label-md text-label-md rounded transition-colors"
-          >
-            Simulate Error
-          </button>
-          <button 
-            onClick={triggerLoading}
-            className="px-4 py-2 border border-outline hover:bg-surface-container-high text-primary font-label-md text-label-md rounded transition-colors"
+            onClick={() => refetch()}
+            disabled={loading || isMutating}
+            className="px-4 py-2 border border-outline hover:bg-surface-container-high text-primary font-label-md text-label-md rounded transition-colors disabled:opacity-50"
           >
             Reload Grid
           </button>
@@ -103,59 +76,93 @@ export default function Departments() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-outline-variant rounded bg-surface-container-lowest focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-body-sm text-body-sm transition-all"
-            placeholder="Search departments by name, code or HOD..."
+            placeholder="Search departments by name or code..."
           />
         </div>
         <div className="font-label-sm text-label-sm text-on-surface-variant font-medium">
-          Showing {filteredDepartments.length} of {departments.length} departments
+          {meta ? `Showing ${departments.length} of ${meta.total} departments` : `Showing ${departments.length} departments`}
         </div>
       </div>
 
       {/* Main Table view */}
-      {loading ? (
+      {loading && departments.length === 0 ? (
         <div className="py-20 flex justify-center items-center bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm">
           <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
         </div>
-      ) : error ? (
+      ) : error && departments.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm">
           <StatePlaceholder
             state="error"
             errorMessage={error}
-            onRetry={() => setError(null)}
+            onRetry={() => refetch()}
           />
         </div>
-      ) : filteredDepartments.length === 0 ? (
+      ) : departments.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm">
           <StatePlaceholder 
             state="empty"
-            emptyMessage="No departments match your query. Try modifying your search."
+            emptyMessage={searchQuery ? "No departments match your query. Try modifying your search." : "No departments found."}
           />
-          <button
-            onClick={() => setSearchQuery('')}
-            className="mt-2 px-4 py-2 border border-outline hover:bg-surface-container-high text-primary font-label-md text-label-md rounded transition-colors"
-          >
-            Clear Filter
-          </button>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="mt-2 px-4 py-2 border border-outline hover:bg-surface-container-high text-primary font-label-md text-label-md rounded transition-colors"
+            >
+              Clear Filter
+            </button>
+          )}
         </div>
       ) : (
-        <DepartmentTable 
-          departments={filteredDepartments} 
-          onSelectDepartment={(dept) => setSelectedDept(dept)}
-        />
+        <div className="space-y-4">
+          <DepartmentTable 
+            departments={departments} 
+            onSelectDepartment={(dept) => setSelectedDeptId(dept.id)}
+          />
+
+          {/* Pagination Controls */}
+          {meta && meta.totalPages > 1 && (
+            <div className="flex justify-between items-center bg-surface-container-lowest p-4 border border-outline-variant rounded-xl">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={!meta.hasPrevPage || loading}
+                className="px-4 py-2 border border-outline hover:bg-surface-container-high text-primary font-label-md text-label-md rounded transition-colors disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="font-body-sm text-body-sm text-on-surface-variant">
+                Page {meta.page} of {meta.totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => p + 1)}
+                disabled={!meta.hasNextPage || loading}
+                className="px-4 py-2 border border-outline hover:bg-surface-container-high text-primary font-label-md text-label-md rounded transition-colors disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Detailed Side Panel */}
       <DepartmentDrawer 
         department={selectedDept}
-        onClose={() => setSelectedDept(null)}
-        onEditClick={() => { setIsEditOpen(true); }}
+        onClose={() => setSelectedDeptId(null)}
+        onEditClick={() => setIsEditOpen(true)}
+        onDelete={async (id) => {
+          await removeDepartment(id);
+        }}
+        onRestore={async (id) => {
+          await recoverDepartment(id);
+        }}
+        isMutating={isMutating}
       />
 
       {/* Add Dialog Modal */}
       <AddDepartmentDialog 
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
-        onAdd={handleAddDepartment}
+        onAdd={createDepartment}
       />
 
       {/* Edit Dialog Modal */}
@@ -163,9 +170,8 @@ export default function Departments() {
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         department={selectedDept}
-        onEdit={handleEditDepartment}
+        onEdit={updateDepartment}
       />
     </div>
   );
 }
-
