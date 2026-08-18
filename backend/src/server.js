@@ -1,14 +1,34 @@
+import http from 'http';
 import './config/env.config.js';
 import app from './app.js';
 import connectDB from './config/db.js';
 import logger from './config/logger.config.js';
 import serverConfig from './config/server.config.js';
+import { initSocket } from './sockets/socket.js';
 
 // Connect to MongoDB Database
 connectDB();
 
-// ─── Start HTTP Server ────────────────────────────────────────────────────────
-const server = app.listen(serverConfig.port, () => {
+// ─── Create HTTP Server & Initialize Socket.IO ───────────────────────────────
+const server = http.createServer(app);
+
+// Initialize Socket.IO server instance
+const io = initSocket(server);
+
+// Attach `io` to Express app so controllers can access it via `req.app.get('io')`
+app.set('io', io);
+
+// Handle Socket connections
+io.on('connection', (socket) => {
+  logger.info(`⚡ Socket client connected: ${socket.id}`);
+
+  socket.on('disconnect', () => {
+    logger.info(`🔌 Socket client disconnected: ${socket.id}`);
+  });
+});
+
+// ─── Start Server ────────────────────────────────────────────────────────────
+server.listen(serverConfig.port, () => {
   logger.info(`Server running in ${serverConfig.nodeEnv} mode on port ${serverConfig.port}`);
   logger.info(`API available at: http://localhost:${serverConfig.port}/api/${serverConfig.apiVersion}`);
 });

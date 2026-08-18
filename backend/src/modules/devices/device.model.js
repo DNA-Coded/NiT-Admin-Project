@@ -91,7 +91,15 @@ const deviceSchema = new Schema(
       type:    String,
       trim:    true,
       default: null,
-      match:   [/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/, 'Please provide a valid MAC address.'],
+      validate: {
+        validator: function (v) {
+          // Pass validation if value is null, undefined, or empty string
+          if (!v || v.trim() === '') return true;
+          // Otherwise check regex
+          return /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/.test(v);
+        },
+        message: 'Please provide a valid MAC address.'
+      }
     },
 
     port: {
@@ -134,11 +142,11 @@ const deviceSchema = new Schema(
     },
 
     // ── Operational & State ──────────────────────────────────────────────────
-    assignedDepartment: {
-      type:    Schema.Types.ObjectId,
-      ref:     'Department',
-      default: null,
-    },
+    // assignedDepartment: {
+    //   type:    Schema.Types.ObjectId,
+    //   ref:     'Department',
+    //   default: null,
+    // },
 
     connectionMode: {
       type: String,
@@ -272,14 +280,14 @@ deviceSchema.index({ createdAt: -1 });
 
 // ─── Instance Methods ─────────────────────────────────────────────────────────
 deviceSchema.methods.toPublicJSON = function () {
-  const dept = this.assignedDepartment;
-  const assignedDepartmentField =
-    dept && typeof dept === 'object' && dept._id
-      ? { id: dept._id, name: dept.name, code: dept.code }
-      : dept ?? null;
+const dept = this.assignedDepartment;
+// If dept exists and has a 'name' property, we know it was populated
+// const assignedDepartmentField = dept 
+//   ? (dept.name ? { id: dept._id, name: dept.name, code: dept.code } : dept.toString()) 
+//   : null;
 
   return {
-    id:                  this._id,
+    id:                  this._id.toString(),
     deviceCode:          this.deviceCode,
     deviceName:          this.deviceName,
     deviceCategory:      this.deviceCategory,
@@ -296,7 +304,7 @@ deviceSchema.methods.toPublicJSON = function () {
     floor:               this.floor,
     room:                this.room,
     locationDescription: this.locationDescription,
-    assignedDepartment:  assignedDepartmentField,
+    // assignedDepartment:  assignedDepartmentField,
     connectionMode:      this.connectionMode,
     heartbeatInterval:   this.heartbeatInterval,
     isAttendanceEnabled: this.isAttendanceEnabled,

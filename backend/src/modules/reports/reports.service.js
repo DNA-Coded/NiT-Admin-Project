@@ -1,4 +1,4 @@
-import Faculty from '../faculty/faculty.model.js';
+import Employee from '../employee/employee.model.js';
 
 import Device from '../devices/device.model.js';
 import Attendance from '../attendance/attendance.model.js';
@@ -7,7 +7,7 @@ import {
   DEVICE_STATUS, 
   DEVICE_HEALTH_STATUS, 
   ATTENDANCE_RECORD_STATUS,
-  FACULTY_STATUS
+  EMPLOYEE_STATUS
 } from '../../constants/index.js';
 import { REPORT_PAGINATION } from './reports.constants.js';
 
@@ -20,17 +20,17 @@ const resolvePersonIds = async (filters) => {
   
   if (!personFiltersPresent) return null;
 
-  const facultyQuery = { isActive: true };
-  let checkFaculty = false;
+  const employeeQuery = { isActive: true };
+  let checkEmployee = false;
 
   if (department) {
-    facultyQuery.department = department;
-    checkFaculty = true;
+    employeeQuery.department = department;
+    checkEmployee = true;
   }
 
   const ids = [];
-  if (checkFaculty) {
-    const facs = await Faculty.find(facultyQuery).select('_id').lean();
+  if (checkEmployee) {
+    const facs = await Employee.find(employeeQuery).select('_id').lean();
     ids.push(...facs.map(f => f._id));
   }
 
@@ -88,7 +88,7 @@ export const getAttendanceReport = async (filters) => {
   };
 };
 
-export const getFacultyReport = async (filters) => {
+export const getEmployeeReport = async (filters) => {
   const page = parseInt(filters.page, 10) || REPORT_PAGINATION.DEFAULT_PAGE;
   const limit = parseInt(filters.limit, 10) || REPORT_PAGINATION.DEFAULT_LIMIT;
   const skip = (page - 1) * limit;
@@ -98,11 +98,11 @@ export const getFacultyReport = async (filters) => {
   if (filters.designation) query.designation = filters.designation;
   if (filters.status) query.status = filters.status;
 
-  const [totalFaculty, active, inactive, data] = await Promise.all([
-    Faculty.countDocuments(query),
-    Faculty.countDocuments({ ...query, status: FACULTY_STATUS.ACTIVE }),
-    Faculty.countDocuments({ ...query, status: { $ne: FACULTY_STATUS.ACTIVE } }),
-    Faculty.find(query)
+  const [totalEmployee, active, inactive, data] = await Promise.all([
+    Employee.countDocuments(query),
+    Employee.countDocuments({ ...query, status: EMPLOYEE_STATUS.ACTIVE }),
+    Employee.countDocuments({ ...query, status: { $ne: EMPLOYEE_STATUS.ACTIVE } }),
+    Employee.find(query)
       .sort({ [filters.sortBy || 'createdAt']: filters.sortOrder === 'asc' ? 1 : -1 })
       .skip(skip)
       .limit(limit)
@@ -112,7 +112,7 @@ export const getFacultyReport = async (filters) => {
 
   return {
     filters,
-    summary: { totalFaculty, active, inactive },
+    summary: { totalEmployee, active, inactive },
     data: data.map(doc => ({
       id: doc._id,
       firstName: doc.firstName,

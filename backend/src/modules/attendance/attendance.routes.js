@@ -9,6 +9,8 @@ import {
 } from './attendance.validator.js';
 import {
   getAllAttendance,
+  getAttendanceSummaryHandler,
+  exportAttendanceCSVHandler,
   getAttendanceHandler,
   getAttendanceHistoryHandler,
   createAttendanceHandler,
@@ -24,17 +26,8 @@ const router = Router();
  * @swagger
  * /attendance:
  *   get:
- *     summary: List attendance records
+ *     summary: List daily aggregated attendance records
  *     tags: [Attendance]
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema: { type: integer, default: 1 }
- *     responses:
- *       200:
- *         description: A paginated list of attendance records
  */
 router.get(
   '/',
@@ -45,21 +38,36 @@ router.get(
 
 /**
  * @swagger
+ * /attendance/summary:
+ *   get:
+ *     summary: Get live attendance summary card metrics
+ *     tags: [Attendance]
+ */
+router.get(
+  '/summary',
+  authenticate,
+  getAttendanceSummaryHandler
+);
+
+/**
+ * @swagger
+ * /attendance/export:
+ *   get:
+ *     summary: Export attendance records as CSV
+ *     tags: [Attendance]
+ */
+router.get(
+  '/export',
+  authenticate,
+  exportAttendanceCSVHandler
+);
+
+/**
+ * @swagger
  * /attendance:
  *   post:
  *     summary: Create a new attendance record
  *     tags: [Attendance]
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Attendance'
- *     responses:
- *       201:
- *         description: Attendance record created successfully
  */
 router.post(
   '/',
@@ -74,16 +82,6 @@ router.post(
  *   get:
  *     summary: Get an attendance record by ID
  *     tags: [Attendance]
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200:
- *         description: Attendance record retrieved successfully
  */
 router.get(
   '/:id',
@@ -98,16 +96,6 @@ router.get(
  *   get:
  *     summary: Get attendance correction history
  *     tags: [Attendance]
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200:
- *         description: History retrieved successfully
  */
 router.get(
   '/:id/history',
@@ -122,22 +110,6 @@ router.get(
  *   put:
  *     summary: Update an attendance record
  *     tags: [Attendance]
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Attendance'
- *     responses:
- *       200:
- *         description: Attendance record updated successfully
  */
 router.put(
   '/:id',
@@ -153,16 +125,6 @@ router.put(
  *   delete:
  *     summary: Soft-delete an attendance record
  *     tags: [Attendance]
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200:
- *         description: Attendance record deactivated successfully
  */
 router.delete(
   '/:id',
@@ -177,16 +139,6 @@ router.delete(
  *   patch:
  *     summary: Restore a soft-deleted attendance record
  *     tags: [Attendance]
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200:
- *         description: Attendance record restored successfully
  */
 router.patch(
   '/:id/restore',
@@ -201,25 +153,6 @@ router.patch(
  *   patch:
  *     summary: Correct an attendance record manually
  *     tags: [Attendance]
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status: { type: string }
- *               remarks: { type: string }
- *     responses:
- *       200:
- *         description: Attendance record corrected successfully
  */
 router.patch(
   '/:id/correct',

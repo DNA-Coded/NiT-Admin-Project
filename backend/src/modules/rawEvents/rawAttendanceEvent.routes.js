@@ -1,11 +1,14 @@
+
 import { Router } from 'express';
 import { authenticate, authorize } from '../auth/auth.middleware.js';
 import { ROLES, PERMISSIONS } from '../../constants/index.js';
+import rateLimit from 'express-rate-limit';
 import {
   listEvents,
   getEventDetails,
   processEventManually,
-  processPendingEvents
+  processPendingEvents,
+  ingestEvent
 } from './rawAttendanceEvent.controller.js';
 import {
   validateListQuery,
@@ -13,6 +16,15 @@ import {
 } from './rawAttendanceEvent.validator.js';
 
 const router = Router();
+
+const ingestLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // Limit each IP/Device to 100 requests per minute
+  message: { error: 'Too many requests from this device, please try again later.' }
+});
+
+// Public / API Key endpoint for Biometric Machine to push data
+router.post('/ingest', ingestLimiter, ingestEvent);
 
 // Only Admins should manage the event pipeline
 router.use(authenticate);
@@ -34,3 +46,4 @@ router.get('/', validateListQuery, listEvents);
 router.get('/:id', validateEventId, getEventDetails);
 
 export default router;
+

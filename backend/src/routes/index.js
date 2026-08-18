@@ -14,7 +14,7 @@ import { Router } from 'express';
 import systemHealthRoutes from '../modules/health/health.routes.js';
 import authRoutes       from '../modules/auth/auth.routes.js';
 import departmentRoutes from '../modules/departments/departments.routes.js';
-import facultyRoutes    from '../modules/faculty/faculty.routes.js';
+import employeeRoutes    from '../modules/employee/employee.routes.js';
 
 import deviceRoutes     from '../modules/devices/device.routes.js';
 import attendanceRoutes from '../modules/attendance/attendance.routes.js';
@@ -35,7 +35,7 @@ const router = Router();
 router.use('/system-health', systemHealthRoutes);
 router.use('/auth',        authRoutes);
 router.use('/departments', departmentRoutes);
-router.use('/faculty',     facultyRoutes);
+router.use('/employee',     employeeRoutes);
 
 router.use('/devices',     deviceRoutes);
 router.use('/attendance',  attendanceRoutes);

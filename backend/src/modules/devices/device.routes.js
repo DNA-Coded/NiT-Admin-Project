@@ -15,9 +15,17 @@ import {
   updateDeviceStatusHandler,
   deleteDeviceHandler,
   restoreDeviceHandler,
+  createDeviceEventHandler,
 } from './device.controller.js';
 
 const router = Router();
+
+
+import { deviceHeartbeatHandler } from './device.controller.js';
+
+// Add this alongside your other routes
+router.post('/:id/heartbeat', deviceHeartbeatHandler);
+router.post('/:id/events', createDeviceEventHandler);
 
 /**
  * @swagger

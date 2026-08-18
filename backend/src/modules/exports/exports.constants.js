@@ -1,6 +1,6 @@
 export const EXPORT_REPORT_TYPES = {
   ATTENDANCE: 'attendance',
-  FACULTY: 'faculty',
+  EMPLOYEE: 'employee',
 
   DEVICES: 'devices',
   SYNCHRONIZATION: 'synchronization',

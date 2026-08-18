@@ -44,7 +44,7 @@ const schemas = {
       isActive: { type: 'boolean', example: true },
     },
   },
-  Faculty: {
+  Employee: {
     type: 'object',
     properties: {
       id: { type: 'string', example: '60d0fe4f5311236168a109ca' },
@@ -74,7 +74,7 @@ const schemas = {
     type: 'object',
     properties: {
       id: { type: 'string', example: '60d0fe4f5311236168a109ca' },
-      personType: { type: 'string', example: 'FACULTY' },
+      personType: { type: 'string', example: 'EMPLOYEE' },
       personId: { type: 'string', example: '60d0fe4f5311236168a109ca' },
       attendanceIdentity: { type: 'string', example: 'BIO-3322' },
       timestamp: { type: 'string', format: 'date-time' },
