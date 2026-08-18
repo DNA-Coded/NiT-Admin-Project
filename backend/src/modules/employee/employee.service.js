@@ -28,7 +28,9 @@ class EmployeeService {
 
     // Fuzzy text search across name, employee ID, identity, and email
     if (search && search.trim()) {
-      const searchRegex = new RegExp(search.trim(), 'i');
+      const trimmedSearch = search.trim();
+      const escapedSearch = trimmedSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(escapedSearch, 'i');
       filter.$or = [
         { firstName: searchRegex },
         { lastName: searchRegex },
