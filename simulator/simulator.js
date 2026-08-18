@@ -1,4 +1,5 @@
 // simulator.js
+const crypto = require('crypto');
 const BASE_URL = 'http://localhost:5000/api/v1/events/ingest';
 const PROVIDER = 'SIMULATOR';
 const DEVICE_CODE = 'DEV-LIB-001';
@@ -11,8 +12,8 @@ const mockEmployees = ['0017', '0089', '0197', '0402', '0112', '0170', '0244', '
 const employeeStates = {};
 
 function generateMockPayload() {
-  const isSuccess = Math.random() > 0.1;
-  const userId = mockEmployees[Math.floor(Math.random() * mockEmployees.length)];
+  const isSuccess = crypto.randomInt(10) > 0;
+  const userId = mockEmployees[crypto.randomInt(mockEmployees.length)];
 
   // Determine punch type: alternate between CHECK_IN and CHECK_OUT
   const currentState = employeeStates[userId] || 'CHECK_OUT';
