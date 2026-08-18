@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import _ from 'lodash';
 import Attendance from './attendance.model.js';
 import { buildUpdatePayload } from '../../utils/update.util.js';
 import Device from '../devices/device.model.js';
@@ -376,7 +377,8 @@ export const getDailyAttendanceRecords = async (query = {}, requestMeta = {}) =>
   }
 
   if (search && search.trim()) {
-    const searchRegex = new RegExp(search.trim(), 'i');
+    const safeSearch = _.escapeRegExp(search.trim());
+    const searchRegex = new RegExp(safeSearch, 'i');
     pipeline.push({
       $match: {
         $or: [
