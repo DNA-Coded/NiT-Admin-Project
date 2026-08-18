@@ -641,7 +641,7 @@ function generateLandscapePDFBuffer(headers, rows, title = 'Attendance Summary R
 
     const textOps = streamLines.map((line, lineIdx) => {
       const yPos = 550 - lineIdx * 17;
-      const cleanLine = line.replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+      const cleanLine = line.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
       return `1 0 0 1 30 ${yPos} Tm (${cleanLine}) Tj`;
     });
 
