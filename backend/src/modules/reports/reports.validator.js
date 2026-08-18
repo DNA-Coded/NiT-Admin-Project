@@ -21,10 +21,11 @@ const validateDateField = (value, fieldName) => {
 
 export const validateReportFilters = (req, res, next) => {
   const errors = [];
+  const filterSource = { ...(req.query || {}), ...(req.body || {}) };
   const {
     from, to, department, employee, device,
     page, limit
-  } = req.query;
+  } = filterSource;
 
   const fromErr = validateDateField(from, 'from');
   if (fromErr) errors.push({ field: 'from', message: fromErr });
