@@ -207,11 +207,32 @@ class EmployeeService {
       'attendanceIdentity',
     ];
 
+    const fieldTypeMap = {
+      employeeId: 'string',
+      name: 'string',
+      email: 'string',
+      phone: 'string',
+      department: 'string',
+      designation: 'string',
+      status: 'string',
+      isHOD: 'boolean',
+      attendanceIdentity: 'string',
+    };
+
     const safeUpdateData = {};
     for (const key of allowedUpdateFields) {
-      if (Object.prototype.hasOwnProperty.call(updateData, key)) {
-        if (key.startsWith('$') || key.includes('.')) continue;
-        safeUpdateData[key] = updateData[key];
+      if (!Object.prototype.hasOwnProperty.call(updateData, key)) continue;
+      if (key.startsWith('$') || key.includes('.')) continue;
+
+      const value = updateData[key];
+      if (value === null || Array.isArray(value)) continue;
+      if (typeof value === 'object') continue;
+
+      if (fieldTypeMap[key] === 'boolean') {
+        if (typeof value !== 'boolean') continue;
+        safeUpdateData[key] = value;
+      } else {
+        safeUpdateData[key] = String(value);
       }
     }
 
@@ -219,7 +240,7 @@ class EmployeeService {
       safeUpdateData.attendanceIdentity = String(safeUpdateData.attendanceIdentity).padStart(4, '0');
     }
 
-    const updatedEmployee = await Employee.findByIdAndUpdate(id, safeUpdateData, {
+    const updatedEmployee = await Employee.findByIdAndUpdate(id, { $set: safeUpdateData }, {
       new: true,
       runValidators: true,
     })
