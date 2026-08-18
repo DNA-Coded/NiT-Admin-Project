@@ -207,8 +207,11 @@ class RawAttendanceEventService {
     if (!payload || !provider || !deviceCode) {
       throw makeError('Payload, provider, and deviceCode are required for ingestion.', 400);
     }
+    if (typeof deviceCode !== 'string' || !deviceCode.trim()) {
+      throw makeError('deviceCode must be a non-empty string.', 400);
+    }
 
-    const device = await Device.findOne({ deviceCode, isActive: true }).lean();
+    const device = await Device.findOne({ deviceCode: { $eq: deviceCode }, isActive: true }).lean();
     if (!device) {
       throw makeError('Device not found or inactive.', 404);
     }
