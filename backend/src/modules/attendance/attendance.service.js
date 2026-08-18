@@ -486,15 +486,26 @@ export const getDailyAttendanceRecords = async (query = {}, requestMeta = {}) =>
  * Attendance Summary Dashboard Cards Data
  */
 export const getAttendanceSummary = async (dateStr) => {
-  let targetDate = dateStr;
+  let targetDate;
 
-  if (!targetDate) {
+  if (dateStr === undefined || dateStr === null || dateStr === '') {
     const latestRecord = await Attendance.findOne({ isActive: true })
       .sort({ attendanceDate: -1 })
       .select('attendanceDate')
       .lean();
-      
+
     targetDate = latestRecord?.attendanceDate || new Date().toISOString().split('T')[0];
+  } else {
+    if (typeof dateStr !== 'string') {
+      throw makeError('Invalid date format. Expected YYYY-MM-DD.', 400);
+    }
+
+    const trimmedDate = dateStr.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmedDate)) {
+      throw makeError('Invalid date format. Expected YYYY-MM-DD.', 400);
+    }
+
+    targetDate = trimmedDate;
   }
 
   const totalEmployees = await Employee.countDocuments({ isActive: true });
