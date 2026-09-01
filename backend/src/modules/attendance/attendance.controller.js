@@ -4,6 +4,9 @@ import { MESSAGES } from '../../constants/index.js';
 import { extractRequestMeta } from '../auth/auth.logger.js';
 import {
   listAttendance,
+  getDailyAttendanceRecords,
+  getAttendanceSummary,
+  exportAttendanceCSV,
   getAttendanceById,
   createAttendance,
   updateAttendance,
@@ -13,24 +16,42 @@ import {
 } from './attendance.service.js';
 
 export const getAllAttendance = asyncHandler(async (req, res) => {
-  const {
-    page, limit, search, personType, person, department, device,
-    verificationMethod, attendanceType, status, attendanceDate,
-    isActive, sortBy, sortOrder,
-  } = req.query;
-
   const requestMeta = extractRequestMeta(req);
+  const { view } = req.query;
 
   try {
-    const result = await listAttendance(
-      { page, limit, search, personType, person, department, device, verificationMethod, attendanceType, status, attendanceDate, isActive, sortBy, sortOrder },
-      requestMeta
-    );
+    // If raw view is requested, return individual raw punch logs
+    if (view === 'raw') {
+      const result = await listAttendance(req.query, requestMeta);
+      return sendSuccess(res, result, MESSAGES.ATTENDANCE_FETCH_LIST, 200);
+    }
+
+    // Default: Return daily aggregated records (First In, Last Out, Total Hours)
+    const result = await getDailyAttendanceRecords(req.query, requestMeta);
     return sendSuccess(res, result, MESSAGES.ATTENDANCE_FETCH_LIST, 200);
   } catch (err) {
     if (!err.statusCode) throw err;
     return sendError(res, err.message, err.statusCode);
   }
+});
+
+export const getAttendanceSummaryHandler = asyncHandler(async (req, res) => {
+  try {
+    const summary = await getAttendanceSummary(req.query.date);
+    return sendSuccess(res, summary, 'Attendance summary retrieved successfully.', 200);
+  } catch (err) {
+    if (!err.statusCode) throw err;
+    return sendError(res, err.message, err.statusCode);
+  }
+});
+
+export const exportAttendanceCSVHandler = asyncHandler(async (req, res) => {
+  const { content, contentType, extension } = await exportAttendanceCSV(req.query);
+  const filename = `attendance_export_${new Date().toISOString().split('T')[0]}.${extension}`;
+
+  res.setHeader('Content-Type', contentType);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  return res.status(200).send(content);
 });
 
 export const getAttendanceHandler = asyncHandler(async (req, res) => {
@@ -50,7 +71,6 @@ export const getAttendanceHistoryHandler = asyncHandler(async (req, res) => {
 
   try {
     const record = await getAttendanceById(req.params.id, requestMeta);
-    // The history is already embedded in the public JSON output
     return sendSuccess(res, record, 'Attendance history retrieved successfully.', 200);
   } catch (err) {
     if (!err.statusCode) throw err;

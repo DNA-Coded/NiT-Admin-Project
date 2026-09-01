@@ -1,7 +1,7 @@
 import RawAttendanceEvent from './rawAttendanceEvent.model.js';
 import { PROCESSING_STATUS } from './rawAttendanceEvent.constants.js';
 import { createAttendance } from '../attendance/attendance.service.js';
-import Faculty from '../faculty/faculty.model.js';
+import Employee from '../employee/employee.model.js';
 
 import Device from '../devices/device.model.js';
 import { MESSAGES } from '../../constants/index.js';
@@ -89,36 +89,55 @@ class RawAttendanceEventService {
       const device = await Device.findById(event.device).lean();
       if (!device) throw new Error('Associated device not found.');
 
-      // 2. Normalize payload via Mapper
-      const normalized = AttendanceMapper.mapRawToEvent(event.rawPayload, event.provider, device);
+      // 2. Normalize payload via Mapper (MUST HAVE await)
+      const normalized = await AttendanceMapper.mapRawToEvent(event.rawPayload, event.provider, device);
       event.normalizedPayload = normalized;
       logEventNormalized({ eventId: event.eventId, provider: event.provider });
-
+      
       // 3. Find Identity Match
-      const attendanceIdentity = normalized.userId || normalized.empId;
+      const attendanceIdentity = normalized.attendanceIdentity || normalized.userId || normalized.empId;
       if (!attendanceIdentity) throw new Error('No attendance identity found in normalized payload.');
-
-      let person = await Faculty.findOne({ attendanceIdentity, isActive: true }).select('_id').lean();
-      let personType = 'FACULTY';
-
+      
+      const fullEmpId = attendanceIdentity.startsWith('NIT/') 
+      ? attendanceIdentity 
+      : `NIT/${attendanceIdentity}`;
+      
+      // ⚠️ Include identity fields in .select()
+      let person = await Employee.findOne({
+        $or: [
+          { attendanceIdentity: attendanceIdentity },
+          { attendanceIdentity: fullEmpId },
+          { empId: fullEmpId },
+          { empId: attendanceIdentity },
+          { employeeId: fullEmpId },
+          { employeeId: attendanceIdentity }
+        ],
+        isActive: true
+      }).select('_id attendanceIdentity empId employeeId').lean();
+      
+      let personType = 'EMPLOYEE';
+      
       if (!person) throw new Error(`Unrecognized attendance identity: ${attendanceIdentity}`);
-
+      
+      // 🎯 Use the exact identity stored on the employee record in DB
+      const matchedIdentity = person.attendanceIdentity || person.empId || person.employeeId || fullEmpId;
+      
       // 4. Create Attendance Record
       const attendanceData = {
         attendanceCode: `ATT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         personType,
         person: person._id,
         device: device._id,
-        attendanceIdentity,
-        verificationMethod: normalized.verificationMethod || 'UNKNOWN',
-        attendanceType: 'IN', // NOTE: Determine IN/OUT via device rules or payload if available
+        attendanceIdentity: matchedIdentity,
+        verificationMethod: normalized.verificationMethod || 'FINGERPRINT',
+        attendanceType: normalized.attendanceType || 'CHECK_IN', // 👈 Pull from normalized mapper!
         timestamp: new Date(normalized.timestamp),
         attendanceDate: new Date(normalized.timestamp).toISOString().split('T')[0],
         attendanceTime: new Date(normalized.timestamp).toTimeString().split(' ')[0],
-        status: 'PRESENT', // NOTE: Determine via Attendance Policies (Phase 5)
+        status: 'PRESENT',
         remarks: `Auto-generated via ${event.provider}`,
       };
-
+      
       await createAttendance(attendanceData, adminEmail, { source: 'IntegrationPipeline' });
 
       // 5. Mark Processed
@@ -179,6 +198,49 @@ class RawAttendanceEventService {
     }
 
     return results;
+  }
+
+  /**
+   * Ingest a raw event from a physical biometric device webhook
+   */
+  async ingestEvent(payload, provider, deviceCode) {
+    if (!payload || !provider || !deviceCode) {
+      throw makeError('Payload, provider, and deviceCode are required for ingestion.', 400);
+    }
+
+    if (typeof deviceCode !== 'string') {
+      throw makeError('deviceCode must be a string.', 400);
+    }
+
+    const sanitizedDeviceCode = deviceCode.trim();
+    if (!sanitizedDeviceCode) {
+      throw makeError('deviceCode must be a non-empty string.', 400);
+    }
+
+    const device = await Device.findOne({
+      deviceCode: { $eq: sanitizedDeviceCode },
+      isActive: true
+    }).lean();
+    if (!device) {
+      throw makeError('Device not found or inactive.', 404);
+    }
+
+    const event = new RawAttendanceEvent({
+      provider,
+      device: device._id,
+      rawPayload: payload,
+      processingStatus: PROCESSING_STATUS.PENDING
+    });
+
+    await event.save();
+    logEventReceived({ eventId: event.eventId, provider, device: device._id });
+    
+    // Asynchronously process the event right away, without awaiting
+    this.processEvent(event.eventId, 'system_webhook').catch(err => {
+      console.error(`[Webhook] Async processing failed for event ${event.eventId}: ${err.message}`);
+    });
+
+    return { message: 'Event ingested successfully', eventId: event.eventId };
   }
 }
 

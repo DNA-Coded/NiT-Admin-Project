@@ -20,14 +20,14 @@ app.set('trust proxy', 1);
 
 // ─── Core Middleware ──────────────────────────────────────────────────────────
 
+// Enable CORS first so OPTIONS handshakes bypass rate-limiting rules cleanly
+app.use(cors(corsOptions));
+
 // Set security HTTP headers
 app.use(helmet());
 
-// Apply global rate limiting to all requests
+// Apply global rate limiting to all requests downstream
 app.use(globalLimiter);
-
-// Enable CORS with configured options
-app.use(cors(corsOptions));
 
 // Compress response bodies
 app.use(compression());

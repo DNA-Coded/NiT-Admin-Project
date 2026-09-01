@@ -6,14 +6,7 @@ import {
   validateUpdateDepartment,
   validateObjectId,
 } from './departments.validator.js';
-import {
-  getAllDepartments,
-  getDepartment,
-  createDepartmentHandler,
-  updateDepartmentHandler,
-  deleteDepartmentHandler,
-  restoreDepartmentHandler,
-} from './departments.controller.js';
+import DepartmentController from './departments.controller.js';
 
 const router = Router();
 
@@ -75,7 +68,7 @@ router.get(
   '/',
   authenticate,
   validateListQuery,
-  getAllDepartments
+  DepartmentController.getAllDepartments
 );
 
 /**
@@ -121,7 +114,7 @@ router.post(
   '/',
   authenticate,
   validateCreateDepartment,
-  createDepartmentHandler
+  DepartmentController.createDepartment
 );
 
 // ─── Document routes ──────────────────────────────────────────────────────────
@@ -159,7 +152,7 @@ router.get(
   '/:id',
   authenticate,
   validateObjectId,
-  getDepartment
+  DepartmentController.getDepartmentById
 );
 
 /**
@@ -197,7 +190,7 @@ router.put(
   authenticate,
   validateObjectId,
   validateUpdateDepartment,
-  updateDepartmentHandler
+  DepartmentController.updateDepartment
 );
 
 /**
@@ -224,7 +217,7 @@ router.delete(
   '/:id',
   authenticate,
   validateObjectId,
-  deleteDepartmentHandler
+  DepartmentController.deleteDepartment
 );
 
 /**
@@ -250,7 +243,7 @@ router.patch(
   '/:id/restore',
   authenticate,
   validateObjectId,
-  restoreDepartmentHandler
+  DepartmentController.restoreDepartment
 );
 
 export default router;

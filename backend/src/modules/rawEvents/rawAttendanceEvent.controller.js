@@ -51,3 +51,17 @@ export const processPendingEvents = asyncHandler(async (req, res) => {
     return sendError(res, err.message, err.statusCode);
   }
 });
+
+export const ingestEvent = asyncHandler(async (req, res) => {
+  const { provider, deviceCode } = req.query;
+  const payload = req.body;
+
+  try {
+    const result = await RawAttendanceEventService.ingestEvent(payload, provider || 'GenericWebhook', deviceCode);
+    return sendSuccess(res, result, 'Webhook received', 201);
+  } catch (err) {
+    if (!err.statusCode) throw err;
+    return sendError(res, err.message, err.statusCode);
+  }
+});
+

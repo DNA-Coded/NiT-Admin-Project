@@ -33,8 +33,8 @@ export const generateExport = async (reportType, format, filters, adminEmail) =>
       case EXPORT_REPORT_TYPES.ATTENDANCE:
         reportData = await reportsService.getAttendanceReport(exportFilters);
         break;
-      case EXPORT_REPORT_TYPES.FACULTY:
-        reportData = await reportsService.getFacultyReport(exportFilters);
+      case EXPORT_REPORT_TYPES.EMPLOYEE:
+        reportData = await reportsService.getEmployeeReport(exportFilters);
         break;
 
       case EXPORT_REPORT_TYPES.DEVICES:

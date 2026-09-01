@@ -37,7 +37,7 @@ const attendanceSchema = new Schema(
     person: {
       type:     Schema.Types.ObjectId,
       required: [true, 'Person reference is required.'],
-      ref:      'Faculty',
+      ref:      'Employee',
     },
 
     device: {

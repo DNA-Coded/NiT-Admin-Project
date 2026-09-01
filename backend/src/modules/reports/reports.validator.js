@@ -21,10 +21,14 @@ const validateDateField = (value, fieldName) => {
 
 export const validateReportFilters = (req, res, next) => {
   const errors = [];
-  const {
-    from, to, department, faculty, device,
-    page, limit
-  } = req.query;
+  const from = req.query.from ? String(req.query.from) : undefined;
+  const to = req.query.to ? String(req.query.to) : undefined;
+  const department = req.query.department ? String(req.query.department) : undefined;
+  const targetId = req.query.employeeId || req.query.staffId || req.query.employee;
+  const targetIdStr = targetId ? String(targetId) : undefined;
+  const device = req.query.device ? String(req.query.device) : undefined;
+  const page = req.query.page;
+  const limit = req.query.limit;
 
   const fromErr = validateDateField(from, 'from');
   if (fromErr) errors.push({ field: 'from', message: fromErr });
@@ -35,8 +39,8 @@ export const validateReportFilters = (req, res, next) => {
   const deptErr = validateObjectIdField(department, 'department');
   if (deptErr) errors.push({ field: 'department', message: deptErr });
 
-  const facErr = validateObjectIdField(faculty, 'faculty');
-  if (facErr) errors.push({ field: 'faculty', message: facErr });
+  const targetErr = validateObjectIdField(targetIdStr, 'employeeId');
+  if (targetErr) errors.push({ field: 'employeeId', message: targetErr });
 
   const devErr = validateObjectIdField(device, 'device');
   if (devErr) errors.push({ field: 'device', message: devErr });

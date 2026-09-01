@@ -1,154 +1,121 @@
-import asyncHandler from '../../utils/asyncHandler.js';
-import { sendSuccess, sendError } from '../../helpers/index.js';
-import { MESSAGES } from '../../constants/index.js';
-import { extractRequestMeta } from '../auth/auth.logger.js';
-import {
-  listDepartments,
-  getDepartmentById,
-  createDepartment,
-  updateDepartment,
-  softDeleteDepartment,
-  restoreDepartment,
-} from './departments.service.js';
+import DepartmentService from './departments.service.js';
 
-/**
- * Department Controller
- *
- * Thin HTTP layer: receives validated request data, delegates to the service,
- * and returns standardized responses. No business logic lives here.
- *
- * Error handling convention (same as auth.controller.js):
- *   - Typed service errors (have `.statusCode`) → sendError with that code.
- *   - Unexpected errors (no `.statusCode`)      → re-throw for global errorHandler (500).
- */
-
-// ─── GET /api/v1/departments ──────────────────────────────────────────────────
-/**
- * @desc    List departments with pagination, search, and filtering
- * @route   GET /api/v1/departments
- * @access  Protected
- */
-export const getAllDepartments = asyncHandler(async (req, res) => {
-  const {
-    page, limit, search,
-    isActive, sortBy, sortOrder,
-  } = req.query;
-
-  const requestMeta = extractRequestMeta(req);
-
-  try {
-    const result = await listDepartments(
-      { page, limit, search, isActive, sortBy, sortOrder },
-      requestMeta
-    );
-    return sendSuccess(res, result, MESSAGES.DEPARTMENT_FETCH_LIST, 200);
-  } catch (err) {
-    if (!err.statusCode) throw err;
-    return sendError(res, err.message, err.statusCode);
+class DepartmentController {
+  /**
+   * GET /api/v1/departments
+   */
+  static async getAllDepartments(req, res, next) {
+    try {
+      const departments = await DepartmentService.getAllDepartments(req.query);
+      return res.status(200).json({
+        success: true,
+        message: 'Departments list retrieved successfully.',
+        data: departments,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
 
-// ─── GET /api/v1/departments/:id ──────────────────────────────────────────────
-/**
- * @desc    Get a single department by ID
- * @route   GET /api/v1/departments/:id
- * @access  Protected
- */
-export const getDepartment = asyncHandler(async (req, res) => {
-  const requestMeta = extractRequestMeta(req);
-
-  try {
-    const dept = await getDepartmentById(req.params.id, requestMeta);
-    return sendSuccess(res, dept, MESSAGES.DEPARTMENT_FETCH_DETAIL, 200);
-  } catch (err) {
-    if (!err.statusCode) throw err;
-    return sendError(res, err.message, err.statusCode);
+  /**
+   * GET /api/v1/departments/:id
+   */
+  static async getDepartmentById(req, res, next) {
+    try {
+      const department = await DepartmentService.getDepartmentById(req.params.id);
+      return res.status(200).json({
+        success: true,
+        message: 'Department retrieved successfully.',
+        data: department,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
 
-// ─── POST /api/v1/departments ─────────────────────────────────────────────────
-/**
- * @desc    Create a new department
- * @route   POST /api/v1/departments
- * @access  Protected — SUPER_ADMIN, ADMIN
- */
-export const createDepartmentHandler = asyncHandler(async (req, res) => {
-  const { name, code, description } = req.body;
-  const adminEmail   = req.admin?.email ?? 'unknown';
-  const requestMeta  = extractRequestMeta(req);
-
-  try {
-    const dept = await createDepartment(
-      { name, code, description },
-      adminEmail,
-      requestMeta
-    );
-    return sendSuccess(res, dept, MESSAGES.DEPARTMENT_CREATED, 201);
-  } catch (err) {
-    if (!err.statusCode) throw err;
-    return sendError(res, err.message, err.statusCode);
+  /**
+   * GET /api/v1/departments/code/:code
+   */
+  static async getDepartmentByCode(req, res, next) {
+    try {
+      const department = await DepartmentService.getDepartmentByCode(req.params.code);
+      return res.status(200).json({
+        success: true,
+        message: 'Department retrieved successfully.',
+        data: department,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
 
-// ─── PUT /api/v1/departments/:id ──────────────────────────────────────────────
-/**
- * @desc    Update a department's mutable fields
- * @route   PUT /api/v1/departments/:id
- * @access  Protected — SUPER_ADMIN, ADMIN
- */
-export const updateDepartmentHandler = asyncHandler(async (req, res) => {
-  const { name, code, description } = req.body;
-  const adminEmail  = req.admin?.email ?? 'unknown';
-  const requestMeta = extractRequestMeta(req);
-
-  try {
-    const dept = await updateDepartment(
-      req.params.id,
-      { name, code, description },
-      adminEmail,
-      requestMeta
-    );
-    return sendSuccess(res, dept, MESSAGES.DEPARTMENT_UPDATED, 200);
-  } catch (err) {
-    if (!err.statusCode) throw err;
-    return sendError(res, err.message, err.statusCode);
+  /**
+   * POST /api/v1/departments
+   */
+  static async createDepartment(req, res, next) {
+    try {
+      const department = await DepartmentService.createDepartment(req.body);
+      return res.status(201).json({
+        success: true,
+        message: 'Department created successfully.',
+        data: department,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
 
-// ─── DELETE /api/v1/departments/:id ───────────────────────────────────────────
-/**
- * @desc    Soft-delete a department (sets isActive: false)
- * @route   DELETE /api/v1/departments/:id
- * @access  Protected — SUPER_ADMIN, ADMIN
- */
-export const deleteDepartmentHandler = asyncHandler(async (req, res) => {
-  const adminEmail  = req.admin?.email ?? 'unknown';
-  const requestMeta = extractRequestMeta(req);
-
-  try {
-    await softDeleteDepartment(req.params.id, adminEmail, requestMeta);
-    return sendSuccess(res, null, MESSAGES.DEPARTMENT_DELETED, 200);
-  } catch (err) {
-    if (!err.statusCode) throw err;
-    return sendError(res, err.message, err.statusCode);
+  /**
+   * PUT /api/v1/departments/:id
+   */
+  static async updateDepartment(req, res, next) {
+    try {
+      const updatedDepartment = await DepartmentService.updateDepartment(
+        req.params.id,
+        req.body
+      );
+      return res.status(200).json({
+        success: true,
+        message: 'Department updated successfully.',
+        data: updatedDepartment,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
 
-// ─── PATCH /api/v1/departments/:id/restore ────────────────────────────────────
-/**
- * @desc    Restore a soft-deleted department (sets isActive: true)
- * @route   PATCH /api/v1/departments/:id/restore
- * @access  Protected — SUPER_ADMIN, ADMIN
- */
-export const restoreDepartmentHandler = asyncHandler(async (req, res) => {
-  const adminEmail  = req.admin?.email ?? 'unknown';
-  const requestMeta = extractRequestMeta(req);
-
-  try {
-    const dept = await restoreDepartment(req.params.id, adminEmail, requestMeta);
-    return sendSuccess(res, dept, MESSAGES.DEPARTMENT_RESTORED, 200);
-  } catch (err) {
-    if (!err.statusCode) throw err;
-    return sendError(res, err.message, err.statusCode);
+  /**
+   * DELETE /api/v1/departments/:id?soft=true
+   */
+  static async deleteDepartment(req, res, next) {
+    try {
+      const softDelete = req.query.soft !== 'false';
+      const result = await DepartmentService.deleteDepartment(req.params.id, softDelete);
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+
+  /**
+   * PATCH /api/v1/departments/:id/restore
+   */
+  static async restoreDepartment(req, res, next) {
+    try {
+      const result = await DepartmentService.restoreDepartment(req.params.id);
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+export default DepartmentController;

@@ -8,7 +8,7 @@ const { Schema } = mongoose;
  * Admin Schema
  *
  * Represents an administrative user who can log into the NiT Admin system.
- * Regular faculty are NOT users — they only interact via biometric devices.
+ * Regular employee are NOT users — they only interact via biometric devices.
  */
 const adminSchema = new Schema(
   {
@@ -42,13 +42,13 @@ const adminSchema = new Schema(
         values: Object.values(ROLES),
         message: `Role must be one of: ${Object.values(ROLES).join(', ')}.`,
       },
-      default: ROLES.FACULTY,
+      default: ROLES.EMPLOYEE,
     },
 
     department: {
       type: String,
       trim: true,
-      default: null, // Optional — required only for HOD and FACULTY roles
+      default: null, // Optional — required only for HOD and EMPLOYEE roles
     },
 
     isActive: {

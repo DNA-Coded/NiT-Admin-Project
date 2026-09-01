@@ -9,5 +9,5 @@ export const ROLES = Object.freeze({
   SUPER_ADMIN: 'super_admin', // Full system access — IT/system administrator
   ADMIN: 'admin',             // HR admin — manage employees, attendance, payroll
   HOD: 'hod',                 // Head of Department — view and manage own dept only
-  FACULTY: 'faculty',         // Faculty member — read-only access to own records
+  EMPLOYEE: 'employee',         // Employee member — read-only access to own records
 });

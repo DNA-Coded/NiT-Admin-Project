@@ -1,6 +1,6 @@
-import Department from '../departments/departments.model.js';
+import {Department} from '../departments/departments.model.js';
 import mongoose from 'mongoose';
-import Faculty from '../faculty/faculty.model.js';
+import Employee from '../employee/employee.model.js';
 import Device from '../devices/device.model.js';
 import Attendance from '../attendance/attendance.model.js';
 import SyncJob from '../../integrations/sync/sync.model.js';
@@ -17,7 +17,7 @@ export const getDashboardOverview = async () => {
   // Run all independent count queries in parallel
   const [
     totalDepartments,
-    totalFaculty,
+    totalEmployee,
     totalDevices,
     
     // Device Status Counts
@@ -43,7 +43,7 @@ export const getDashboardOverview = async () => {
   ] = await Promise.all([
     // Summary
     Department.countDocuments({ isActive: true }),
-    Faculty.countDocuments({ isActive: true }),
+    Employee.countDocuments({ isActive: true }),
     Device.countDocuments({ isActive: true }),
 
     // Devices
@@ -71,7 +71,7 @@ export const getDashboardOverview = async () => {
   return {
     summary: {
       totalDepartments,
-      totalFaculty,
+      totalEmployee,
       totalDevices
     },
     devices: {
@@ -132,7 +132,7 @@ export const getDashboardAnalytics = async () => {
   const [
     attendanceAgg,
     departmentAgg,
-    facultyAgg,
+    employeeAgg,
     deviceAgg,
     syncAgg
   ] = await Promise.all([
@@ -171,7 +171,7 @@ export const getDashboardAnalytics = async () => {
       },
       {
         $addFields: {
-          totalFaculty: { $size: '$faculties' },
+          totalEmployee: { $size: '$faculties' },
           allPersonIds: '$faculties._id'
         }
       },
@@ -196,14 +196,14 @@ export const getDashboardAnalytics = async () => {
       {
         $project: {
           department: '$name',
-          totalFaculty: 1,
+          totalEmployee: 1,
           attendancePercentage: {
             $cond: [
-              { $eq: ['$totalFaculty', 0] },
+              { $eq: ['$totalEmployee', 0] },
               0,
               {
                 $multiply: [
-                  { $divide: [{ $size: '$todayAttendances' }, '$totalFaculty'] },
+                  { $divide: [{ $size: '$todayAttendances' }, '$totalEmployee'] },
                   100
                 ]
               }
@@ -213,8 +213,8 @@ export const getDashboardAnalytics = async () => {
       }
     ]),
 
-    // 3. Faculty Analytics
-    Faculty.aggregate([
+    // 3. Employee Analytics
+    Employee.aggregate([
       {
         $facet: {
           total: [{ $count: 'count' }],
@@ -267,10 +267,10 @@ export const getDashboardAnalytics = async () => {
       monthly: getCount(attendanceAgg[0].monthly)
     },
     departments: departmentAgg, // Already formatted by $project
-    faculty: {
-      total: getCount(facultyAgg[0].total),
-      active: getCount(facultyAgg[0].active),
-      inactive: getCount(facultyAgg[0].inactive)
+    employee: {
+      total: getCount(employeeAgg[0].total),
+      active: getCount(employeeAgg[0].active),
+      inactive: getCount(employeeAgg[0].inactive)
     },
     devices: {
       total: getCount(deviceAgg[0].total),
@@ -468,25 +468,25 @@ export const getFilteredDashboardData = async (filters, { page, limit }) => {
   // ─── 1. Pre-resolve Person Filters (if any) ──────────────────────────────
   const {
     from, to,
-    department, faculty, designation, facultyStatus,
+    department, employee, designation, employeeStatus,
     attendanceType, verificationMethod, correctionStatus,
     device, deviceCategory, healthStatus, connectionStatus,
     syncStatus, provider
   } = filters;
 
   let matchedPersonIds = null;
-  const personFiltersPresent = department || faculty || designation || facultyStatus;
+  const personFiltersPresent = department || employee || designation || employeeStatus;
 
   if (personFiltersPresent) {
-    const facultyQuery = { isActive: true };
-    let checkFaculty = false;
+    const employeeQuery = { isActive: true };
+    let checkEmployee = false;
 
-    // Faculty-specific filters
-    if (faculty || designation || facultyStatus) {
-      if (faculty) facultyQuery._id = faculty;
-      if (designation) facultyQuery.designation = designation;
-      if (facultyStatus) facultyQuery.status = facultyStatus;
-      checkFaculty = true;
+    // Employee-specific filters
+    if (employee || designation || employeeStatus) {
+      if (employee) employeeQuery._id = employee;
+      if (designation) employeeQuery.designation = designation;
+      if (employeeStatus) employeeQuery.status = employeeStatus;
+      checkEmployee = true;
     }
 
     // Shared filters (department)
@@ -494,13 +494,13 @@ export const getFilteredDashboardData = async (filters, { page, limit }) => {
       if (!mongoose.Types.ObjectId.isValid(department)) {
         throw { statusCode: 422, message: 'Invalid department ID format.' };
       }
-      facultyQuery.department = department;
-      checkFaculty = true;
+      employeeQuery.department = department;
+      checkEmployee = true;
     }
 
     const ids = [];
-    if (checkFaculty) {
-      const facs = await Faculty.find(facultyQuery).select('_id').lean();
+    if (checkEmployee) {
+      const facs = await Employee.find(employeeQuery).select('_id').lean();
       ids.push(...facs.map(f => f._id));
     }
     

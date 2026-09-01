@@ -1,5 +1,5 @@
 import Settings from './settings.model.js';
-import Department from '../departments/departments.model.js';
+import {Department} from '../departments/departments.model.js';
 import Device from '../devices/device.model.js';
 import { DEFAULT_SETTINGS } from './settings.constants.js';
 import { MESSAGES } from '../../constants/index.js';
