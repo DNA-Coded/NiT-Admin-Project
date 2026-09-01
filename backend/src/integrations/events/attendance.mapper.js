@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { VERIFICATION_METHODS } from '../../constants/attendance.constants.js';
 import Employee from '../../modules/employee/employee.model.js';
 
@@ -36,7 +37,8 @@ export default class AttendanceMapper {
       .lean();
 
     return {
-      eventId: rawLog.id || `evt-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      // SECURITY FIX: Use crypto.randomBytes() instead of Math.random() for secure random ID generation
+      eventId: rawLog.id || `evt-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
       deviceId: deviceContext?._id || deviceContext?.id || rawLog.deviceId || 'SECUREEYE_DEVICE_01',
       provider: providerName || 'SIMULATOR',
       attendanceIdentity: paddedId,

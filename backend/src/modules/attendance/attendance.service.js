@@ -26,11 +26,25 @@ const makeError = (message, status) => {
   return err;
 };
 
-const assertDeviceExists = async (deviceId) => {
-const escapePdfLiteralString = (value) => {
-  return String(value).replace(/[\\()]/g, (ch) => `\\${ch}`);
+/**
+ * Helper: Escape special regex characters to prevent regex injection
+ * @param {string} str - String to escape
+ * @returns {string} - Escaped string safe for use in RegExp constructor
+ */
+const escapeRegex = (str) => {
+  return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
 
+/**
+ * Helper: Escape PDF literal strings to prevent PDF injection
+ * @param {string} value - String to escape
+ * @returns {string} - Escaped string safe for PDF output
+ */
+const escapePdfLiteralString = (value) => {
+  return String(value || '').replace(/[\\()]/g, (ch) => `\\${ch}`);
+};
+
+const assertDeviceExists = async (deviceId) => {
   if (!deviceId) return;
   const device = await Device.findById(deviceId).select('isActive status').lean();
   if (!device) {
@@ -159,7 +173,9 @@ export const listAttendance = async (query = {}, requestMeta = {}) => {
   }
 
   if (search && search.trim()) {
-    const searchRegex = new RegExp(search.trim(), 'i');
+    // SECURITY FIX: Escape user input before using in regex to prevent regex injection
+    const escapedSearch = escapeRegex(search.trim());
+    const searchRegex = new RegExp(escapedSearch, 'i');
     filter.$or = [
       { attendanceCode: searchRegex },
       { attendanceIdentity: searchRegex },
@@ -380,7 +396,9 @@ export const getDailyAttendanceRecords = async (query = {}, requestMeta = {}) =>
   }
 
   if (search && search.trim()) {
-    const searchRegex = new RegExp(search.trim(), 'i');
+    // SECURITY FIX: Escape user input before using in regex to prevent regex injection
+    const escapedSearch = escapeRegex(search.trim());
+    const searchRegex = new RegExp(escapedSearch, 'i');
     pipeline.push({
       $match: {
         $or: [
@@ -596,7 +614,9 @@ function generateLandscapePDFBuffer(headers, rows, title = 'Attendance Summary R
   const colWidths = [12, 22, 25, 20, 12, 10, 10, 8, 10];
 
   const pad = (val, width) => {
-    const s = String(val || '').replace(/[()\\"]/g, '').slice(0, width);
+    // SECURITY FIX: Use escapePdfLiteralString helper to properly escape PDF literals
+    const escaped = escapePdfLiteralString(val);
+    const s = String(escaped || '').slice(0, width);
     return s.padEnd(width, ' ');
   };
 
@@ -643,7 +663,8 @@ function generateLandscapePDFBuffer(headers, rows, title = 'Attendance Summary R
 
     const textOps = streamLines.map((line, lineIdx) => {
       const yPos = 550 - lineIdx * 17;
-      const cleanLine = line.replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+      // SECURITY FIX: Properly escape PDF literal strings
+      const cleanLine = escapePdfLiteralString(line);
       return `1 0 0 1 30 ${yPos} Tm (${cleanLine}) Tj`;
     });
 
@@ -656,7 +677,7 @@ function generateLandscapePDFBuffer(headers, rows, title = 'Attendance Summary R
       Buffer.from('\nendstream\nendobj\n'),
     ]);
     objects.push(contentObj);
-      const cleanLine = escapePdfLiteralString(line);
+  });
 
   objects.push(Buffer.from(`${fontObjId} 0 obj\n<</Type /Font /Subtype /Type1 /BaseFont /Courier>>\nendobj\n`));
 
