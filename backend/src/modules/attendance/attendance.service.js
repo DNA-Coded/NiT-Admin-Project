@@ -28,10 +28,6 @@ const makeError = (message, status) => {
 };
 
 const assertDeviceExists = async (deviceId) => {
-const escapePdfLiteralString = (value) => {
-  return String(value).replace(/[\\()]/g, (ch) => `\\${ch}`);
-};
-
   if (!deviceId) return;
   const device = await Device.findById(deviceId).select('isActive status').lean();
   if (!device) {
@@ -590,6 +586,10 @@ function generateExcelXML(headers, rows, sheetName = 'Attendance') {
 </Workbook>`;
 }
 
+const escapePdfLiteralString = (value) => {
+  return String(value).replace(/[\\()]/g, (ch) => `\\${ch}`);
+};
+
 /**
  * Helper to generate valid multi-page A4 Landscape PDF Buffer
  */
@@ -644,7 +644,7 @@ function generateLandscapePDFBuffer(headers, rows, title = 'Attendance Summary R
 
     const textOps = streamLines.map((line, lineIdx) => {
       const yPos = 550 - lineIdx * 17;
-      const cleanLine = line.replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+      const cleanLine = escapePdfLiteralString(line);
       return `1 0 0 1 30 ${yPos} Tm (${cleanLine}) Tj`;
     });
 
@@ -657,7 +657,7 @@ function generateLandscapePDFBuffer(headers, rows, title = 'Attendance Summary R
       Buffer.from('\nendstream\nendobj\n'),
     ]);
     objects.push(contentObj);
-      const cleanLine = escapePdfLiteralString(line);
+  });
 
   objects.push(Buffer.from(`${fontObjId} 0 obj\n<</Type /Font /Subtype /Type1 /BaseFont /Courier>>\nendobj\n`));
 

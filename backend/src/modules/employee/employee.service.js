@@ -223,15 +223,11 @@ class EmployeeService {
       sanitizedUpdateData[key] = value;
     }
 
-<<<<<<< HEAD
-    const updatedEmployee = await Employee.findByIdAndUpdate(String(id), updateData, {
-=======
     if (sanitizedUpdateData.attendanceIdentity) {
       sanitizedUpdateData.attendanceIdentity = String(sanitizedUpdateData.attendanceIdentity).padStart(4, '0');
     }
 
-    const updatedEmployee = await Employee.findByIdAndUpdate(id, sanitizedUpdateData, {
->>>>>>> 73fa3e1ddd3f9cfcd0414cdc09cbb3907793b16d
+    const updatedEmployee = await Employee.findByIdAndUpdate(String(id), sanitizedUpdateData, {
       new: true,
       runValidators: true,
     })
