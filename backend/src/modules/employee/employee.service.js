@@ -204,11 +204,31 @@ class EmployeeService {
    * @param {Object} updateData - Fields to update
    */
   static async updateEmployee(id, updateData) {
-    if (updateData.attendanceIdentity) {
-      updateData.attendanceIdentity = String(updateData.attendanceIdentity).padStart(4, '0');
+    const allowedUpdateFields = [
+      'employeeId',
+      'firstName',
+      'lastName',
+      'email',
+      'phone',
+      'department',
+      'designation',
+      'status',
+      'isHOD',
+      'attendanceIdentity',
+    ];
+
+    const sanitizedUpdateData = {};
+    for (const [key, value] of Object.entries(updateData || {})) {
+      if (key.startsWith('$') || key.includes('.')) continue;
+      if (!allowedUpdateFields.includes(key)) continue;
+      sanitizedUpdateData[key] = value;
     }
 
-    const updatedEmployee = await Employee.findByIdAndUpdate(id, updateData, {
+    if (sanitizedUpdateData.attendanceIdentity) {
+      sanitizedUpdateData.attendanceIdentity = String(sanitizedUpdateData.attendanceIdentity).padStart(4, '0');
+    }
+
+    const updatedEmployee = await Employee.findByIdAndUpdate(id, sanitizedUpdateData, {
       new: true,
       runValidators: true,
     })
