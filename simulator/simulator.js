@@ -1,4 +1,5 @@
 // simulator.js
+const { randomInt } = require('crypto');
 const BASE_URL = 'http://localhost:5000/api/v1/events/ingest';
 const PROVIDER = 'SIMULATOR';
 const DEVICE_CODE = 'DEV-LIB-001';

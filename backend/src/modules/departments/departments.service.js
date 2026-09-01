@@ -2,6 +2,8 @@ import Department from './departments.model.js';
 import Employee from '../employee/employee.model.js';
 import { escapeRegex } from '../../utils/sanitize.util.js';
 
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 class DepartmentService {
   /**
    * Get all departments with optional active filtering and employee counts

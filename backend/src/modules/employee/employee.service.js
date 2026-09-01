@@ -4,6 +4,15 @@ import { escapeRegex } from '../../utils/sanitize.util.js';
 
 class EmployeeService {
   /**
+   * Escape user-provided text so it is treated as a literal in RegExp.
+   * @param {string} value
+   * @returns {string}
+   */
+  static escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  /**
    * Get paginated list of employee with full search, filtering, and sorting
    * @param {Object} options - Query parameters
    * @returns {Promise<Object>} Paginated result set with metadata
@@ -194,11 +203,35 @@ class EmployeeService {
    * @param {Object} updateData - Fields to update
    */
   static async updateEmployee(id, updateData) {
-    if (updateData.attendanceIdentity) {
-      updateData.attendanceIdentity = String(updateData.attendanceIdentity).padStart(4, '0');
+    const allowedUpdateFields = [
+      'employeeId',
+      'firstName',
+      'lastName',
+      'email',
+      'phone',
+      'department',
+      'designation',
+      'status',
+      'isHOD',
+      'attendanceIdentity',
+    ];
+
+    const sanitizedUpdateData = {};
+    for (const [key, value] of Object.entries(updateData || {})) {
+      if (key.startsWith('$') || key.includes('.')) continue;
+      if (!allowedUpdateFields.includes(key)) continue;
+      sanitizedUpdateData[key] = value;
     }
 
+<<<<<<< HEAD
     const updatedEmployee = await Employee.findByIdAndUpdate(String(id), updateData, {
+=======
+    if (sanitizedUpdateData.attendanceIdentity) {
+      sanitizedUpdateData.attendanceIdentity = String(sanitizedUpdateData.attendanceIdentity).padStart(4, '0');
+    }
+
+    const updatedEmployee = await Employee.findByIdAndUpdate(id, sanitizedUpdateData, {
+>>>>>>> 73fa3e1ddd3f9cfcd0414cdc09cbb3907793b16d
       new: true,
       runValidators: true,
     })
