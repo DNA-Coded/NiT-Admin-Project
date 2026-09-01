@@ -1,5 +1,6 @@
 import { Department } from '../departments/departments.model.js';
 import Employee from './employee.model.js';
+import { escapeRegex } from '../../utils/sanitize.util.js';
 
 class EmployeeService {
   /**
@@ -28,7 +29,7 @@ class EmployeeService {
 
     // Fuzzy text search across name, employee ID, identity, and email
     if (search && search.trim()) {
-      const searchRegex = new RegExp(search.trim(), 'i');
+      const searchRegex = new RegExp(escapeRegex(search.trim()), 'i');
       filter.$or = [
         { firstName: searchRegex },
         { lastName: searchRegex },
@@ -197,7 +198,7 @@ class EmployeeService {
       updateData.attendanceIdentity = String(updateData.attendanceIdentity).padStart(4, '0');
     }
 
-    const updatedEmployee = await Employee.findByIdAndUpdate(id, updateData, {
+    const updatedEmployee = await Employee.findByIdAndUpdate(String(id), updateData, {
       new: true,
       runValidators: true,
     })

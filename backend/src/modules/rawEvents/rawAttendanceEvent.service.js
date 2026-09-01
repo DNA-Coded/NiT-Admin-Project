@@ -208,7 +208,7 @@ class RawAttendanceEventService {
       throw makeError('Payload, provider, and deviceCode are required for ingestion.', 400);
     }
 
-    const device = await Device.findOne({ deviceCode, isActive: true }).lean();
+    const device = await Device.findOne({ deviceCode: String(deviceCode), isActive: true }).lean();
     if (!device) {
       throw makeError('Device not found or inactive.', 404);
     }

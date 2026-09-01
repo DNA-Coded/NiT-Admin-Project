@@ -10,9 +10,15 @@ const mockEmployees = ['0017', '0089', '0197', '0402', '0112', '0170', '0244', '
 // In-memory state tracker to toggle CHECK_IN vs CHECK_OUT per employee
 const employeeStates = {};
 
+import crypto from 'crypto';
+
+function secureRandom() {
+  return crypto.randomBytes(4).readUInt32LE(0) / 0x100000000;
+}
+
 function generateMockPayload() {
-  const isSuccess = Math.random() > 0.1;
-  const userId = mockEmployees[Math.floor(Math.random() * mockEmployees.length)];
+  const isSuccess = secureRandom() > 0.1;
+  const userId = mockEmployees[Math.floor(secureRandom() * mockEmployees.length)];
 
   // Determine punch type: alternate between CHECK_IN and CHECK_OUT
   const currentState = employeeStates[userId] || 'CHECK_OUT';

@@ -1,5 +1,6 @@
 import Department from './departments.model.js';
 import Employee from '../employee/employee.model.js';
+import { escapeRegex } from '../../utils/sanitize.util.js';
 
 class DepartmentService {
   /**
@@ -16,7 +17,7 @@ class DepartmentService {
     }
 
     if (search && search.trim()) {
-      const searchRegex = new RegExp(search.trim(), 'i');
+      const searchRegex = new RegExp(escapeRegex(search.trim()), 'i');
       filter.$or = [{ name: searchRegex }, { code: searchRegex }];
     }
 
@@ -110,7 +111,7 @@ class DepartmentService {
 
       const existing = await Department.findOne({
         code: updateData.code,
-        _id: { $ne: id },
+        _id: { $ne: String(id) },
       });
 
       if (existing) {
@@ -118,7 +119,7 @@ class DepartmentService {
       }
     }
 
-    const updatedDepartment = await Department.findByIdAndUpdate(id, updateData, {
+    const updatedDepartment = await Department.findByIdAndUpdate(String(id), updateData, {
       new: true,
       runValidators: true,
     }).lean();

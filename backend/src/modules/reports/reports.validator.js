@@ -21,10 +21,13 @@ const validateDateField = (value, fieldName) => {
 
 export const validateReportFilters = (req, res, next) => {
   const errors = [];
-  const {
-    from, to, department, employee, device,
-    page, limit
-  } = req.query;
+  const from = req.query.from ? String(req.query.from) : undefined;
+  const to = req.query.to ? String(req.query.to) : undefined;
+  const department = req.query.department ? String(req.query.department) : undefined;
+  const employee = req.query.employee ? String(req.query.employee) : undefined;
+  const device = req.query.device ? String(req.query.device) : undefined;
+  const page = req.query.page;
+  const limit = req.query.limit;
 
   const fromErr = validateDateField(from, 'from');
   if (fromErr) errors.push({ field: 'from', message: fromErr });

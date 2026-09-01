@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { escapeRegex } from '../../utils/sanitize.util.js';
 import Attendance from './attendance.model.js';
 import { buildUpdatePayload } from '../../utils/update.util.js';
 import Device from '../devices/device.model.js';
@@ -155,7 +156,7 @@ export const listAttendance = async (query = {}, requestMeta = {}) => {
   }
 
   if (search && search.trim()) {
-    const searchRegex = new RegExp(search.trim(), 'i');
+    const searchRegex = new RegExp(escapeRegex(search.trim()), 'i');
     filter.$or = [
       { attendanceCode: searchRegex },
       { attendanceIdentity: searchRegex },
@@ -509,7 +510,7 @@ export const getAttendanceSummary = async (dateStr) => {
   const lateArrivals = todayRecords.filter((r) => r.status === 'LATE').length;
   const earlyDepartures = todayRecords.filter((r) => r.status === 'EARLY_EXIT').length;
 
-  const personPunches = {};
+  const personPunches = Object.create(null);
   todayRecords.forEach((r) => {
     const pid = r.person.toString();
     if (!personPunches[pid]) personPunches[pid] = { minIn: null, maxOut: null };
@@ -755,7 +756,7 @@ export const exportAttendanceCSV = async (query = {}) => {
 };
 
 export const getAttendanceById = async (id, requestMeta = {}) => {
-  const record = await Attendance.findById(id)
+  const record = await Attendance.findById(String(id))
     .populate({
       path: 'person',
       select: 'firstName lastName fullName empId employeeId department',
@@ -831,7 +832,7 @@ export const updateAttendance = async (id, data, adminEmail, requestMeta = {}) =
     throw makeError(MESSAGES.ATTENDANCE_NO_CHANGES, 400);
   }
 
-  const record = await Attendance.findById(id);
+  const record = await Attendance.findById(String(id));
   if (!record) {
     logAttendanceNotFound(id, requestMeta);
     throw makeError(MESSAGES.ATTENDANCE_NOT_FOUND, 404);
@@ -895,7 +896,7 @@ export const updateAttendance = async (id, data, adminEmail, requestMeta = {}) =
 };
 
 export const softDeleteAttendance = async (id, adminEmail, requestMeta = {}) => {
-  const record = await Attendance.findById(id);
+  const record = await Attendance.findById(String(id));
 
   if (!record) {
     logAttendanceNotFound(id, requestMeta);
@@ -931,7 +932,7 @@ export const softDeleteAttendance = async (id, adminEmail, requestMeta = {}) => 
 };
 
 export const restoreAttendance = async (id, adminEmail, requestMeta = {}) => {
-  const record = await Attendance.findById(id);
+  const record = await Attendance.findById(String(id));
 
   if (!record) {
     logAttendanceNotFound(id, requestMeta);
@@ -978,7 +979,7 @@ export const restoreAttendance = async (id, adminEmail, requestMeta = {}) => {
 export const correctAttendance = async (id, data, adminEmail, requestMeta = {}) => {
   const { status, attendanceType, remarks, correctionReason } = data;
 
-  const record = await Attendance.findById(id);
+  const record = await Attendance.findById(String(id));
   if (!record) {
     logAttendanceNotFound(id, requestMeta);
     throw makeError(MESSAGES.ATTENDANCE_NOT_FOUND, 404);
