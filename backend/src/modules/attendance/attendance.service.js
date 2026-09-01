@@ -377,7 +377,7 @@ export const getDailyAttendanceRecords = async (query = {}, requestMeta = {}) =>
   }
 
   if (search && search.trim()) {
-    const searchRegex = new RegExp(search.trim(), 'i');
+    const searchRegex = new RegExp(escapeRegex(search.trim()), 'i');
     pipeline.push({
       $match: {
         $or: [
@@ -499,7 +499,7 @@ export const getAttendanceSummary = async (dateStr) => {
   const totalEmployees = await Employee.countDocuments({ isActive: true });
 
   const todayRecords = await Attendance.find({
-    attendanceDate: targetDate,
+    attendanceDate: { $eq: String(targetDate) },
     isActive: true,
   }).lean();
 

@@ -48,13 +48,13 @@ class DepartmentService {
    * @param {string} id - Department ObjectId
    */
   static async getDepartmentById(id) {
-    const department = await Department.findById(id).lean();
+    const department = await Department.findById(String(id)).lean();
     if (!department) {
       throw new Error(`Department not found with ID: ${id}`);
     }
 
     const activeEmployeeCount = await Employee.countDocuments({
-      department: id,
+      department: String(id),
       status: 'ACTIVE',
     });
 
@@ -66,8 +66,8 @@ class DepartmentService {
    * @param {string} code - Department code string
    */
   static async getDepartmentByCode(code) {
-    const formattedCode = code.trim().toUpperCase();
-    const department = await Department.findOne({ code: formattedCode }).lean();
+    const formattedCode = String(code || '').trim().toUpperCase();
+    const department = await Department.findOne({ code: { $eq: formattedCode } }).lean();
 
     if (!department) {
       throw new Error(`Department not found with code: ${formattedCode}`);
@@ -86,15 +86,23 @@ class DepartmentService {
    * @param {Object} departmentData - Department data payload
    */
   static async createDepartment(departmentData) {
-    const code = departmentData.code ? departmentData.code.trim().toUpperCase() : '';
+    const code = departmentData.code ? String(departmentData.code).trim().toUpperCase() : '';
 
-    const existing = await Department.findOne({ code });
+    const existing = await Department.findOne({ code: { $eq: code } });
     if (existing) {
       throw new Error(`Department with code '${code}' already exists.`);
     }
 
+    const allowedFields = ['name', 'code', 'description', 'isActive'];
+    const sanitizedData = {};
+    for (const [key, value] of Object.entries(departmentData || {})) {
+      if (key.startsWith('$') || key.includes('.')) continue;
+      if (!allowedFields.includes(key)) continue;
+      sanitizedData[key] = value;
+    }
+
     const newDepartment = new Department({
-      ...departmentData,
+      ...sanitizedData,
       code,
     });
 
@@ -108,20 +116,28 @@ class DepartmentService {
    * @param {Object} updateData - Data to update
    */
   static async updateDepartment(id, updateData) {
-    if (updateData.code) {
-      updateData.code = updateData.code.trim().toUpperCase();
+    const allowedUpdateFields = ['name', 'code', 'description', 'isActive'];
+    const sanitizedUpdateData = {};
+    for (const [key, value] of Object.entries(updateData || {})) {
+      if (key.startsWith('$') || key.includes('.')) continue;
+      if (!allowedUpdateFields.includes(key)) continue;
+      sanitizedUpdateData[key] = value;
+    }
+
+    if (sanitizedUpdateData.code) {
+      sanitizedUpdateData.code = String(sanitizedUpdateData.code).trim().toUpperCase();
 
       const existing = await Department.findOne({
-        code: updateData.code,
+        code: { $eq: sanitizedUpdateData.code },
         _id: { $ne: String(id) },
       });
 
       if (existing) {
-        throw new Error(`Another department with code '${updateData.code}' already exists.`);
+        throw new Error(`Another department with code '${sanitizedUpdateData.code}' already exists.`);
       }
     }
 
-    const updatedDepartment = await Department.findByIdAndUpdate(String(id), updateData, {
+    const updatedDepartment = await Department.findByIdAndUpdate(String(id), sanitizedUpdateData, {
       new: true,
       runValidators: true,
     }).lean();

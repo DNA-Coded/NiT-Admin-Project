@@ -1,5 +1,6 @@
+import crypto from 'crypto';
+
 // simulator.js
-const { randomInt } = require('crypto');
 const BASE_URL = 'http://localhost:5000/api/v1/events/ingest';
 const PROVIDER = 'SIMULATOR';
 const DEVICE_CODE = 'DEV-LIB-001';
@@ -11,15 +12,9 @@ const mockEmployees = ['0017', '0089', '0197', '0402', '0112', '0170', '0244', '
 // In-memory state tracker to toggle CHECK_IN vs CHECK_OUT per employee
 const employeeStates = {};
 
-import crypto from 'crypto';
-
-function secureRandom() {
-  return crypto.randomBytes(4).readUInt32LE(0) / 0x100000000;
-}
-
 function generateMockPayload() {
-  const isSuccess = secureRandom() > 0.1;
-  const userId = mockEmployees[Math.floor(secureRandom() * mockEmployees.length)];
+  const isSuccess = crypto.randomInt(0, 100) < 90;
+  const userId = mockEmployees[crypto.randomInt(0, mockEmployees.length)];
 
   // Determine punch type: alternate between CHECK_IN and CHECK_OUT
   const currentState = employeeStates[userId] || 'CHECK_OUT';

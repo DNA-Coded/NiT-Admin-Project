@@ -24,7 +24,8 @@ export const validateReportFilters = (req, res, next) => {
   const from = req.query.from ? String(req.query.from) : undefined;
   const to = req.query.to ? String(req.query.to) : undefined;
   const department = req.query.department ? String(req.query.department) : undefined;
-  const employee = req.query.employee ? String(req.query.employee) : undefined;
+  const targetId = req.query.employeeId || req.query.staffId || req.query.employee;
+  const targetIdStr = targetId ? String(targetId) : undefined;
   const device = req.query.device ? String(req.query.device) : undefined;
   const page = req.query.page;
   const limit = req.query.limit;
@@ -38,8 +39,8 @@ export const validateReportFilters = (req, res, next) => {
   const deptErr = validateObjectIdField(department, 'department');
   if (deptErr) errors.push({ field: 'department', message: deptErr });
 
-  const facErr = validateObjectIdField(employee, 'employee');
-  if (facErr) errors.push({ field: 'employee', message: facErr });
+  const targetErr = validateObjectIdField(targetIdStr, 'employeeId');
+  if (targetErr) errors.push({ field: 'employeeId', message: targetErr });
 
   const devErr = validateObjectIdField(device, 'device');
   if (devErr) errors.push({ field: 'device', message: devErr });
