@@ -1,4 +1,4 @@
-import { Employee } from '../types/attendance';
+import type { Employee } from '../types/attendance';
 
 export function parseRawEmployeeLine(line: string): Employee | null {
   const parts = line.split('|').map((p) => p.trim());
@@ -32,10 +32,11 @@ export function parseRawEmployeeLine(line: string): Employee | null {
     attendanceIdentity: `BIO_${numCode}`, // Standard identifier for biometric machines
     isActive: true,
     attendanceSummary: {
-      presentDays: 0,
-      absentDays: 0,
-      lateDays: 0,
-      leaveDays: 0,
+      presentToday: 0,
+      absentToday: 0,
+      lateArrivals: 0,
+      earlyDepartures: 0,
+      avgWorkingHours: '0h',
     },
   };
 }

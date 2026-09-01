@@ -13,6 +13,9 @@ const statusStyles: Record<AttendanceStatus, string> = {
   ABSENT: 'bg-danger-bg text-danger-text border-danger/20',
   HALF_DAY: 'bg-surface-container text-on-surface border-outline-variant/30',
   ON_LEAVE: 'bg-surface-container-low text-on-surface-variant border-outline-variant/20',
+  Present: 'bg-success-bg text-success-text border-success/20',
+  Late: 'bg-warning-bg text-warning-text border-warning/20',
+  Absent: 'bg-danger-bg text-danger-text border-danger/20',
 };
 
 const statusLabels: Record<AttendanceStatus, string> = {
@@ -21,6 +24,9 @@ const statusLabels: Record<AttendanceStatus, string> = {
   ABSENT: 'Absent',
   HALF_DAY: 'Half Day',
   ON_LEAVE: 'On Leave',
+  Present: 'Present',
+  Late: 'Late',
+  Absent: 'Absent',
 };
 
 export const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({ status, className }) => {

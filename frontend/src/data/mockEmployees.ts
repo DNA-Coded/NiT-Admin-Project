@@ -1,4 +1,4 @@
-import { Employee } from '../types/attendance';
+import type { Employee } from '../types/attendance';
 import { parseRawDataSet } from '../utils/employeeParser';
 
 const rawData = `

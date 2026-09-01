@@ -77,9 +77,9 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
   };
 
   const departmentName = 
-    employee.department && typeof employee.department === 'object'
-      ? employee.department.name
-      : employee.department || 'N/A';
+    typeof employee.department === 'object' && employee.department !== null
+      ? (employee.department as { name?: string }).name || 'N/A'
+      : (typeof employee.department === 'string' && employee.department ? employee.department : 'N/A');
 
   return (
     <tr 

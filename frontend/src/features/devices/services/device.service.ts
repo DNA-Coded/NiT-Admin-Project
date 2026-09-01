@@ -17,7 +17,7 @@ export const deviceService = {
       ...params // Allow incoming params to override if the user clicks a table header
     };
 
-    const response = await apiClient.get<{ data: DeviceListResponse }>(BASE_URL, { 
+    const response = await apiClient.get<DeviceListResponse>(BASE_URL, { 
       params: queryParams 
     });
     console.log(response);
@@ -25,22 +25,22 @@ export const deviceService = {
   },
 
   getDeviceById: async (id: string) => {
-    const response = await apiClient.get<{ data: DeviceDetailResponse }>(`${BASE_URL}/${id}`);
+    const response = await apiClient.get<DeviceDetailResponse>(`${BASE_URL}/${id}`);
     return response.data.data;
   },
 
   createDevice: async (data: CreateDeviceDTO) => {
-    const response = await apiClient.post<{ data: DeviceDetailResponse }>(BASE_URL, data);
+    const response = await apiClient.post<DeviceDetailResponse>(BASE_URL, data);
     return response.data.data;
   },
 
   updateDevice: async (id: string, data: UpdateDeviceDTO) => {
-    const response = await apiClient.put<{ data: DeviceDetailResponse }>(`${BASE_URL}/${id}`, data);
+    const response = await apiClient.put<DeviceDetailResponse>(`${BASE_URL}/${id}`, data);
     return response.data.data;
   },
 
   updateDeviceStatus: async (id: string, status: string) => {
-    const response = await apiClient.patch<{ data: DeviceDetailResponse }>(`${BASE_URL}/${id}/status`, { status });
+    const response = await apiClient.patch<DeviceDetailResponse>(`${BASE_URL}/${id}/status`, { status });
     return response.data.data;
   },
 
@@ -50,7 +50,7 @@ export const deviceService = {
   },
 
   restoreDevice: async (id: string) => {
-    const response = await apiClient.patch<{ data: DeviceDetailResponse }>(`${BASE_URL}/${id}/restore`);
+    const response = await apiClient.patch<DeviceDetailResponse>(`${BASE_URL}/${id}/restore`);
     return response.data.data;
   },
 };
