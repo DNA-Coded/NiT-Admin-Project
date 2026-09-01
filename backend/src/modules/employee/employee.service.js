@@ -3,6 +3,15 @@ import Employee from './employee.model.js';
 
 class EmployeeService {
   /**
+   * Escape user-provided text so it is treated as a literal in RegExp.
+   * @param {string} value
+   * @returns {string}
+   */
+  static escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  /**
    * Get paginated list of employee with full search, filtering, and sorting
    * @param {Object} options - Query parameters
    * @returns {Promise<Object>} Paginated result set with metadata
@@ -28,7 +37,9 @@ class EmployeeService {
 
     // Fuzzy text search across name, employee ID, identity, and email
     if (search && search.trim()) {
-      const searchRegex = new RegExp(search.trim(), 'i');
+      const trimmedSearch = search.trim();
+      const safeSearch = EmployeeService.escapeRegExp(trimmedSearch);
+      const searchRegex = new RegExp(safeSearch, 'i');
       filter.$or = [
         { firstName: searchRegex },
         { lastName: searchRegex },
