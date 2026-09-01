@@ -27,6 +27,10 @@ const makeError = (message, status) => {
 };
 
 const assertDeviceExists = async (deviceId) => {
+const escapePdfLiteralString = (value) => {
+  return String(value).replace(/[\\()]/g, (ch) => `\\${ch}`);
+};
+
   if (!deviceId) return;
   const device = await Device.findById(deviceId).select('isActive status').lean();
   if (!device) {
@@ -652,7 +656,7 @@ function generateLandscapePDFBuffer(headers, rows, title = 'Attendance Summary R
       Buffer.from('\nendstream\nendobj\n'),
     ]);
     objects.push(contentObj);
-  });
+      const cleanLine = escapePdfLiteralString(line);
 
   objects.push(Buffer.from(`${fontObjId} 0 obj\n<</Type /Font /Subtype /Type1 /BaseFont /Courier>>\nendobj\n`));
 
