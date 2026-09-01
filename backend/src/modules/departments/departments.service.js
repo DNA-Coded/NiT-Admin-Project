@@ -1,6 +1,8 @@
 import Department from './departments.model.js';
 import Employee from '../employee/employee.model.js';
 
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 class DepartmentService {
   /**
    * Get all departments with optional active filtering and employee counts
@@ -16,7 +18,8 @@ class DepartmentService {
     }
 
     if (search && search.trim()) {
-      const searchRegex = new RegExp(search.trim(), 'i');
+      const safeSearch = escapeRegExp(search.trim());
+      const searchRegex = new RegExp(safeSearch, 'i');
       filter.$or = [{ name: searchRegex }, { code: searchRegex }];
     }
 
