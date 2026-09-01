@@ -37,7 +37,7 @@ export const swaggerOptions = {
     tags: [
       { name: 'Authentication', description: 'Admin authentication and session endpoints' },
       { name: 'Departments', description: 'Master Data Management for Departments' },
-      { name: 'Faculty', description: 'Master Data Management for Faculty' },
+      { name: 'Employee', description: 'Master Data Management for Employee' },
 
       { name: 'Devices', description: 'Biometric Device Management and Status' },
       { name: 'Health', description: 'Device Health Monitoring' },

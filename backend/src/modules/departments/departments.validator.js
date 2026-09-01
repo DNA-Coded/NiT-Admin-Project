@@ -77,9 +77,13 @@ const validateCreateDepartmentFields = (req, res, next) => {
   }
 
   // description — optional
+  // description — optional, but must be valid if provided
   if (description !== undefined && description !== null) {
-    const descErr = validateStringField(description, 'Description', 1, 500);
-    if (descErr) errors.push({ field: 'description', message: descErr });
+    if (typeof description !== 'string') {
+      errors.push({ field: 'description', message: 'Description must be a valid string.' });
+    } else if (description.trim().length > 500) { // Or whatever your max character limit is
+      errors.push({ field: 'description', message: 'Description cannot exceed 500 characters.' });
+    }
   }
 
   req.validationErrors = errors;

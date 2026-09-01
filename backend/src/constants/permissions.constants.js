@@ -58,7 +58,7 @@ export const ROLE_PERMISSIONS = Object.freeze({
     PERMISSIONS.ATTENDANCE_READ,
     PERMISSIONS.REPORTS_READ,
   ],
-  faculty: [
+  employee: [
     PERMISSIONS.ATTENDANCE_READ,
   ],
 });

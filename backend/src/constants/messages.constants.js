@@ -49,22 +49,22 @@ export const MESSAGES = Object.freeze({
   DEPARTMENT_ALREADY_INACTIVE: 'Department is already inactive.',
   DEPARTMENT_NO_CHANGES:       'No fields were provided to update.',
 
-  // ─── Faculty ─────────────────────────────────────────────────────────────────
-  FACULTY_FETCH_LIST:   'Faculty records retrieved successfully.',
-  FACULTY_FETCH_DETAIL: 'Faculty record retrieved successfully.',
-  FACULTY_CREATED:      'Faculty record created successfully.',
-  FACULTY_UPDATED:      'Faculty record updated successfully.',
-  FACULTY_DELETED:      'Faculty record deactivated successfully.',
-  FACULTY_RESTORED:     'Faculty record restored successfully.',
-  FACULTY_NOT_FOUND:                 'Faculty record not found.',
-  FACULTY_EMPLOYEE_ID_TAKEN:         'A faculty member with this employee ID already exists.',
-  FACULTY_EMAIL_TAKEN:               'A faculty member with this email address already exists.',
-  FACULTY_ATTENDANCE_IDENTITY_TAKEN: 'This attendance identity is already registered to another faculty member.',
-  FACULTY_ALREADY_ACTIVE:            'Faculty record is already active.',
-  FACULTY_ALREADY_INACTIVE:          'Faculty record is already inactive.',
-  FACULTY_NO_CHANGES:                'No fields were provided to update.',
-  FACULTY_INVALID_DESIGNATION:       'Invalid designation. Please select from the allowed values.',
-  FACULTY_INVALID_STATUS:            'Invalid status. Allowed values are: ACTIVE, ON_LEAVE, RETIRED, SUSPENDED.',
+  // ─── Employee ─────────────────────────────────────────────────────────────────
+  EMPLOYEE_FETCH_LIST:   'Employee records retrieved successfully.',
+  EMPLOYEE_FETCH_DETAIL: 'Employee record retrieved successfully.',
+  EMPLOYEE_CREATED:      'Employee record created successfully.',
+  EMPLOYEE_UPDATED:      'Employee record updated successfully.',
+  EMPLOYEE_DELETED:      'Employee record deactivated successfully.',
+  EMPLOYEE_RESTORED:     'Employee record restored successfully.',
+  EMPLOYEE_NOT_FOUND:                 'Employee record not found.',
+  EMPLOYEE_EMPLOYEE_ID_TAKEN:         'A employee member with this employee ID already exists.',
+  EMPLOYEE_EMAIL_TAKEN:               'A employee member with this email address already exists.',
+  EMPLOYEE_ATTENDANCE_IDENTITY_TAKEN: 'This attendance identity is already registered to another employee member.',
+  EMPLOYEE_ALREADY_ACTIVE:            'Employee record is already active.',
+  EMPLOYEE_ALREADY_INACTIVE:          'Employee record is already inactive.',
+  EMPLOYEE_NO_CHANGES:                'No fields were provided to update.',
+  EMPLOYEE_INVALID_DESIGNATION:       'Invalid designation. Please select from the allowed values.',
+  EMPLOYEE_INVALID_STATUS:            'Invalid status. Allowed values are: ACTIVE, ON_LEAVE, RETIRED, SUSPENDED.',
 
 
 

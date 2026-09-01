@@ -1,6 +1,6 @@
 import Device from './device.model.js';
 import { buildUpdatePayload } from '../../utils/update.util.js';
-import Department from '../departments/departments.model.js';
+import {Department} from '../departments/departments.model.js';
 import { MESSAGES } from '../../constants/index.js';
 import {
   logDeviceListFetched,
@@ -20,6 +20,32 @@ import {
 } from './device.logger.js';
 import { activityService } from '../activity/activity.service.js';
 import { ACTIVITY_MODULES, ACTIVITY_ACTIONS, ACTIVITY_STATUS, ACTIVITY_SEVERITY } from '../../constants/index.js';
+
+// backend/src/module/devices/device.service.js
+import { DEVICE_STATUS } from '../../constants/device.constants.js';
+import { DEVICE_HEALTH_STATUS } from '../../integrations/health/health.constants.js';
+
+export const updateDeviceHeartbeat = async (id, payload, requestMeta) => {
+  const device = await Device.findById(id);
+  
+  if (!device) {
+    const error = new Error('Device not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Update real-time telemetry fields
+  device.lastHeartbeat = new Date();
+  device.lastSeen = new Date();
+  device.status = payload.status || DEVICE_STATUS.ONLINE;
+  device.healthStatus = DEVICE_HEALTH_STATUS.HEALTHY;
+  
+  // Reset failure count on successful heartbeat
+  device.failureCount = 0;
+
+  await device.save();
+  return device.toPublicJSON();
+};
 
 const makeError = (message, status) => {
   const err = new Error(message);
@@ -100,7 +126,7 @@ const toListItem = (doc) => {
     floor:               doc.floor,
     room:                doc.room,
     locationDescription: doc.locationDescription ?? null,
-    assignedDepartment:  assignedDepartmentField,
+    // assignedDepartment:  assignedDepartmentField,
     connectionMode:      doc.connectionMode ?? null,
     heartbeatInterval:   doc.heartbeatInterval ?? null,
     isAttendanceEnabled: doc.isAttendanceEnabled,
@@ -124,7 +150,8 @@ export const listDevices = async (query = {}, requestMeta = {}) => {
   const {
     page = 1, limit = 10, search = '',
     deviceCategory = null, status = null, building = null, floor = null,
-    assignedDepartment = null, connectionMode = null,
+    // assignedDepartment = null,
+    connectionMode = null,
     isAttendanceEnabled = 'all', isDefaultDevice = 'all',
     isActive = 'all', sortBy = 'createdAt', sortOrder = 'desc',
   } = query;
@@ -143,9 +170,9 @@ export const listDevices = async (query = {}, requestMeta = {}) => {
     filter.isDefaultDevice = isDefaultDevice === true || isDefaultDevice === 'true';
   }
 
-  if (assignedDepartment && mongoose.Types.ObjectId.isValid(assignedDepartment)) {
-    filter.assignedDepartment = new mongoose.Types.ObjectId(assignedDepartment);
-  }
+  // if (assignedDepartment && mongoose.Types.ObjectId.isValid(assignedDepartment)) {
+  //   filter.assignedDepartment = new mongoose.Types.ObjectId(assignedDepartment);
+  // }
 
   if (connectionMode && connectionMode.trim()) {
     filter.connectionMode = connectionMode.trim().toUpperCase();
@@ -186,7 +213,7 @@ export const listDevices = async (query = {}, requestMeta = {}) => {
   const [total, docs] = await Promise.all([
     Device.countDocuments(filter),
     Device.find(filter)
-      .populate('assignedDepartment', 'name code')
+      // .populate('assignedDepartment', 'name code')
       .sort(sort)
       .skip(skip)
       .limit(limitNum)
@@ -211,7 +238,8 @@ export const listDevices = async (query = {}, requestMeta = {}) => {
 };
 
 export const getDeviceById = async (id, requestMeta = {}) => {
-  const device = await Device.findById(id).populate('assignedDepartment', 'name code');
+  const device = await Device.findById(id)
+  // .populate('assignedDepartment', 'name code');
 
   if (!device) {
     logDeviceNotFound(id, requestMeta);
@@ -227,25 +255,27 @@ export const createDevice = async (data, adminEmail, requestMeta = {}) => {
     deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
     ipAddress, macAddress = null, port, campus = null, building, floor, room,
     locationDescription = null, firmwareVersion = null, status,
-    assignedDepartment = null, connectionMode = null, heartbeatInterval = null,
+    // assignedDepartment = null, 
+    connectionMode = null, heartbeatInterval = null,
     isAttendanceEnabled, isDefaultDevice,
   } = data;
 
-  await assertDepartmentExists(assignedDepartment, requestMeta);
+  // await assertDepartmentExists(assignedDepartment, requestMeta);
   await assertNoDuplicate({ deviceCode, serialNumber }, null, requestMeta);
 
   const device = await Device.create({
     deviceCode, deviceName, deviceCategory, supportedVerificationMethods, manufacturer, model, serialNumber,
     ipAddress, macAddress, port, campus, building, floor, room,
     locationDescription, firmwareVersion,
-    assignedDepartment, connectionMode, heartbeatInterval,
+    // assignedDepartment, 
+    connectionMode, heartbeatInterval,
     ...(isAttendanceEnabled !== undefined && { isAttendanceEnabled }),
     ...(isDefaultDevice !== undefined && { isDefaultDevice }),
     ...(status && { status }),
     createdBy: adminEmail,
   });
 
-  await device.populate('assignedDepartment', 'name code');
+  // await device.populate('assignedDepartment', 'name code');
 
   logDeviceCreated(
     { id: device._id, deviceCode: device.deviceCode, ipAddress: device.ipAddress },
@@ -272,7 +302,8 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
     'deviceCode', 'deviceName', 'deviceCategory', 'supportedVerificationMethods', 'manufacturer', 'model', 'serialNumber',
     'ipAddress', 'macAddress', 'port', 'campus', 'building', 'floor', 'room',
     'locationDescription', 'firmwareVersion', 'status',
-    'assignedDepartment', 'connectionMode', 'heartbeatInterval',
+    // 'assignedDepartment',
+    'connectionMode', 'heartbeatInterval',
     'isAttendanceEnabled', 'isDefaultDevice',
   ];
 
@@ -288,9 +319,9 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
     throw makeError(MESSAGES.DEVICE_NOT_FOUND, 404);
   }
 
-  if (updates.assignedDepartment !== undefined) {
-    await assertDepartmentExists(updates.assignedDepartment, requestMeta);
-  }
+  // if (updates.assignedDepartment !== undefined) {
+  //   await assertDepartmentExists(updates.assignedDepartment, requestMeta);
+  // }
 
   await assertNoDuplicate(
     {
@@ -302,11 +333,11 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
   );
 
   // Compare config changes for specific logs
-  const oldDept = device.assignedDepartment?.toString();
-  const newDept = updates.assignedDepartment?.toString();
-  if (newDept !== undefined && oldDept !== newDept) {
-    logDeviceAssignmentChanged({ id: device._id, deviceCode: device.deviceCode, oldDepartment: oldDept, newDepartment: newDept }, adminEmail, requestMeta);
-  }
+  // const oldDept = device.assignedDepartment?.toString();
+  // const newDept = updates.assignedDepartment?.toString();
+  // if (newDept !== undefined && oldDept !== newDept) {
+  //   logDeviceAssignmentChanged({ id: device._id, deviceCode: device.deviceCode, oldDepartment: oldDept, newDepartment: newDept }, adminEmail, requestMeta);
+  // }
 
   if ((updates.connectionMode !== undefined && updates.connectionMode !== device.connectionMode) ||
       (updates.heartbeatInterval !== undefined && updates.heartbeatInterval !== device.heartbeatInterval)) {
@@ -333,7 +364,7 @@ export const updateDevice = async (id, data, adminEmail, requestMeta = {}) => {
   device.updatedBy = adminEmail;
   await device.save();
 
-  await device.populate('assignedDepartment', 'name code');
+  // await device.populate('assignedDepartment', 'name code');
 
   logDeviceUpdated(
     { id: device._id, deviceCode: device.deviceCode, ipAddress: device.ipAddress },

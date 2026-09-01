@@ -8,7 +8,7 @@ import {
   DEVICE_SORT_FIELDS,
   DEVICE_SORT_ORDERS,
   DEVICE_PAGINATION,
-} from '../../constants/index.js';
+} from '../../constants/device.constants.js';
 
 const validateStringField = (value, fieldName, min, max) => {
   if (typeof value !== 'string' || value.trim() === '') {

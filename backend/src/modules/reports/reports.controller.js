@@ -37,20 +37,20 @@ export const getAttendanceReport = async (req, res, next) => {
   }
 };
 
-export const getFacultyReport = async (req, res, next) => {
+export const getEmployeeReport = async (req, res, next) => {
   try {
     const adminEmail = req.admin?.email;
     const requestMeta = buildRequestMeta(req);
     const filters = { ...req.query };
 
-    reportsLogger.logReportRequested(adminEmail, 'FACULTY', filters, requestMeta);
-    const report = await reportsService.getFacultyReport(filters);
-    reportsLogger.logReportGenerated(adminEmail, 'FACULTY', report.summary);
+    reportsLogger.logReportRequested(adminEmail, 'EMPLOYEE', filters, requestMeta);
+    const report = await reportsService.getEmployeeReport(filters);
+    reportsLogger.logReportGenerated(adminEmail, 'EMPLOYEE', report.summary);
 
     activityService.recordActivity({
       module: ACTIVITY_MODULES.REPORT,
       action: ACTIVITY_ACTIONS.REPORT,
-      description: `Generated Faculty report with ${report.summary.totalFaculty} records`,
+      description: `Generated Employee report with ${report.summary.totalEmployee} records`,
       metadata: { adminEmail, filters, summary: report.summary, ...requestMeta },
       status: ACTIVITY_STATUS.SUCCESS,
       severity: ACTIVITY_SEVERITY.LOW

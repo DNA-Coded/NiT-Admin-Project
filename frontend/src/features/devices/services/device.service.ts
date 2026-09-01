@@ -1,0 +1,56 @@
+import { apiClient } from '@/services/api/client';
+import type { 
+  DeviceListResponse, 
+  DeviceDetailResponse, 
+  CreateDeviceDTO, 
+  UpdateDeviceDTO,
+  GetDevicesParams
+} from '../types/device.api.types';
+
+const BASE_URL = '/devices';
+
+export const deviceService = {
+  getDevices: async (params: GetDevicesParams = {}) => {
+    const queryParams = {
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+      ...params // Allow incoming params to override if the user clicks a table header
+    };
+
+    const response = await apiClient.get<{ data: DeviceListResponse }>(BASE_URL, { 
+      params: queryParams 
+    });
+    console.log(response);
+    return response.data.data;
+  },
+
+  getDeviceById: async (id: string) => {
+    const response = await apiClient.get<{ data: DeviceDetailResponse }>(`${BASE_URL}/${id}`);
+    return response.data.data;
+  },
+
+  createDevice: async (data: CreateDeviceDTO) => {
+    const response = await apiClient.post<{ data: DeviceDetailResponse }>(BASE_URL, data);
+    return response.data.data;
+  },
+
+  updateDevice: async (id: string, data: UpdateDeviceDTO) => {
+    const response = await apiClient.put<{ data: DeviceDetailResponse }>(`${BASE_URL}/${id}`, data);
+    return response.data.data;
+  },
+
+  updateDeviceStatus: async (id: string, status: string) => {
+    const response = await apiClient.patch<{ data: DeviceDetailResponse }>(`${BASE_URL}/${id}/status`, { status });
+    return response.data.data;
+  },
+
+  deleteDevice: async (id: string) => {
+    const response = await apiClient.delete(`${BASE_URL}/${id}`);
+    return response.data;
+  },
+
+  restoreDevice: async (id: string) => {
+    const response = await apiClient.patch<{ data: DeviceDetailResponse }>(`${BASE_URL}/${id}/restore`);
+    return response.data.data;
+  },
+};

@@ -30,8 +30,8 @@ Handles all administrator authentication flows for the NiT Admin system. Provide
   fullName:   String,   required, 2–100 chars
   email:      String,   required, unique, indexed
   password:   String,   required, ≥8 chars, select: false (never returned)
-  role:       String,   enum: super_admin | admin | hod | faculty
-  department: String,   optional (required for hod/faculty)
+  role:       String,   enum: super_admin | admin | hod | employee
+  department: String,   optional (required for hod/employee)
   isActive:   Boolean,  default: true
   lastLogin:  Date,     default: null
   createdAt:  Date,     auto (timestamps)
@@ -46,7 +46,7 @@ Handles all administrator authentication flows for the NiT Admin system. Provide
 | `ROLES.SUPER_ADMIN` | `super_admin` | Full system access |
 | `ROLES.ADMIN` | `admin` | HR admin — employees, attendance, payroll |
 | `ROLES.HOD` | `hod` | Department-scoped read + attendance |
-| `ROLES.FACULTY` | `faculty` | Read-only attendance |
+| `ROLES.EMPLOYEE` | `employee` | Read-only attendance |
 
 ## Middleware Usage
 

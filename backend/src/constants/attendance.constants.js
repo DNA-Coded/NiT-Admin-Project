@@ -5,7 +5,9 @@
  */
 
 export const PERSON_TYPES = Object.freeze({
-  FACULTY: 'FACULTY',
+  EMPLOYEE: 'EMPLOYEE',
+  SECURITY: 'SECURITY',
+  HOSTEL: 'HOSTEL',
 });
 
 export const PERSON_TYPES_VALUES = Object.freeze(Object.values(PERSON_TYPES));

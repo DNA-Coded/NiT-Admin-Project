@@ -3,7 +3,7 @@ import { authenticate } from '../auth/auth.middleware.js';
 import { validateReportFilters } from './reports.validator.js';
 import {
   getAttendanceReport,
-  getFacultyReport,
+  getEmployeeReport,
 
   getDeviceReport,
   getSynchronizationReport,
@@ -26,17 +26,17 @@ const router = Router();
 router.get('/attendance', authenticate, validateReportFilters, getAttendanceReport);
 /**
  * @swagger
- * /reports/faculty:
+ * /reports/employee:
  *   get:
- *     summary: Generate faculty report
+ *     summary: Generate employee report
  *     tags: [Reports]
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Faculty report generated successfully
+ *         description: Employee report generated successfully
  */
-router.get('/faculty', authenticate, validateReportFilters, getFacultyReport);
+router.get('/employee', authenticate, validateReportFilters, getEmployeeReport);
 
 /**
  * @swagger

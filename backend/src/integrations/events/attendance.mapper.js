@@ -1,32 +1,62 @@
-/**
- * Attendance Mapper
- * 
- * Maps raw provider-specific logs into a standardized Event format
- * that the core Attendance Engine can understand.
- */
+import crypto from 'crypto';
+import { VERIFICATION_METHODS } from '../../constants/attendance.constants.js';
+import Employee from '../../modules/employee/employee.model.js';
 
-class AttendanceMapper {
-  
-  /**
-   * Map raw log from a specific provider to a standard event
-   * @param {Object} rawLog 
-   * @param {string} providerName 
-   * @param {Object} deviceContext 
-   * @returns {Object} Standardized event object
-   */
-  static mapRawToEvent(rawLog, providerName, deviceContext) {
-    // NOTE: Implement mapper routing based on providerName
-    // e.g. if (providerName === 'SecureEyeProvider') return this.mapSecureEye(rawLog, deviceContext);
-    
+export default class AttendanceMapper {
+  static async mapRawToEvent(rawLog, providerName, deviceContext) {
+    const rawVal = rawLog.userId || rawLog.empId || rawLog.UserId || rawLog.pin || '';
+    const paddedId = /^\d+$/.test(String(rawVal)) ? String(rawVal).padStart(4, '0') : String(rawVal);
+    const fullEmpId = paddedId.startsWith('NIT/') ? paddedId : `NIT/${paddedId}`;
+
+    // 🎯 Extract attendance type dynamically ('CHECK_IN' or 'CHECK_OUT')
+    const rawType = String(rawLog.attendanceType || rawLog.type || rawLog.punchType || 'CHECK_IN').toUpperCase();
+    const attendanceType = (rawType === 'CHECK_OUT' || rawType === 'OUT') ? 'CHECK_OUT' : 'CHECK_IN';
+
+    // Map verification method
+    const rawMode = String(rawLog.verifyMode || rawLog.verificationMethod || '').toUpperCase();
+    let verificationMethod = VERIFICATION_METHODS.FINGERPRINT;
+
+    if (rawMode.includes('FACE')) {
+      verificationMethod = VERIFICATION_METHODS.FACE_RECOGNITION;
+    } else if (rawMode.includes('HYBRID')) {
+      verificationMethod = VERIFICATION_METHODS.HYBRID;
+    } else if (rawMode.includes('MANUAL')) {
+      verificationMethod = VERIFICATION_METHODS.MANUAL;
+    }
+
+    const employee = await Employee.findOne({
+      $or: [
+        { attendanceIdentity: paddedId },
+        { attendanceIdentity: fullEmpId },
+        { empId: fullEmpId },
+        { employeeId: fullEmpId }
+      ],
+      isActive: true
+    })
+      .populate('department', 'name code')
+      .lean();
+
     return {
-      eventId: rawLog.id || `raw-${Date.now()}`,
-      deviceId: deviceContext.id,
-      userId: rawLog.userId || rawLog.empId,
-      timestamp: new Date(rawLog.timestamp || rawLog.time),
-      verificationMethod: rawLog.verifyMode, // Should be normalized to VERIFICATION_METHODS
-      raw: rawLog, // Store raw log for debugging/audit
+      // SECURITY FIX: Use crypto.randomBytes() instead of Math.random() for secure random ID generation
+      eventId: rawLog.id || `evt-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
+      deviceId: deviceContext?._id || deviceContext?.id || rawLog.deviceId || 'SECUREEYE_DEVICE_01',
+      provider: providerName || 'SIMULATOR',
+      attendanceIdentity: paddedId,
+      userId: paddedId,
+      empId: fullEmpId,
+      attendanceType, // 👈 Added dynamic attendance type!
+      employee: employee
+        ? {
+            id: employee._id,
+            employeeId: employee.empId || employee.employeeId,
+            fullName: `${employee.firstName} ${employee.lastName}`,
+            department: employee.department?.code || employee.deptCode || 'N/A',
+            designation: employee.rawDesignation || employee.designation,
+          }
+        : null,
+      timestamp: new Date(rawLog.timestamp || rawLog.time || Date.now()),
+      verificationMethod,
+      raw: rawLog,
     };
   }
 }
-
-export default AttendanceMapper;

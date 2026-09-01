@@ -22,7 +22,7 @@ const validateDateField = (value, fieldName) => {
 export const validateReportFilters = (req, res, next) => {
   const errors = [];
   const {
-    from, to, department, faculty, device,
+    from, to, department, employee, device,
     page, limit
   } = req.query;
 
@@ -35,8 +35,8 @@ export const validateReportFilters = (req, res, next) => {
   const deptErr = validateObjectIdField(department, 'department');
   if (deptErr) errors.push({ field: 'department', message: deptErr });
 
-  const facErr = validateObjectIdField(faculty, 'faculty');
-  if (facErr) errors.push({ field: 'faculty', message: facErr });
+  const facErr = validateObjectIdField(employee, 'employee');
+  if (facErr) errors.push({ field: 'employee', message: facErr });
 
   const devErr = validateObjectIdField(device, 'device');
   if (devErr) errors.push({ field: 'device', message: devErr });
