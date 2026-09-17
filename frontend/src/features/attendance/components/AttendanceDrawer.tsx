@@ -212,6 +212,18 @@ export const AttendanceDrawer: React.FC<AttendanceDrawerProps> = ({ record, onCl
                       <p className="text-[12px] text-on-surface-variant pl-6.5">
                         Synced via Integration Gateway.
                       </p>
+                      
+                      {record.verificationMethod && (
+                        <div className="mt-2 flex items-center gap-2 text-primary font-medium pl-6.5">
+                          <span className="material-symbols-outlined text-[16px]">
+                            {record.verificationMethod.includes('FACE') ? 'face' : 
+                             record.verificationMethod.includes('FINGER') ? 'fingerprint' : 
+                             record.verificationMethod.includes('CARD') ? 'badge' : 
+                             record.verificationMethod.includes('PASS') ? 'password' : 'check_circle'}
+                          </span>
+                          <span>Verified by: {record.verificationMethod.replace('_', ' ')}</span>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <div className="flex items-center gap-2 text-on-surface-variant italic">

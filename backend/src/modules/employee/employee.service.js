@@ -25,6 +25,7 @@ class EmployeeService {
       department = '',
       designation = '',
       status = '',
+      isActive = undefined,
       isHOD = undefined,
       sortBy = 'createdAt',
       sortOrder = 'desc',
@@ -45,6 +46,15 @@ class EmployeeService {
         { employeeId: searchRegex },
         { attendanceIdentity: searchRegex },
         { email: searchRegex },
+        {
+          $expr: {
+            $regexMatch: {
+              input: { $concat: ["$firstName", " ", "$lastName"] },
+              regex: escapeRegex(search.trim()),
+              options: "i"
+            }
+          }
+        }
       ];
     }
 
@@ -72,6 +82,11 @@ class EmployeeService {
     // Filter by HOD flag
     if (isHOD !== undefined && isHOD !== '') {
       filter.isHOD = isHOD === 'true' || isHOD === true;
+    }
+
+    // Filter by active/inactive flag (e.g., true for Active Only, false for Soft Deleted)
+    if (isActive !== undefined && isActive !== '') {
+      filter.isActive = isActive === 'true' || isActive === true;
     }
 
     const sortOptions = {

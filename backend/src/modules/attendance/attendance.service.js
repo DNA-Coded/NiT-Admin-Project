@@ -748,9 +748,17 @@ export const exportAttendanceCSV = async (query = {}) => {
   }
 
   // 3. CSV Export (UTF-8 BOM CSV Buffer)
+  const todayStr = new Date().toISOString().split('T')[0];
   const csvHeaders = headers.map((h) => `"${h}"`).join(',');
   const csvRows = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','));
-  const csvText = '\uFEFF' + [csvHeaders, ...csvRows].join('\n');
+  
+  const csvMetadata = [
+    `"Attendance Summary Report"`,
+    `"Generated on: ${todayStr}"`,
+    `""`
+  ].join('\n');
+
+  const csvText = '\uFEFF' + csvMetadata + '\n' + [csvHeaders, ...csvRows].join('\n');
 
   return {
     content: Buffer.from(csvText, 'utf-8'),

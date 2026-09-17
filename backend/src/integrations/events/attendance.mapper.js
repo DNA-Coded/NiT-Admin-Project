@@ -17,6 +17,10 @@ export default class AttendanceMapper {
 
     if (rawMode.includes('FACE')) {
       verificationMethod = VERIFICATION_METHODS.FACE_RECOGNITION;
+    } else if (rawMode.includes('CARD') || rawMode.includes('RFID')) {
+      verificationMethod = VERIFICATION_METHODS.RFID_CARD;
+    } else if (rawMode.includes('PIN') || rawMode.includes('PASS')) {
+      verificationMethod = VERIFICATION_METHODS.PASSWORD;
     } else if (rawMode.includes('HYBRID')) {
       verificationMethod = VERIFICATION_METHODS.HYBRID;
     } else if (rawMode.includes('MANUAL')) {

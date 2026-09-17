@@ -77,11 +77,31 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           >
             <option value="">All Designations</option>
             {designations.map((desig, index) => (
-              // ✅ Combine name and index to prevent duplicate key collisions
               <option key={`desig-${desig || index}`} value={desig}>
                 {desig}
               </option>
             ))}
+          </select>
+          <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">
+            arrow_drop_down
+          </span>
+        </div>
+      </div>
+
+      {/* HOD Status Dropdown */}
+      <div className="w-full md:w-auto min-w-[140px]">
+        <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1.5">
+          Role / HOD
+        </label>
+        <div className="relative">
+          <select
+            className="w-full appearance-none pl-3 pr-8 py-2 bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg font-body-sm text-body-sm text-on-surface outline-none transition-all cursor-pointer"
+            value={filters.isHOD || ''}
+            onChange={(e) => onFilterChange('isHOD', e.target.value)}
+          >
+            <option value="">All Roles</option>
+            <option value="true">HOD Only</option>
+            <option value="false">Non-HOD Only</option>
           </select>
           <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">
             arrow_drop_down

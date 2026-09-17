@@ -20,7 +20,6 @@ export const deviceService = {
     const response = await apiClient.get<DeviceListResponse>(BASE_URL, { 
       params: queryParams 
     });
-    console.log(response);
     return response.data.data;
   },
 

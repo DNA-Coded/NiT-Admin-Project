@@ -23,6 +23,7 @@ export default function Departments() {
     updateDepartment,
     removeDepartment,
     recoverDepartment,
+    changeHod,
     refetch,
   } = useDepartments();
 
@@ -212,6 +213,7 @@ export default function Departments() {
         onClose={() => setIsEditOpen(false)}
         department={selectedDept}
         onEdit={updateDepartment}
+        onChangeHod={changeHod}
       />
     </div>
   );

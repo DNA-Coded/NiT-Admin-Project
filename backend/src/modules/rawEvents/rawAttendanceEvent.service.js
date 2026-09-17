@@ -12,6 +12,7 @@ import {
   logDuplicateEvent,
   logProcessingFailed,
 } from './rawAttendanceEvent.logger.js';
+import { getIO } from '../../sockets/socket.js';
 import AttendanceMapper from '../../integrations/events/attendance.mapper.js';
 
 const makeError = (message, status) => {
@@ -139,6 +140,23 @@ class RawAttendanceEventService {
       };
       
       await createAttendance(attendanceData, adminEmail, { source: 'IntegrationPipeline' });
+
+      // Broadcast live event to socket for LiveMonitor
+      const io = getIO();
+      if (io) {
+        io.emit('device:event', {
+          deviceCode: device.deviceCode,
+          deviceName: device.deviceName,
+          building: device.building,
+          floor: device.floor,
+          userCode: matchedIdentity,
+          verificationMethod: attendanceData.verificationMethod,
+          eventType: attendanceData.attendanceType,
+          timestamp: attendanceData.timestamp.toISOString(),
+          employeeName: person.fullName || `${person.firstName || ''} ${person.lastName || ''}`.trim(),
+          department: person.department?.name || 'General',
+        });
+      }
 
       // 5. Mark Processed
       event.processingStatus = PROCESSING_STATUS.PROCESSED;

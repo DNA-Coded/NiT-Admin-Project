@@ -46,7 +46,7 @@ export default function Reports() {
   const handleQuickReportClick = async (title: string) => {
     try {
       await generateQuickReport(title);
-    } catch (err) {
+    } catch {
       // Error is handled in the hook, maybe display a toast if implemented
     }
   };

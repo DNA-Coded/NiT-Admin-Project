@@ -45,7 +45,22 @@ export const LiveAttendanceFeed: React.FC<LiveAttendanceFeedProps> = ({ data, vi
             <tbody className="divide-y divide-outline-variant font-body-sm text-body-sm">
               {data.map((event) => (
                 <tr key={event.id} className="hover:bg-surface-container-lowest transition-colors">
-                  <td className="px-6 py-3 font-medium text-on-background">{event.employeeName}</td>
+                  <td className="px-6 py-3 font-medium text-on-background">
+                    <div className="flex items-center gap-2">
+                      <span>{event.employeeName}</span>
+                      {event.verificationMethod && (
+                        <span 
+                          className="material-symbols-outlined text-[14px] text-primary/70"
+                          title={`Verified by ${event.verificationMethod.replace('_', ' ')}`}
+                        >
+                          {event.verificationMethod.includes('FACE') ? 'face' : 
+                           event.verificationMethod.includes('FINGER') ? 'fingerprint' : 
+                           event.verificationMethod.includes('CARD') ? 'badge' : 
+                           event.verificationMethod.includes('PASS') ? 'password' : 'check_circle'}
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-3 text-on-surface-variant">{event.department}</td>
                   <td className="px-6 py-3 text-on-surface-variant">{event.time}</td>
                   <td className="px-6 py-3 text-right">

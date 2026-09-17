@@ -33,7 +33,7 @@ export function DepartmentTable({ departments, onSelectDepartment }: DepartmentT
                 <tr 
                   key={dept.id} 
                   className="hover:bg-surface-container-low/50 cursor-pointer transition-colors duration-150"
-                  onClick={() => {console.log(dept), onSelectDepartment(dept)}}
+                  onClick={() => onSelectDepartment(dept)}
                 >
                   <td className="px-6 py-4 font-semibold text-primary">{dept.name}</td>
                   <td className="px-6 py-4">

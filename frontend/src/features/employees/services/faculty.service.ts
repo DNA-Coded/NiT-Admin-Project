@@ -21,6 +21,7 @@ export const facultyService = {
     designation?: string;
     status?: string;
     isActive?: string | boolean;
+    isHOD?: boolean | string;
   }): Promise<FacultyListResponse> {
 
     // 🛠️ Sanitize params to completely remove empty strings or undefined values
@@ -29,8 +30,6 @@ export const facultyService = {
           Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== '')
         )
       : {};
-
-      console.log('🚀 Outgoing API Params:', cleanedParams);
 
     const raw_response = await apiClient.get<FacultyListResponse>(BASE_URL, { 
       params: cleanedParams 

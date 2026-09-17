@@ -67,6 +67,7 @@ export function mapAttendanceDtoToRecord(dto: any): AttendanceRecord {
     breakSessions: [],
     notes: dto.remarks || undefined,
     attendanceType: dto.attendanceType,
+    verificationMethod: dto.verificationMethod,
     remarks: dto.remarks,
     correctionHistory: dto.correctionHistory,
   };

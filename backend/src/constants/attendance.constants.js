@@ -15,6 +15,8 @@ export const PERSON_TYPES_VALUES = Object.freeze(Object.values(PERSON_TYPES));
 export const VERIFICATION_METHODS = Object.freeze({
   FINGERPRINT:      'FINGERPRINT',
   FACE_RECOGNITION: 'FACE_RECOGNITION',
+  RFID_CARD:        'RFID_CARD',
+  PASSWORD:         'PASSWORD',
   HYBRID:           'HYBRID',
   MANUAL:           'MANUAL',
 });

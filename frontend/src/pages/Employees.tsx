@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import type { Employee } from '@/types/employees';
 import type { ViewState } from '@/components/shared/StatePlaceholder';
 import { FilterBar } from '@/features/employees/components/FilterBar';
@@ -8,6 +8,7 @@ import { AddEmployeeDialog } from '@/features/employees/components/AddEmployeeDi
 import { EditEmployeeDialog } from '@/features/employees/components/EditEmployeeDialog';
 import { useEmployees } from '@/features/employees/hooks/useEmployees';
 import { departmentsService } from '@/features/departments/services/departments.service';
+import { EMPLOYEE_DESIGNATIONS } from '@/constants/employee.constants';
 import { ExportMenu } from '@/components/shared/ExportMenu';
 import { useExport } from '@/features/exports/hooks/useExport';
 
@@ -60,14 +61,14 @@ export default function Employees() {
     }
   }, [employees, selectedEmployee]);
 
-  // Extract designations based on active dataset safely
-  const uniqueDesignations = useMemo(() => {
-    return Array.from(new Set(employees.map((emp) => emp.designation))).filter(Boolean).sort();
-  }, [employees]);
+  // Use centralized designations list to ensure dropdown is fully populated regardless of pagination
+  const uniqueDesignations = EMPLOYEE_DESIGNATIONS;
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
-    setPage(1); // Crucial: Reset to page 1 on filter modifications to avoid empty-page locks
+    if (key !== 'search') {
+      setPage(1); // Reset to page 1 on filter modifications to avoid empty-page locks
+    }
   };
 
   const handleReset = () => {

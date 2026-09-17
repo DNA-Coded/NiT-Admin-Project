@@ -1,33 +1,54 @@
 import { useState, useEffect } from 'react';
 import type { Department } from '@/types/departments';
+import { facultyService } from '@/features/employees/services/faculty.service';
+import type { FacultyDTO } from '@/features/employees/types/faculty.api.types';
 
 interface EditDepartmentDialogProps {
   isOpen: boolean;
   onClose: () => void;
   department: Department | null;
   onEdit: (id: string, dept: { name?: string; code?: string; description?: string }) => Promise<void>;
+  onChangeHod?: (deptId: string, newHodId: string | null, oldHodId: string | null) => Promise<void>;
 }
 
-export function EditDepartmentDialog({ isOpen, onClose, department, onEdit }: EditDepartmentDialogProps) {
+export function EditDepartmentDialog({ isOpen, onClose, department, onEdit, onChangeHod }: EditDepartmentDialogProps) {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
-  const [hodName, setHodName] = useState(''); // Kept for UI
+  const [hodId, setHodId] = useState<string>(''); 
+  const [initialHodId, setInitialHodId] = useState<string>('');
   const [location, setLocation] = useState(''); // Kept for UI
   const [description, setDescription] = useState('');
+  
+  const [departmentEmployees, setDepartmentEmployees] = useState<FacultyDTO[]>([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (department) {
+    if (department && isOpen) {
       setName(department.name);
       setCode(department.code);
-      setHodName(department.hodName || '');
       setLocation(department.officeLocation || '');
       setDescription(department.description || '');
       setError(null);
+      
+      // Fetch employees for this department to populate HOD dropdown
+      facultyService.getAllFaculty({ department: department.id, limit: 200, isActive: true })
+        .then(res => {
+          const faculty = res.data.faculty || [];
+          setDepartmentEmployees(faculty);
+          const currentHod = faculty.find(emp => emp.isHOD);
+          if (currentHod) {
+            setHodId(currentHod.id);
+            setInitialHodId(currentHod.id);
+          } else {
+            setHodId('');
+            setInitialHodId('');
+          }
+        })
+        .catch(err => console.error('Failed to load department employees for HOD dropdown', err));
     }
-  }, [department]);
+  }, [department, isOpen]);
 
   if (!isOpen || !department) return null;
 
@@ -44,6 +65,12 @@ export function EditDepartmentDialog({ isOpen, onClose, department, onEdit }: Ed
         code,
         description,
       });
+      
+      // Handle HOD change if modified
+      if (onChangeHod && hodId !== initialHodId) {
+        await onChangeHod(department.id, hodId || null, initialHodId || null);
+      }
+      
       onClose();
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Failed to update department');
@@ -121,14 +148,22 @@ export function EditDepartmentDialog({ isOpen, onClose, department, onEdit }: Ed
               <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1.5 font-medium">
                 Head of Department (HOD)
               </label>
-              <input 
-                type="text" 
-                disabled={isSubmitting}
-                value={hodName}
-                onChange={(e) => setHodName(e.target.value)}
+              <select
+                disabled={isSubmitting || departmentEmployees.length === 0}
+                value={hodId}
+                onChange={(e) => setHodId(e.target.value)}
                 className="w-full px-3.5 py-2 border border-outline-variant rounded bg-surface-container-lowest focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-body-sm text-body-sm transition-all disabled:opacity-50"
-                placeholder="e.g. Dr. Soumen Mukherjee"
-              />
+              >
+                <option value="">-- No HOD Assigned --</option>
+                {departmentEmployees.map(emp => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.fullName || `${emp.firstName} ${emp.lastName}`} ({emp.designation})
+                  </option>
+                ))}
+              </select>
+              {departmentEmployees.length === 0 && (
+                <p className="text-xs text-on-surface-variant mt-1">Loading employees...</p>
+              )}
             </div>
           </div>
 

@@ -14,6 +14,7 @@ export interface LiveAttendanceEvent {
   department: string;
   time: string;
   event: 'IN' | 'OUT';
+  verificationMethod?: string;
 }
 
 export interface DepartmentSummary {

@@ -46,6 +46,7 @@ export const mapLiveAttendance = (rawItems: any): LiveAttendanceEvent[] => {
       department: item.department || item.personType || 'UNASSIGNED',
       time: item.time || (item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()),
       event: item.event || item.attendanceType || 'CHECK_IN',
+      verificationMethod: item.verificationMethod,
     };
   });
 };

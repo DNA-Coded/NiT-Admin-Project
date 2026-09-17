@@ -40,7 +40,20 @@ export const AttendanceRow: React.FC<AttendanceRowProps> = ({ record, onSelect }
 
       {/* First In */}
       <td className="py-3 px-4 font-medium text-primary whitespace-nowrap">
-        {record.firstIn || '--'}
+        <div className="flex items-center gap-2">
+          <span>{record.firstIn || '--'}</span>
+          {record.verificationMethod && record.firstIn && record.firstIn !== '--' && (
+            <span 
+              className="material-symbols-outlined text-[14px] text-on-surface-variant/70"
+              title={`Verified by ${record.verificationMethod.replace('_', ' ')}`}
+            >
+              {record.verificationMethod.includes('FACE') ? 'face' : 
+               record.verificationMethod.includes('FINGER') ? 'fingerprint' : 
+               record.verificationMethod.includes('CARD') ? 'badge' : 
+               record.verificationMethod.includes('PASS') ? 'password' : 'check_circle'}
+            </span>
+          )}
+        </div>
       </td>
 
       {/* Last Out */}

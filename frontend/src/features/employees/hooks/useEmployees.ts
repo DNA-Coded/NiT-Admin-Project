@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { facultyService } from '../services/faculty.service';
 import { mapFacultyList } from '../utils/employeeMappers';
 import type { Employee, FilterState } from '@/types/employees';
@@ -20,6 +20,7 @@ export function useEmployees() {
     employmentType: '',
     status: '',
     isActive: '',
+    isHOD: '',
   });
 
   // 1. Create a specific debounced value just for the search string
@@ -27,7 +28,12 @@ export function useEmployees() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setDebouncedSearch(filters.search);
+      setDebouncedSearch((prev) => {
+        if (prev !== filters.search) {
+          setPage(1); // Reset page only when search actually changes
+        }
+        return filters.search;
+      });
     }, 400);
     return () => clearTimeout(timeoutId);
   }, [filters.search]);
@@ -55,6 +61,7 @@ export function useEmployees() {
         designation: cleanFilter(filters.designation),   
         status: cleanFilter(filters.status),             
         isActive: cleanFilter(filters.isActive),
+        isHOD: cleanFilter(filters.isHOD),
       });
 
       const rawList = Array.isArray(response.data) 
@@ -71,17 +78,9 @@ export function useEmployees() {
     } finally {
       setLoading(false);
     }
-  }, [page, debouncedSearch, filters.department, filters.designation, filters.status, filters.isActive]);
+  }, [page, debouncedSearch, filters.department, filters.designation, filters.status, filters.isActive, filters.isHOD]);
 
-  // 3. Reset to page 1 ONLY when filters change (ignoring page changes)
-  const isFirstRender = useRef(true);
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    setPage(1);
-  }, [debouncedSearch, filters.department, filters.designation, filters.status, filters.isActive]);
+  // 3. (Removed redundant isFirstRender page reset effect. Handled by FilterBar and debounce safely)
 
   // 4. Trigger fetch automatically when dependencies change
   useEffect(() => {

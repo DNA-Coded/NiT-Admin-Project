@@ -2,7 +2,8 @@
 import type { Department } from '@/types/departments';
 import type { DepartmentDTO } from '../types/departments.api.types';
 
-export const mapDepartment = (dto: DepartmentDTO): Department => {
+
+export const mapDepartment = (dto: DepartmentDTO, hodMap?: Record<string, string>): Department => {
   if (!dto) return {} as Department;
 
   // Handle MongoDB raw `_id` vs Mongoose virtual `id`
@@ -12,8 +13,8 @@ export const mapDepartment = (dto: DepartmentDTO): Department => {
     id,
     name: dto.name || '',
     code: dto.code || '',
-    hodName: (dto as any).hodName ?? 'Not Assigned', // Fallback until aggregated
-    staffCount: (dto as any).staffCount ?? 0,
+    hodName: (dto as any).hodName || (hodMap ? hodMap[id] : 'Not Assigned') || 'Not Assigned',
+    staffCount: (dto as any).activeEmployeeCount ?? (dto as any).staffCount ?? 0,
     deviceCount: (dto as any).deviceCount ?? 0,
     attendanceRate: (dto as any).attendanceRate ?? 0,
     isActive: dto.isActive ?? true,
@@ -25,9 +26,9 @@ export const mapDepartment = (dto: DepartmentDTO): Department => {
  * Defensive array mapper.
  * Returns [] if input is null, undefined, or not an array.
  */
-export const mapDepartmentsList = (dtos?: DepartmentDTO[] | null): Department[] => {
+export const mapDepartmentsList = (dtos?: DepartmentDTO[] | null, hodMap?: Record<string, string>): Department[] => {
   if (!Array.isArray(dtos)) {
     return [];
   }
-  return dtos.map(mapDepartment);
+  return dtos.map((dto) => mapDepartment(dto, hodMap));
 };

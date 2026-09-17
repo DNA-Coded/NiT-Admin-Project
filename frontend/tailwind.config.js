@@ -12,7 +12,6 @@ export default {
         "tertiary": "#393f45",
         "on-error": "#ffffff",
         "on-secondary-fixed": "#0b1c30",
-        "surface-container": "#e7eeff",
         "primary": "#263b74",
         "surface-container-high": "#dee8ff",
         "tertiary-fixed": "#dde3eb",

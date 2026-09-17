@@ -1,5 +1,6 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { departmentsService } from '../services/departments.service';
+import { facultyService } from '@/features/employees/services/faculty.service';
 import { mapDepartmentsList } from '../utils/departmentMappers';
 import type { Department } from '@/types/departments';
 import type { PaginationMeta } from '../types/departments.api.types';
@@ -10,57 +11,65 @@ export function useDepartments(initialSearch = '', initialPage = 1, limit = 10) 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [page, setPage] = useState(initialPage);
   const [isMutating, setIsMutating] = useState(false);
 
-  const isInitialMount = useRef(true);
-
-  const fetchDepartments = useCallback(async (searchVal = searchQuery, pageVal = page) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await departmentsService.getDepartments({
-        page: pageVal,
-        limit,
-        search: searchVal,
-      });
-      setDepartments(mapDepartmentsList(response.departments));
-      setMeta(response.pagination);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch departments');
-    } finally {
-      setLoading(false);
-    }
-  }, [limit]);
-
-  // Handle Search Input Debounce without cyclical updates
+  // Debounce search query and reset to page 1
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      fetchDepartments(searchQuery, page);
-      return;
-    }
-
     const timer = setTimeout(() => {
-      setPage(1); 
-      fetchDepartments(searchQuery, 1);
+      setDebouncedSearch(searchQuery);
+      setPage(1);
     }, 400);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Separate effect handler for pure page pagination switches
-  useEffect(() => {
-    if (!isInitialMount.current) {
-      fetchDepartments(searchQuery, page);
+  const fetchDepartments = useCallback(async (searchVal = debouncedSearch, pageVal = page) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [deptResponse, hodResponse] = await Promise.all([
+        departmentsService.getDepartments({
+          page: pageVal,
+          limit,
+          search: searchVal,
+        }),
+        facultyService.getAllFaculty({ isHOD: true, limit: 100 })
+      ]);
+
+      const hodMap: Record<string, string> = {};
+      // Backend returns { success, data: [...employees], pagination }
+      // facultyService.getAllFaculty returns the .data payload already (via raw_response.data)
+      // So hodResponse = { success, data: [...], pagination }
+      const rawData = hodResponse?.data;
+      const facultyList = Array.isArray(rawData) ? rawData : (rawData as any)?.faculty || [];
+      facultyList.forEach((hod: any) => {
+        const deptId = typeof hod.department === 'object' && hod.department !== null 
+          ? (hod.department.id || hod.department._id)
+          : String(hod.department);
+          
+        hodMap[deptId] = (hod.fullName || `${hod.firstName} ${hod.lastName}`).trim();
+      });
+
+      setDepartments(mapDepartmentsList(deptResponse.departments, hodMap));
+      setMeta(deptResponse.pagination);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to fetch departments');
+    } finally {
+      setLoading(false);
     }
-  }, [page]);
+  }, [limit, debouncedSearch, page]);
+
+  useEffect(() => {
+    fetchDepartments(debouncedSearch, page);
+  }, [debouncedSearch, page, fetchDepartments]);
 
   const createDepartment = async (data: { name: string; code: string; description?: string }) => {
     setIsMutating(true);
     try {
       await departmentsService.createDepartment(data);
-      await fetchDepartments(searchQuery, page);
+      await fetchDepartments(debouncedSearch, page);
     } finally {
       setIsMutating(false);
     }
@@ -70,7 +79,7 @@ export function useDepartments(initialSearch = '', initialPage = 1, limit = 10) 
     setIsMutating(true);
     try {
       await departmentsService.updateDepartment(id, data);
-      await fetchDepartments(searchQuery, page);
+      await fetchDepartments(debouncedSearch, page);
     } finally {
       setIsMutating(false);
     }
@@ -80,7 +89,7 @@ export function useDepartments(initialSearch = '', initialPage = 1, limit = 10) 
     setIsMutating(true);
     try {
       await departmentsService.deleteDepartment(id);
-      await fetchDepartments(searchQuery, page);
+      await fetchDepartments(debouncedSearch, page);
     } finally {
       setIsMutating(false);
     }
@@ -90,7 +99,25 @@ export function useDepartments(initialSearch = '', initialPage = 1, limit = 10) 
     setIsMutating(true);
     try {
       await departmentsService.restoreDepartment(id);
-      await fetchDepartments(searchQuery, page);
+      await fetchDepartments(debouncedSearch, page);
+    } finally {
+      setIsMutating(false);
+    }
+  };
+
+  const changeHod = async (_departmentId: string, newHodId: string | null, oldHodId: string | null) => {
+    setIsMutating(true);
+    try {
+      if (oldHodId) {
+        await facultyService.updateFaculty(oldHodId, { isHOD: false });
+      }
+      if (newHodId) {
+        await facultyService.updateFaculty(newHodId, { isHOD: true });
+      }
+      await fetchDepartments(debouncedSearch, page);
+    } catch (err: any) {
+      console.error('Failed to change HOD:', err);
+      throw err;
     } finally {
       setIsMutating(false);
     }
@@ -110,6 +137,7 @@ export function useDepartments(initialSearch = '', initialPage = 1, limit = 10) 
     updateDepartment,
     removeDepartment,
     recoverDepartment,
-    refetch: () => fetchDepartments(searchQuery, page),
+    changeHod,
+    refetch: () => fetchDepartments(debouncedSearch, page),
   };
 }

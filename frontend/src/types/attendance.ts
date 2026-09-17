@@ -84,5 +84,6 @@ export interface AttendanceRecord {
   attendanceType?: 'IN' | 'OUT' | 'CHECK_IN' | 'CHECK_OUT';
   remarks?: string | null;
   attendanceCode?: string;
+  verificationMethod?: string;
   correctionHistory?: any[];
 }
