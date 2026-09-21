@@ -5,5 +5,9 @@
     "build": "npm --prefix frontend run build",
     "dev": "npm --prefix frontend run dev",
     "lint": "npm --prefix frontend run lint"
+  },
+  "dependencies": {
+    "msnodesqlv8": "^5.5.0",
+    "mssql": "^12.7.2"
   }
 }

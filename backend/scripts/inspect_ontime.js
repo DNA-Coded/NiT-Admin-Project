@@ -25,6 +25,7 @@ async function runQueries() {
           Card_Number,
           Punch_RawDate,
           Att_PunchRecDate,
+          Att_PunchDownDate,
           Dev_Id,
           dev_sno,
           Dev_Verify,
