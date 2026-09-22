@@ -50,7 +50,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8">
-        <h2 className="text-2xl font-semibold text-center mb-6">Sign in to NiT Admin</h2>
+        <h2 className="text-2xl font-semibold text-center mb-6">Sign in to HR Admin</h2>
         
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded text-sm text-center">

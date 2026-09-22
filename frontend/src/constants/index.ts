@@ -45,7 +45,7 @@ export const DEPARTMENTS = [
 ] as const;
 
 export const APP_INFO = {
-  name: 'NiT Admin',
+  name: 'HR Admin',
   organization: 'Narula Institute of Technology',
   version: '1.0.0',
 } as const;

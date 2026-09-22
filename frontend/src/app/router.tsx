@@ -34,7 +34,7 @@ function SuspenseWrapper({ children }: { children: React.ReactNode }) {
             <div className="flex flex-col items-center gap-3">
               <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
               <div className="text-center">
-                <p className="font-label-md text-label-md font-semibold text-primary">Loading NiT Admin</p>
+                <p className="font-label-md text-label-md font-semibold text-primary">Loading HR Admin</p>
                 <p className="font-body-xs text-body-xs text-on-surface-variant/70 mt-0.5">Preparing dashboard module...</p>
               </div>
             </div>

@@ -38,7 +38,7 @@ export function AdminLayout() {
               <img src="/logo.png" alt="NiT Logo" className="object-contain w-full h-full" />
             </div>
             <div className="overflow-hidden">
-              <h1 className="text-headline-lg font-headline-lg font-bold text-white leading-tight truncate">NiT Admin</h1>
+              <h1 className="text-headline-lg font-headline-lg font-bold text-white leading-tight truncate">HR Admin</h1>
               <p className="font-label-sm text-label-sm text-white/70 whitespace-nowrap truncate">Academic Administration</p>
             </div>
           </div>
@@ -76,7 +76,7 @@ export function AdminLayout() {
             <img src="/logo.png" alt="NiT Logo" className="object-contain w-full h-full" />
           </div>
           <div className="overflow-hidden">
-            <h1 className="text-headline-lg font-headline-lg font-bold text-white leading-tight truncate">NiT Admin</h1>
+            <h1 className="text-headline-lg font-headline-lg font-bold text-white leading-tight truncate">HR Admin</h1>
             <p className="font-label-sm text-label-sm text-white/70 whitespace-nowrap truncate">Academic Administration</p>
           </div>
         </div>
@@ -111,7 +111,7 @@ export function AdminLayout() {
               <span className="material-symbols-outlined">menu</span>
             </button>
             <div className="font-headline-md text-headline-md font-bold text-primary hidden md:block">
-              NiT Admin Dashboard
+              HR Admin Dashboard
             </div>
           </div>
           <div className="flex items-center gap-4">

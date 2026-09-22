@@ -19,7 +19,7 @@ export default function ErrorPage() {
           <div className="w-10 h-10 bg-white rounded-lg p-1 flex items-center justify-center shadow-sm border border-outline-variant">
             <img src="/logo.png" alt="NiT Logo" className="object-contain w-full h-full" />
           </div>
-          <span className="font-headline-md text-headline-md font-bold text-primary">NiT Admin</span>
+          <span className="font-headline-md text-headline-md font-bold text-primary">HR Admin</span>
         </div>
 
         {/* Error Illustration / Icon */}
